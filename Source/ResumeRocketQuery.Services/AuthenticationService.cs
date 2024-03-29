@@ -58,7 +58,7 @@ namespace ResumeRocketQuery.Services
         public string CreateJsonWebToken(Account account)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_resumeRocketQueryConfigurationSettings.AuthenticationPrivateKey);
+            var key = Encoding.UTF8.GetBytes(_resumeRocketQueryConfigurationSettings.AuthenticationPrivateKey);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
