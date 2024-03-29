@@ -16,6 +16,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Options;
+using System.IO;
+using System.Reflection;
+using System;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
@@ -51,6 +55,7 @@ namespace ResumeRocketQuery.Api.Configuration
 
             services.AddControllers();
 
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("ResumeRocketQuery", new OpenApiInfo
@@ -59,7 +64,12 @@ namespace ResumeRocketQuery.Api.Configuration
                     Version = "1",
                     Description = "Restful Api for ResumeRocketQuery Service."
                 });
+
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
+
+
         }
 
         private void ConfigureJwtAuthentication(IServiceCollection services)

@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace ResumeRocketQuery.Api.Controllers
 {
     [AllowAnonymous]
-    [ApiController]
     [Route("api")]
     public class AuthenticationController : ControllerBase
     {
@@ -47,6 +46,7 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost]
         [Route("account")]
         public async Task<ServiceResponse<AuthenticationResponseBody>> Post([FromBody] AccountRequestBody authenticationRequestBody)
         {

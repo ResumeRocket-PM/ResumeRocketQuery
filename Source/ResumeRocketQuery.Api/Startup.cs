@@ -15,17 +15,18 @@ namespace ResumeRocketQuery.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
-
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/ResumeRocketQuery/swagger.json", "ResumeRocketQuery");
+                c.RoutePrefix = string.Empty;
+                
             });
 
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             app.UseCors(x => x

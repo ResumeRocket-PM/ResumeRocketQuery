@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace ResumeRocketQuery.Api.Controllers
 {
     [Authorize]
-    [ApiController]
     [Route("api/account")]
     public class AccountController : ControllerBase
     {
