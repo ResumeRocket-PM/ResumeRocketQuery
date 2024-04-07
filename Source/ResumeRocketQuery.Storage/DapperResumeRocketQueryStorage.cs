@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Dapper;
+using MySqlConnector;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
 
@@ -18,7 +19,7 @@ namespace ResumeRocketQuery.Storage
 
         public async Task<int> InsertAccountStorageAsync(AccountStorage accountStorage)
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.ExecuteScalarAsync<int>(
                     StorageConstants.StoredProcedures.InsertAccount,
