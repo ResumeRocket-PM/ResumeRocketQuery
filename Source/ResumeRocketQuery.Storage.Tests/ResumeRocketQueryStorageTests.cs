@@ -15,6 +15,7 @@ namespace ResumeRocketQuery.Storage.Tests
         private IResumeRocketQueryStorage GetSystemUnderTest(Type storageType)
         {
             var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+
             var config = serviceProvider.GetService<IResumeRocketQueryConfigurationSettings>();
 
             IResumeRocketQueryStorage systemUnderTest;

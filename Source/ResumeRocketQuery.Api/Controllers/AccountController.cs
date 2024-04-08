@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
+    /// <summary>
+    /// This is a controller that handles the creation and modification of accounts.
+    /// </summary>
     [Authorize]
     [Route("api/account")]
     public class AccountController : ControllerBase
@@ -26,6 +29,10 @@ namespace ResumeRocketQuery.Api.Controllers
             _accountService = accountService;
         }
 
+        /// <summary>
+        /// This retrieves the User details
+        /// </summary>
+        /// <returns>A User Object.</returns>
         [HttpGet]
         [Route("details")]
         public async Task<ServiceResponse<AccountResponseBody>> Get()

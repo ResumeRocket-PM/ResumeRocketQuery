@@ -28,7 +28,7 @@ namespace ResumeRocketQuery.Storage
                         AccountAlias = accountStorage.AccountAlias,
                         AccountConfiguration = accountStorage.AccountConfiguration
                     },
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.Text);
 
                 return result;
             }
@@ -36,7 +36,7 @@ namespace ResumeRocketQuery.Storage
 
         public async Task<AccountStorage> SelectAccountStorageAsync(int accountId)
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.QueryFirstOrDefaultAsync<AccountStorage>(
                     StorageConstants.StoredProcedures.SelectAccount,
@@ -44,7 +44,7 @@ namespace ResumeRocketQuery.Storage
                     {
                         AccountID = accountId
                     },
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.Text);
 
                 return result;
             }
@@ -52,7 +52,7 @@ namespace ResumeRocketQuery.Storage
 
         public async Task<int> InsertEmailAddressStorageAsync(EmailAddressStorage emailAddressStorage)
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.ExecuteScalarAsync<int>(
                     StorageConstants.StoredProcedures.InsertEmailAddress,
@@ -61,7 +61,7 @@ namespace ResumeRocketQuery.Storage
                         EmailAddress = emailAddressStorage.EmailAddress,
                         AccountID = emailAddressStorage.AccountId
                     },
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.Text);
 
                 return result;
             }
@@ -69,7 +69,7 @@ namespace ResumeRocketQuery.Storage
 
         public async Task<EmailAddressStorage> SelectEmailAddressStorageByEmailAddressAsync(string emailAddress)
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.QueryFirstOrDefaultAsync<EmailAddressStorage>(
                     StorageConstants.StoredProcedures.SelectEmailAddressByEmailAddress,
@@ -77,7 +77,7 @@ namespace ResumeRocketQuery.Storage
                     {
                         EmailAddress = emailAddress
                     },
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.Text);
 
                 return result;
             }
@@ -85,7 +85,7 @@ namespace ResumeRocketQuery.Storage
 
         public async Task<EmailAddressStorage> SelectEmailAddressStorageAsync(int emailAddressId)
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.QueryFirstOrDefaultAsync<EmailAddressStorage>(
                     StorageConstants.StoredProcedures.SelectEmailAddress,
@@ -93,7 +93,7 @@ namespace ResumeRocketQuery.Storage
                     {
                         EmailAddressID = emailAddressId
                     },
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.Text);
 
                 return result;
             }
@@ -101,7 +101,7 @@ namespace ResumeRocketQuery.Storage
 
         public async Task<EmailAddressStorage> SelectEmailAddressStorageByAccountIdAsync(int accountId)
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.QueryFirstOrDefaultAsync<EmailAddressStorage>(
                     StorageConstants.StoredProcedures.SelectEmailAddressByAccountId,
@@ -109,7 +109,7 @@ namespace ResumeRocketQuery.Storage
                     {
                         AccountID = accountId
                     },
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.Text);
 
                 return result;
             }
