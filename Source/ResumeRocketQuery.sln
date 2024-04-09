@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.Api", "ResumeRocketQuery.Api\ResumeRocketQuery.Api.csproj", "{19D0D907-B030-4408-93D7-85A9220CCBF0}"
 EndProject
@@ -21,7 +20,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.Storage.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.Tests", "ResumeRocketQuery.Tests\ResumeRocketQuery.Tests.csproj", "{42370ED0-1450-4F4E-A670-1E3102523C9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.Repository.Tests", "ResumeRocketQuery.Repository.Tests\ResumeRocketQuery.Repository.Tests.csproj", "{35BDA412-57DC-4B08-9B77-537E576AFA48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.Repository.Tests", "ResumeRocketQuery.Repository.Tests\ResumeRocketQuery.Repository.Tests.csproj", "{35BDA412-57DC-4B08-9B77-537E576AFA48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.External", "ResumeRocketQuery.External\ResumeRocketQuery.External.csproj", "{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.External.Tests", "ResumeRocketQuery.External.Tests\ResumeRocketQuery.External.Tests.csproj", "{DED01952-5146-4ABB-A5EE-1902153AC20B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +72,14 @@ Global
 		{35BDA412-57DC-4B08-9B77-537E576AFA48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35BDA412-57DC-4B08-9B77-537E576AFA48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35BDA412-57DC-4B08-9B77-537E576AFA48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
