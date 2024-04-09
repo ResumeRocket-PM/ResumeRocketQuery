@@ -6,37 +6,27 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using ResumeRocketQuery.Domain.External;
 
 namespace ResumeRocketQuery.Repository.Tests
 {
-    public class ResumeRocketQueryRepositoryTests
+    public class OpenAiClientTests
     {
-        private IResumeRocketQueryRepository _systemUnderTest;
+        private IOpenAiClient _systemUnderTest;
 
-        public ResumeRocketQueryRepositoryTests()
+        public OpenAiClientTests()
         {
             var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
 
-            _systemUnderTest = serviceProvider.GetService<FILL_THIS_IN>();
+            _systemUnderTest = serviceProvider.GetService<IOpenAiClient>();
         }
 
-        public class CreateAccountAsync : ResumeRocketQueryRepositoryTests
+        public class CreateAccountAsync : OpenAiClientTests
         {
             [Fact]
             public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_stored()
             {
-                var accountId = await _systemUnderTest.CreateAccountAsync(new Account
-                {
-                    AccountAlias = Guid.NewGuid().ToString(),
-                    EmailAddress = $"{Guid.NewGuid().ToString()}@email.com",
-                    Authentication = new Authentication
-                    {
-                        Salt = Guid.NewGuid().ToString(),
-                        HashedPassword = Guid.NewGuid().ToString()
-                    }
-                });
-
-                Assert.True(accountId > 0);
+                await _systemUnderTest.SendMessageAsync("help me please");
             }
         }
     }

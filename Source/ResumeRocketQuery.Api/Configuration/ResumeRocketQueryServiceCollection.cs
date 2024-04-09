@@ -20,6 +20,8 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using System.Reflection;
 using System;
+using ResumeRocketQuery.Domain.External;
+using ResumeRocketQuery.External;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
@@ -31,6 +33,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddTransient<IResumeRocketQueryStorage, DapperResumeRocketQueryStorage>();
 
             services.AddTransient<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
+            services.AddTransient<IOpenAiClient, OpenAiClient>(); 
 
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IAccountService, AccountService>();
