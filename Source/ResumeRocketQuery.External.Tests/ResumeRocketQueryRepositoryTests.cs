@@ -24,7 +24,7 @@ namespace ResumeRocketQuery.Repository.Tests
         public class SendMessageAsync : OpenAiClientTests
         {
             [Fact]
-            public async Task WHEN_SendMessageAsync_is_called_THEN_response_is_NOT_Null()
+            public async Task WHEN_SendMessageAsync_is_called_THEN_response_is_NOT_NULL()
             {
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
@@ -36,6 +36,19 @@ namespace ResumeRocketQuery.Repository.Tests
                     3rd Law of Thermodynamics - A perfect crystal at zero Kelvin has zero entropy.");
 
                 Assert.True(response != null);
+            }
+
+            [Fact]
+            public async Task WHEN_SendMessageAsync_is_called_THEN_expected_result()
+            {
+                var response = await _systemUnderTest.SendMessageAsync(
+                    @"{{$input}} 
+
+                    Respond with exactly one number representing the provided word.",
+                    @"
+                    One");
+
+                Assert.Equal("1", response);
             }
         }
     }
