@@ -58,7 +58,7 @@ namespace ResumeRocketQuery.External
         public string get_HTML_Body()
         {
             //var node = HtmlDocument.DocumentNode.Element("//body");//.Descendants().SingleOrDefault(n => n.Attributes.Contains("class") && n.Attributes["class"].Value == "myforecast-current");
-            var node = HtmlDocument.DocumentNode.SelectSingleNode("//body");
+            var node = HtmlDocument.DocumentNode.SelectSingleNode("//html");
             if (node != null)
             {
                 return node.InnerText;
