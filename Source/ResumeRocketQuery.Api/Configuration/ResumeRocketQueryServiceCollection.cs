@@ -34,7 +34,7 @@ namespace ResumeRocketQuery.Api.Configuration
 
             services.AddTransient<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
             services.AddTransient<IOpenAiClient, OpenAiClient>(); 
-
+            services.AddTransient<IjobScraper, jobScraper>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
