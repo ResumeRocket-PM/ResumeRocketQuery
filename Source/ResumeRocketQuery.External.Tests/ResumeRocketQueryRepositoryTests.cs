@@ -7,6 +7,11 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using ResumeRocketQuery.Domain.External;
+using System.IO;
+using Json.More;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace ResumeRocketQuery.Repository.Tests
 {
@@ -39,16 +44,29 @@ namespace ResumeRocketQuery.Repository.Tests
             }
 
             [Fact]
-            public async Task WHEN_SendMessageAsync_is_called_THEN_expected_result()
+            public async Task WHEN_SendMessageAsync_is_called_on_true_THEN_returned_true()
             {
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
-                    Respond with exactly one number representing the provided word.",
+                    State whether the given equality is true or false in one word.",
                     @"
-                    One");
+                    2+2=4");
 
-                Assert.Equal("1", response);
+                Assert.Equal("true", response.ToLower());
+            }
+
+            [Fact]
+            public async Task WHEN_SendMessageAsync_is_called_on_false_THEN_returned_false()
+            {
+                var response = await _systemUnderTest.SendMessageAsync(
+                    @"{{$input}} 
+
+                    State whether the given equality is true or false in one word.",
+                    @"
+                    2+2=6");
+
+                Assert.Equal("false", response.ToLower());
             }
         }
     }
