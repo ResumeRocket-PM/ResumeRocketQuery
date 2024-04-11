@@ -8,6 +8,6 @@ namespace ResumeRocketQuery.Domain.External
 {
     public interface IOpenAiClient
     {
-        Task<string> SendMessageAsync(string requirements, string prompt);
+        Task<string> SendMessageAsync(string prompt, string message);
     }
 }

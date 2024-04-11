@@ -12,6 +12,8 @@ using Json.More;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ResumeRocketQuery.Repository.Tests
 {
@@ -68,6 +70,43 @@ namespace ResumeRocketQuery.Repository.Tests
 
                 Assert.Equal("false", response.ToLower());
             }
+
+            [Fact]
+            public async Task WHEN_SendMessageAsync_is_called_on_marketstar_page_source_THEN_assert_keywords()
+            {
+                var jobPosting = File.ReadAllText(@"C:\Users\Azira\git\resumerocketquery\Source\ResumeRocketQuery.External.Tests\Samples\MarketStar\MarketStar.html");
+                var response = await _systemUnderTest.SendMessageAsync(
+                    @"{{$input}} 
+
+                    For the provided webpage source code for a job posting, return a JSON array where every element is a string. Those elements should be the top 10 keywords I can use to update my resume with.",
+                    jobPosting);
+
+                var jsonResult = JsonConvert.DeserializeObject<List<String>>(response);
+
+                Debug.WriteLine(jsonResult);
+
+                Assert.IsType<List<String>>(jsonResult);
+                Assert.Equal(10, jsonResult.Count);
+            }
+
+            // TODO - uncomment test after web scraper is truncating the source code
+            /*[Fact]
+            public async Task WHEN_SendMessageAsync_is_called_on_1800contacts_page_source_THEN_assert_keywords()
+            {
+                var jobPosting = File.ReadAllText(@"C:\Users\Azira\git\resumerocketquery\Source\ResumeRocketQuery.External.Tests\Samples\1800Contacts\1800Contacts.html");
+                var response = await _systemUnderTest.SendMessageAsync(
+                    @"{{$input}} 
+
+                    For the provided webpage source code for a job posting, return a JSON array where every element is a string. Those elements should be the top 10 keywords I can use to update my resume with.",
+                    jobPosting);
+
+                var jsonResult = JsonConvert.DeserializeObject<List<String>>(response);
+
+                Debug.WriteLine(jsonResult);
+
+                Assert.IsType<List<String>>(jsonResult);
+                Assert.Equal(10, jsonResult.Count);
+            }*/
         }
     }
 }
