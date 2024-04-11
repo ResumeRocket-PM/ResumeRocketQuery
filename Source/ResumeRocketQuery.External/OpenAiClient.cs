@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.ChatCompletion;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace ResumeRocketQuery.External
 {
@@ -16,9 +21,25 @@ namespace ResumeRocketQuery.External
         /// <param name="prompt"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<string> SendMessageAsync(string prompt)
+        public async Task<string> SendMessageAsync(string requirements, string prompt)
         {
-            throw new NotImplementedException();
+            var builder = Kernel.CreateBuilder();
+            builder.AddOpenAIChatCompletion(
+                "gpt-3.5-turbo", // OpenAI Model name
+                "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"); // OpenAI API Key
+            var kernel = builder.Build();
+            var result = await kernel.InvokePromptAsync(requirements, new() { ["input"] = prompt });
+
+        // Used for back and forth chat model, would need to be in a loop with calls to front-end
+            /*var chatGPT = kernel.GetRequiredService<IChatCompletionService>();
+            var chat = new ChatHistory(requirements);
+            Console.WriteLine($"User: {prompt}");
+            chat.AddUserMessage(prompt);
+            var assistantReply = await chatGPT.GetChatMessageContentAsync(chat, new OpenAIPromptExecutionSettings());
+            chat.AddAssistantMessage(assistantReply.Content);*/
+
+            Debug.WriteLine(result);
+            return result.ToString();
         }
     }
 }
