@@ -21,18 +21,19 @@ namespace ResumeRocketQuery.External
         /// <param name="prompt"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<string> SendMessageAsync(string requirements, string prompt)
+        public async Task<string> SendMessageAsync(string prompt, string message)
         {
             var builder = Kernel.CreateBuilder();
             builder.AddOpenAIChatCompletion(
                 "gpt-3.5-turbo", // OpenAI Model name
                 "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"); // OpenAI API Key
             var kernel = builder.Build();
-            var result = await kernel.InvokePromptAsync(requirements, new() { ["input"] = prompt });
+            var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message});
 
         // Used for back and forth chat model, would need to be in a loop with calls to front-end
             /*var chatGPT = kernel.GetRequiredService<IChatCompletionService>();
             var chat = new ChatHistory(requirements);
+            for loop here
             Console.WriteLine($"User: {prompt}");
             chat.AddUserMessage(prompt);
             var assistantReply = await chatGPT.GetChatMessageContentAsync(chat, new OpenAIPromptExecutionSettings());
