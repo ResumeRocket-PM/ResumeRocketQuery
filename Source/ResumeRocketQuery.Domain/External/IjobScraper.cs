@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.External
 {
-    public interface IjobScraper
+    public interface IJobScraper
     {
 
         Task<string> scrapJobPosting(string url);

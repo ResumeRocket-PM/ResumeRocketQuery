@@ -22,6 +22,8 @@ using System.Reflection;
 using System;
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.External;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
@@ -34,10 +36,11 @@ namespace ResumeRocketQuery.Api.Configuration
 
             services.AddTransient<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
             services.AddTransient<IOpenAiClient, OpenAiClient>(); 
-            services.AddTransient<IjobScraper, jobScraper>();
+            services.AddTransient<IJobScraper, jobScraper>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
+            services.AddTransient<ILanguageService, LanguageService>();
 
             services.AddTransient<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddTransient<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
@@ -70,9 +73,34 @@ namespace ResumeRocketQuery.Api.Configuration
 
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
-
-
         }
 
         private void ConfigureJwtAuthentication(IServiceCollection services)

@@ -6,6 +6,8 @@ using ResumeRocketQuery.Domain.Api.Response;
 using ResumeRocketQuery.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ResumeRocketQuery.Services;
+using System.Collections.Generic;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -17,36 +19,35 @@ namespace ResumeRocketQuery.Api.Controllers
     public class LanguageController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
-        private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
-        private readonly IAccountService _accountService;
+        private readonly ILanguageService languageService;
 
-        public LanguageController(IServiceResponseBuilder serviceResponseBuilder,
-            IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder,
-            IAccountService accountService)
+        public LanguageController(IServiceResponseBuilder serviceResponseBuilder, ILanguageService languageService)
         {
-            _serviceResponseBuilder = serviceResponseBuilder;
-            _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
-            _accountService = accountService;
+            this._serviceResponseBuilder = serviceResponseBuilder;
+            this.languageService = languageService;
         }
 
         /// <summary>
         /// This retrieves the User details
         /// </summary>
         /// <returns>A User Object.</returns>
-        [HttpGet]
-        [Route("details")]
-        public async Task<ServiceResponse<AccountResponseBody>> Get()
+        [HttpPost]
+        [Route("jobposting")]
+        public async Task<ServiceResponse<CreateJobPostingResponse>> Post([FromBody]CreateJobPostingRequest request)
         {
-            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var jobPostingResult = await languageService.CaptureJobPostingAsync(request.Url);
 
-            var accountResponse = await _accountService.GetAccountAsync(user.AccountId);
-
-            var response = new AccountResponseBody
+            var result = new CreateJobPostingResponse
             {
-                EmailAddress = accountResponse.EmailAddress
+                DatePosted = jobPostingResult.DatePosted,
+                Description = jobPostingResult.Description,
+                Keywords    = jobPostingResult.Keywords,
+                Perks = jobPostingResult.Perks, 
+                Requirements = jobPostingResult.Requirements,
+                Title = jobPostingResult.Title
             };
 
-            return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.Created);
         }
     }
 }

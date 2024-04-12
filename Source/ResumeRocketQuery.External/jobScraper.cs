@@ -11,7 +11,7 @@ using NScrape;
 namespace ResumeRocketQuery.External
 {
     
-    public class jobScraper : IjobScraper 
+    public class jobScraper : IJobScraper 
     {
         //private string Url;
         public class scraper() 

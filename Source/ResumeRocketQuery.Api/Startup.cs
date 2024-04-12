@@ -2,6 +2,7 @@ using ResumeRocketQuery.Api.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 
 namespace ResumeRocketQuery.Api
 {

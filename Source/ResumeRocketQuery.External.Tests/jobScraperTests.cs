@@ -14,13 +14,13 @@ namespace ResumeRocketQuery.Repository.Tests
 {
     public class jobScraperTests
     {
-        private IjobScraper _systemUnderTest;
+        private IJobScraper _systemUnderTest;
 
         public jobScraperTests()
         {
             var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
 
-            _systemUnderTest = serviceProvider.GetService<IjobScraper>();
+            _systemUnderTest = serviceProvider.GetService<IJobScraper>();
         }
 
         public class CreateAccountAsync : jobScraperTests
