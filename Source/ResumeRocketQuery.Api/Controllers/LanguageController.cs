@@ -13,7 +13,7 @@ namespace ResumeRocketQuery.Api.Controllers
     /// This is a controller that handles the creation and modification of accounts.
     /// </summary>
     [Authorize]
-    [Route("api/account")]
+    [Route("api/language")]
     public class LanguageController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;

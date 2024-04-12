@@ -74,7 +74,7 @@ namespace ResumeRocketQuery.Repository.Tests
             [Fact]
             public async Task WHEN_SendMessageAsync_is_called_on_marketstar_page_source_THEN_assert_keywords()
             {
-                var jobPosting = File.ReadAllText(@"C:\Users\Azira\git\resumerocketquery\Source\ResumeRocketQuery.External.Tests\Samples\MarketStar\MarketStar.html");
+                var jobPosting = File.ReadAllText(@".\Samples\MarketStar\MarketStar.html");
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
