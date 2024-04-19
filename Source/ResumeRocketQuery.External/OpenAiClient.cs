@@ -39,7 +39,6 @@ namespace ResumeRocketQuery.External
             var assistantReply = await chatGPT.GetChatMessageContentAsync(chat, new OpenAIPromptExecutionSettings());
             chat.AddAssistantMessage(assistantReply.Content);*/
 
-            Debug.WriteLine(result);
             return result.ToString();
         }
     }
