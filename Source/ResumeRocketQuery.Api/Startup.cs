@@ -15,6 +15,8 @@ namespace ResumeRocketQuery.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors();
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -29,11 +31,6 @@ namespace ResumeRocketQuery.Api
             app.UseAuthorization();
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
         }
     }
 }

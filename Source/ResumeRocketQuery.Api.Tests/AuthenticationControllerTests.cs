@@ -172,6 +172,45 @@ namespace ResumeRocketQuery.Api.Tests
                     expected.ToExpectedObject().ShouldMatch(actual);
                 }
             }
+
+            [Fact]
+            public async Task GIVEN_invalid_length_password_WHEN_POST_is_called_THEN_validation_error_returned()
+            {
+                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                {
+                    var email = $"{Guid.NewGuid().ToString()}@testemail.com";
+                    var password = "12345";
+
+                    var authenticationRequestBody = new AccountRequestBody
+                    {
+                        EmailAddress = email,
+                        Password = password
+                    };
+
+                    var expected = new
+                    {
+                        Succeeded = false,
+                        ResponseMetadata = new
+                        {
+                            HttpStatusCode = 400,
+                            Exception = Expect.Null(),
+                            ValidationErrors = new[]
+                            {
+                                new
+                                {
+                                    Property = "Password",
+                                    Message = @"The field Password must be a string or array type with a minimum length of '6'."
+                                }
+                            }
+                        },
+                        Result = Expect.Null()
+                    };
+
+                    var actual = await _restRequestClient.SendRequest<AuthenticateAccountResponse>($"{selfHost.Url}/api/account", HttpMethod.Post, authenticationRequestBody);
+
+                    expected.ToExpectedObject().ShouldMatch(actual);
+                }
+            }
         }
     }
 }

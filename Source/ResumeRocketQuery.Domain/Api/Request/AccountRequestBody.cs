@@ -7,7 +7,9 @@ namespace ResumeRocketQuery.Domain.Api.Request
         [Required]
         [RegularExpression(@"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$")]
         public string EmailAddress { get; set; }
+
         [Required]
+        [MinLength(6)]
         public string Password { get; set; }
     }
 }

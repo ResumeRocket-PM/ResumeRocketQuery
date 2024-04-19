@@ -53,6 +53,17 @@ namespace ResumeRocketQuery.Api.Configuration
         {
             services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                    });
+            });
+
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(ExceptionFilter));
@@ -60,7 +71,6 @@ namespace ResumeRocketQuery.Api.Configuration
             });
 
             services.AddControllers();
-
 
             services.AddSwaggerGen(c =>
             {

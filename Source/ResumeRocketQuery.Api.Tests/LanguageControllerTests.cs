@@ -39,7 +39,6 @@ namespace ResumeRocketQuery.Api.Tests
                         Password = password
                     });
 
-
                     var expected = new
                     {
                         Succeeded = true,

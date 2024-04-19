@@ -6,6 +6,7 @@ using ResumeRocketQuery.Domain.Api.Response;
 using ResumeRocketQuery.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
