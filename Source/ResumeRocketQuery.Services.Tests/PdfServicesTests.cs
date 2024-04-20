@@ -10,17 +10,17 @@ using Xunit;
 
 namespace ResumeRocketQuery.External.Tests
 {
-    public class PdfUtilityTests
+    public class PdfServicesTests
     {
         private IPdfUtility _systemUnderTest;
 
-        public PdfUtilityTests() 
+        public PdfServicesTests() 
         {
             var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
             _systemUnderTest = serviceProvider.GetService<IPdfUtility>();
         }
 
-        public class ReadPdfAsync : PdfUtilityTests
+        public class ReadPdfAsync : PdfServicesTests
         {
             [Fact]
             public async Task WHEN_SendMessageAsync_is_called_THEN_response_is_NOT_NULL()
@@ -31,7 +31,7 @@ namespace ResumeRocketQuery.External.Tests
             }
         }
 
-        public class UpdatePdfAsync : PdfUtilityTests
+        public class UpdatePdfAsync : PdfServicesTests
         {
             [Fact]
             public async Task WHEN_SendMessageAsync_is_called_THEN_response_is_NOT_NULL()

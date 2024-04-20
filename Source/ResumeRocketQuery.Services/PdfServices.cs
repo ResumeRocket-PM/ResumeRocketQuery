@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.External
 {
-    public class PdfUtility : IPdfUtility
+    public class PdfServices : IPdfServices
     {
         public Task<string> ReadPdfAsync(string filepath)
         {
