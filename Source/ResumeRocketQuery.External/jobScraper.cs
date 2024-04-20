@@ -14,7 +14,7 @@ namespace ResumeRocketQuery.External
     public class jobScraper : IJobScraper 
     {
         //private string Url;
-        public class scraper() 
+        public class Scraper() 
         {
         }
 

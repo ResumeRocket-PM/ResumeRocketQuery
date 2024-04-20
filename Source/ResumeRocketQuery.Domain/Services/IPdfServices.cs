@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ResumeRocketQuery.Domain.External
+namespace ResumeRocketQuery.Domain.Services
 {
     public interface IPdfServices
     {
