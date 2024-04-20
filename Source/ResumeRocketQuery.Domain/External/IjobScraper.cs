@@ -9,6 +9,6 @@ namespace ResumeRocketQuery.Domain.External
     public interface IJobScraper
     {
 
-        Task<string> scrapJobPosting(string url);
+        Task<string> ScrapeJobPosting(string url);
     }
 }

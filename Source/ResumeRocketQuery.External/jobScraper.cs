@@ -18,7 +18,7 @@ namespace ResumeRocketQuery.External
         {
         }
 
-        public async Task<string> scrapJobPosting(string url)
+        public async Task<string> ScrapeJobPosting(string url)
         {
             try
             {
@@ -42,9 +42,6 @@ namespace ResumeRocketQuery.External
                 throw new Exception($"Error occurred while scraping: {e.Message}");
             }
         }
-
-
-
     }
 
 

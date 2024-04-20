@@ -29,7 +29,7 @@ namespace ResumeRocketQuery.Repository.Tests
             public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_stored()
             {
                 //jobScraper jbs = new();
-                var result = await _systemUnderTest.scrapJobPosting("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907");
+                var result = await _systemUnderTest.ScrapeJobPosting("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907");
                 //string content = result;
                 Console.WriteLine(result);
                 Assert.NotNull(result);
