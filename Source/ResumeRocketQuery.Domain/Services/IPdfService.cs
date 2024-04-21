@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.Services
 {
-    public interface IPdfServices
+    public interface IPdfService
     {
         Task<string> ReadPdfAsync(string filepath);
-        Task<string> UpdatePdfAsync(string filepath);
+        Task<string> UpdatePdfAsync(string filepath, string update);
     }
 }

@@ -41,6 +41,8 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
             services.AddTransient<ILanguageService, LanguageService>();
+            services.AddTransient<IPdfService, PdfService>();
+
 
             services.AddTransient<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddTransient<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
