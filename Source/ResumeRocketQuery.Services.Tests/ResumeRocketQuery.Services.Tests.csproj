@@ -21,4 +21,14 @@
     <ProjectReference Include="..\ResumeRocketQuery.Tests\ResumeRocketQuery.Tests.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Samples\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Samples\studentAthleteResume.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

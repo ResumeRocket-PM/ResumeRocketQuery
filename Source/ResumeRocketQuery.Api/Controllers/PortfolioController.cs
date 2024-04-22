@@ -50,7 +50,7 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpPost]
-        [Route("details")]
+        [Route("")]
         public async Task<ServiceResponse> Post([FromBody] PortfolioRequestBody requestBody)
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);

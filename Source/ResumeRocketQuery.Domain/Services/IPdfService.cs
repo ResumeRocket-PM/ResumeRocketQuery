@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ResumeRocketQuery.Domain.External
+namespace ResumeRocketQuery.Domain.Services
 {
-    public interface IPdfUtility
+    public interface IPdfService
     {
         Task<string> ReadPdfAsync(string filepath);
-        Task<string> UpdatePdfAsync(string filepath);
+        Task<string> UpdatePdfAsync(string filepath, string update);
     }
 }

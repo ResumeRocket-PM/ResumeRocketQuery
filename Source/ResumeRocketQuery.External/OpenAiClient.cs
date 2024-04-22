@@ -19,8 +19,7 @@ namespace ResumeRocketQuery.External
         /// Second Use Case: Pass in all of the HTML - Have the Language Model parse it for us. It would return keywords based on that.
         /// </summary>
         /// <param name="prompt"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <returns>Response message from ChatGPT</returns>
         public async Task<string> SendMessageAsync(string prompt, string message)
         {
             var builder = Kernel.CreateBuilder();

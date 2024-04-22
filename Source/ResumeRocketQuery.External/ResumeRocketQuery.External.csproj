@@ -5,7 +5,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="IronPdf" Version="2024.4.2" />
 	  <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.7.1" />
 	  <PackageReference Include="HtmlAgilityPack" Version="1.9.1" />
 	  <PackageReference Include="NScrape" Version="0.4.1" />

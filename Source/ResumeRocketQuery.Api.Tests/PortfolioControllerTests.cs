@@ -49,7 +49,7 @@ namespace ResumeRocketQuery.Api.Tests
                         },
                     };
 
-                    var resource = $"{selfHost.Url}/api/portfolio/details";
+                    var resource = $"{selfHost.Url}/api/portfolio";
 
                     var headers = new Dictionary<string, string>
                     {

@@ -42,11 +42,12 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IAuthenticationHelper, AuthenticationHelper>();
             services.AddSingleton<ILanguageService, LanguageService>();
             services.AddSingleton<IPortfolioService, PortfolioService>();
+            services.AddSingleton<IPdfService, PdfService>();
 
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
 
-            
+
             ConfigureJwtAuthentication(services);
             ConfigureMiddlewareServices(services);
         }
