@@ -32,19 +32,21 @@ namespace ResumeRocketQuery.Api.Configuration
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>();
-            services.AddTransient<IResumeRocketQueryStorage, DapperResumeRocketQueryStorage>();
+            services.AddSingleton<IResumeRocketQueryStorage, DapperResumeRocketQueryStorage>();
 
-            services.AddTransient<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
-            services.AddTransient<IOpenAiClient, OpenAiClient>(); 
-            services.AddTransient<IJobScraper, jobScraper>();
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
-            services.AddTransient<IAccountService, AccountService>();
-            services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
-            services.AddTransient<ILanguageService, LanguageService>();
+            services.AddSingleton<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
+            services.AddSingleton<IOpenAiClient, OpenAiClient>(); 
+            services.AddSingleton<IJobScraper, jobScraper>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            services.AddSingleton<IAccountService, AccountService>();
+            services.AddSingleton<IAuthenticationHelper, AuthenticationHelper>();
+            services.AddSingleton<ILanguageService, LanguageService>();
+            services.AddSingleton<IPortfolioService, PortfolioService>();
 
-            services.AddTransient<IServiceResponseBuilder, ServiceResponseBuilder>();
-            services.AddTransient<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
+            services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
+            services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
 
+            
             ConfigureJwtAuthentication(services);
             ConfigureMiddlewareServices(services);
         }

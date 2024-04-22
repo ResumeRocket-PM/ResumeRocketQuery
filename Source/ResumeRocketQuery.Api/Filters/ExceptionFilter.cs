@@ -10,7 +10,7 @@ namespace ResumeRocketQuery.Api.Filters
     {
         public async Task OnExceptionAsync(ExceptionContext context)
         {
-            var response = new ServiceResponse<object>
+            var response = new ServiceResponseGeneric<object>
             {
                 Result = null,
                 ResponseMetadata = new ResponseMetadata

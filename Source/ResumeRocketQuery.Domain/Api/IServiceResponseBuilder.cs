@@ -4,6 +4,7 @@ namespace ResumeRocketQuery.Domain.Api
 {
     public interface IServiceResponseBuilder
     {
-        ServiceResponse<T> BuildServiceResponse<T>(T result, HttpStatusCode statusCode);
+        ServiceResponseGeneric<T> BuildServiceResponse<T>(T result, HttpStatusCode statusCode);
+        ServiceResponse BuildServiceResponse(HttpStatusCode statusCode);
     }
 }

@@ -15,7 +15,7 @@ namespace ResumeRocketQuery.Api.Filters
             {
                 var errors = context.ModelState;
 
-                var response = new ServiceResponse<object>
+                var response = new ServiceResponseGeneric<object>
                 {
                     Result = null,
                     ResponseMetadata = new ResponseMetadata

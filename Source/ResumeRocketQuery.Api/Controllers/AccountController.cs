@@ -36,7 +36,7 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <returns>A User Object.</returns>
         [HttpGet]
         [Route("details")]
-        public async Task<ServiceResponse<AccountResponseBody>> Get()
+        public async Task<ServiceResponseGeneric<AccountResponseBody>> Get()
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 

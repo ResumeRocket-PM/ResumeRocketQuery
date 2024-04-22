@@ -4,7 +4,36 @@ namespace ResumeRocketQuery.Storage
     {
         public static class StoredProcedures
         {
-			public static string InsertAccount = @"
+            public static string InsertPortfolio = @"
+				INSERT INTO Portfolio (
+							AccountId,
+							PortfolioAlias,
+							PortfolioConfiguration,
+							InsertDate,
+							UpdateDate
+						)
+						VALUES 
+						(
+							@AccountId,
+							@PortfolioAlias,
+							@PortfolioConfiguration,
+							Now(),
+							Now()
+						);
+
+						SELECT LAST_INSERT_ID();";
+
+
+            public static string SelectPortfolio = @"
+                SELECT 
+					 PortfolioId
+                    ,AccountID
+			        ,PortfolioAlias
+			        ,PortfolioConfiguration
+		        FROM Portfolio
+		        WHERE AccountID = @AccountID;";
+
+            public static string InsertAccount = @"
 				INSERT INTO Account (
 							AccountAlias,
 							AccountConfiguration,

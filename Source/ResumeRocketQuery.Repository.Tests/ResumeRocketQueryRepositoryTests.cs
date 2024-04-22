@@ -84,5 +84,66 @@ namespace ResumeRocketQuery.Repository.Tests
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
+
+
+        public class CreatePortfolioAsync : ResumeRocketQueryRepositoryTests
+        {
+            [Fact]
+            public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_stored()
+            {
+                var accountId = await _systemUnderTest.CreateAccountAsync(new Account
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@email.com",
+                    Authentication = new Authentication
+                    {
+                        Salt = Guid.NewGuid().ToString(),
+                        HashedPassword = Guid.NewGuid().ToString()
+                    }
+                });
+
+                var portfolioId = await _systemUnderTest.CreatePortfolioAsync(new Portfolio
+                {
+                    Configuration = Guid.NewGuid().ToString(),
+                    AccountId = accountId,
+                });
+
+                Assert.True(portfolioId > 0);
+            }
+
+            [Fact]
+            public async Task WHEN_CreateAccountAsync_is_called_THEN_storage_matches()
+            {
+
+                var accountId = await _systemUnderTest.CreateAccountAsync(new Account
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@email.com",
+                    Authentication = new Authentication
+                    {
+                        Salt = Guid.NewGuid().ToString(),
+                        HashedPassword = Guid.NewGuid().ToString()
+                    }
+                });
+
+                var portfolio = Guid.NewGuid().ToString();
+
+                var portfolioId = await _systemUnderTest.CreatePortfolioAsync(new Portfolio
+                {
+                    Configuration = portfolio,
+                    AccountId = accountId,
+                });
+
+                var expected = new Portfolio
+                {
+                    AccountId = accountId,
+                    Configuration = portfolio
+                };
+
+                var actual = await _systemUnderTest.GetPortfolioAsync(expected.AccountId);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
+            }
+        }
     }
 }
