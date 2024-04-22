@@ -3,6 +3,7 @@ using ResumeRocketQuery.Domain.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace ResumeRocketQuery.Api.Filters
 {

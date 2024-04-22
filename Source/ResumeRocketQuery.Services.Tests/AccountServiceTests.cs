@@ -59,6 +59,31 @@ namespace ResumeRocketQuery.Services.Tests
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
+
+            [Fact]
+            public async Task GIVEN_account_exists_WHEN_CreateAccountAsync_is_called_THEN_validation_error_returned()
+            {
+                var emailAddress = $"{Guid.NewGuid().ToString()}@gmail.com";
+
+                var createResponse = await _systemUnderTest.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = emailAddress,
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var expected = new
+                {
+                    Message = "Account already exists"
+                };
+
+                var actual = await Assert.ThrowsAsync<ValidationException>(() => _systemUnderTest.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = emailAddress,
+                    Password = Guid.NewGuid().ToString()
+                }));
+
+                expected.ToExpectedObject().ShouldMatch(actual);
+            }
         }
     }
 }

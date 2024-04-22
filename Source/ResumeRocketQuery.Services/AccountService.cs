@@ -23,6 +23,13 @@ namespace ResumeRocketQuery.Services
 
         public async Task<CreateAccountResponse> CreateAccountAsync(CreateAccountRequest createAccountRequest)
         {
+            var existingEmail = await _resumeRocketQueryRepository.GetAccountByEmailAddressAsync(createAccountRequest.EmailAddress);
+
+            if (existingEmail != null)
+            {
+                throw new ValidationException("Account already exists");
+            }
+
             var passwordSalt = Guid.NewGuid().ToString();
 
             var passwordResponse = await _authenticationHelper.GeneratePasswordHashAsync(new PasswordHashRequest
