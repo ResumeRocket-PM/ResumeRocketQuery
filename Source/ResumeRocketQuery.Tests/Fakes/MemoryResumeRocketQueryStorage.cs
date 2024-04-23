@@ -88,12 +88,12 @@ namespace ResumeRocketQuery.Tests.Fakes
         // for resume table
         public async Task<int> InsertResumeStorageAsync(ResumeStorage resume)
         {
-            var result = await _memoryStorage.InsertAsync(resume, (x, id) => { });
+            var result = await _memoryStorage.InsertAsync(resume, (x, id) => { x.ResumeID = id; });
 
             return result;
         }
 
-        public async Task<List<ResumeStorage>> SelectResumeStorageAsync(int accountID)
+        public async Task<List<ResumeStorage>> SelectResumeStoragesAsync(int accountID)
         {
 
             var resumeStorages = await _memoryStorage.SelectAsync<ResumeStorage>();
@@ -103,6 +103,13 @@ namespace ResumeRocketQuery.Tests.Fakes
             return result.ToList();
         }
 
+        public async Task<ResumeStorage> SelectResumeStorageAsync(int resumeId)
+        {
+            var resumeStorages = await _memoryStorage.SelectAsync<ResumeStorage>();
 
+            var result = resumeStorages.FirstOrDefault(x => x.ResumeID == resumeId);
+
+            return result;
+        }
     }
 }

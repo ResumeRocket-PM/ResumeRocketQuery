@@ -12,16 +12,16 @@ using Xunit;
 
 namespace ResumeRocketQuery.Api.Tests
 {
-    public class LanguageControllerTests
+    public class JobControllerTests
     {
         private readonly RestRequestClient _restRequestClient;
 
-        public LanguageControllerTests()
+        public JobControllerTests()
         {
             _restRequestClient = new RestRequestClient();
         }
 
-        public class Get : LanguageControllerTests
+        public class Get : JobControllerTests
         {
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_endpoint()
@@ -46,27 +46,21 @@ namespace ResumeRocketQuery.Api.Tests
                         {
                             HttpStatusCode = 201
                         },
-                        Result = new
-                        {
-                            Description = Expect.Any<string>(),
-                            Keywords = Expect.Any<List<string>>(),
-                            Perks = Expect.Any<List<string>>(),
-                            Requirements = Expect.Any<List<string>>(),
-                            Title = Expect.Any<string>()
-                        }
                     };
 
-                    var resource = $"{selfHost.Url}/api/language/jobposting";
+                    var resource = $"{selfHost.Url}/api/job/postings";
 
                     var headers = new Dictionary<string, string>
                     {
                         {"Authorization", $"Bearer {createAccountResponse.JsonWebToken}"}
                     };
 
-                     var actual = await _restRequestClient.SendRequest<CreateJobPostingResponse>(resource, HttpMethod.Post, new CreateJobPostingRequest
-                     {
-                         Url = "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907"
-                     }, headers);
+                     var actual = await _restRequestClient.SendRequest<CreateJobPostingResponse>(resource, 
+                         HttpMethod.Post, 
+                         new CreateJobPostingRequest
+                         {
+                             Url = "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907"
+                         }, headers, fileUpload: "./Samples/Tyler DeBruin Resume.pdf");
 
                     expected.ToExpectedObject().ShouldMatch(actual);
                 }

@@ -27,7 +27,7 @@ namespace ResumeRocketQuery.Services.Tests
             {
                 var expected = new 
                 {
-                    DatePosted = Expect.Any<string>(),
+                    CompanyName = Expect.Any<string>(),
                     Description = Expect.Any<string>(),
                     Keywords = Expect.Any<List<string>>(),
                     Perks = Expect.Any<List<string>>(),

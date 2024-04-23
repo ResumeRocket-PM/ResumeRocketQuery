@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.DataLayer;
@@ -133,74 +134,65 @@ namespace ResumeRocketQuery.Repository
             return portfolioId;
         }
 
-
-        //public async Task<Resume> GetResumeAsync(int accountId)
-        //{
-        //    Resume result = null;
-
-        //    var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStorageAsync(accountId);
-
-        //    if (resumeStorage != null)
-        //    {
-        //        result = new Resume
-        //        {
-        //            accountID = resumeStorage.AccountId,
-        //            Content = resumeStorage.ResumeContent
-        //        };
-        //    }
-
-        //    return result;
-        //}
-
-        //TODO: this is another type of getResumeAsync
-        //because the SelectResumeStorageAsync is going to return the list instead of a single resumeStorage obj
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="accountId"></param>
-        /// <returns></returns>
-        public async Task<List<Resume>> GetResumeAsync(int accountId)
+        public async Task<List<Resume>> GetResumesAsync(int accountId)
         {
-            Resume result = null;
+            var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStoragesAsync(accountId);
 
-            var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStorageAsync(accountId);
-
-            List<Resume> resumeList = new();
-            if (resumeStorage != null)
+            var result = resumeStorage.Select(x => new Resume
             {
-                foreach (var item in resumeStorage)
-                {
-                    result = new Resume
-                    {
-                        AccountId = item.accountID,
-                        Content = item.resume
-                    }; 
-                    resumeList.Add(result);
-                }
-            }
+                AccountID = x.accountID,
+                ApplyDate = x.applyDate,
+                CompanyName = x.companyName,
+                JobUrl = x.jobUrl,
+                Position = x.position,
+                ResumeContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(x.resume),
+                ResumeID = x.ResumeID,
+                Status = x.status,
+            });
 
-            return resumeList;
+            return result.ToList();
         }
 
         public async Task<int> CreateResumeAsync(Resume resume)
         {
-            Resume result = null;
-
             var resumeId = await _resumeRocketQueryStorage.InsertResumeStorageAsync(new ResumeStorage
             {
-                accountID = resume.AccountId,
-                //ResumeAlias = Guid.NewGuid().ToString(),
-                resume = resume.Content,
-
-                jobUrl = Guid.NewGuid().ToString(),
-                //accountID = resume.accountID,
-                //status = resume.status,
-                //resume = resume.resume,
-                //position = resume.position,
-                //companyName = resume.companyName,
+                ResumeID = resume.ResumeID,
+                accountID = resume.AccountID,
+                applyDate = resume.ApplyDate,
+                companyName = resume.CompanyName,
+                resume = JsonConvert.SerializeObject(resume.ResumeContent),
+                position = resume.Position,
+                jobUrl = resume.JobUrl,
+                status = resume.Status,
             });
 
             return resumeId;
+        }
+
+
+        public async Task<Resume> GetResumeAsync(int resumeId)
+        {
+            Resume result = null;
+
+            var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStorageAsync(resumeId);
+
+            if (resumeStorage != null)
+            {
+                result = new Resume
+                {
+                    AccountID = resumeStorage.accountID,
+                    ApplyDate = resumeStorage.applyDate,
+                    CompanyName = resumeStorage.companyName,
+                    JobUrl = resumeStorage.jobUrl,
+                    Position = resumeStorage.position,
+                    ResumeContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(resumeStorage.resume),
+                    ResumeID = resumeStorage.ResumeID,
+                    Status = resumeStorage.status,
+                };
+            }
+
+            return result;
         }
     }
 }

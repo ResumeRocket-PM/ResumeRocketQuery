@@ -249,7 +249,7 @@ namespace ResumeRocketQuery.Storage.Tests
         {
             [Theory]
             [InlineData(typeof(DapperResumeRocketQueryStorage))]
-            //[InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            [InlineData(typeof(MemoryResumeRocketQueryStorage))]
             public async Task when_insert_then_ID_return(Type storageType)
             {
                 var systemUnderTest = GetSystemUnderTest(storageType);
@@ -328,7 +328,7 @@ namespace ResumeRocketQuery.Storage.Tests
                 await systemUnderTest.InsertResumeStorageAsync(expected1);
                 await systemUnderTest.InsertResumeStorageAsync(expected2);
 
-                var actual = await systemUnderTest.SelectResumeStorageAsync(accountId);
+                var actual = await systemUnderTest.SelectResumeStoragesAsync(accountId);
 
                 Assert.True(actual.Count == 2);
 
@@ -350,6 +350,40 @@ namespace ResumeRocketQuery.Storage.Tests
                 //expected1.ToExpectedObject().ShouldMatch(actual[1]);
 
 
+            }
+        }
+
+        public class SelectResumeStorageAsync : ResumeRocketQueryStorageTests
+        {
+            [Theory]
+            [InlineData(typeof(DapperResumeRocketQueryStorage))]
+            [InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            public async Task WHEN_SelectResumeStorageAsync_THEN_storage_is_returned(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    AccountConfiguration = Guid.NewGuid().ToString()
+                });
+
+                var expected = new ResumeStorage
+                {
+                    applyDate = DateTime.Today,
+                    jobUrl = Guid.NewGuid().ToString(),
+                    accountID = accountId,
+                    status = Guid.NewGuid().ToString(),
+                    resume = "test",
+                    position = "A",
+                    companyName = Guid.NewGuid().ToString(),
+                };
+
+                expected.ResumeID = await systemUnderTest.InsertResumeStorageAsync(expected);
+
+                var actual = await systemUnderTest.SelectResumeStorageAsync(expected.ResumeID);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
     }

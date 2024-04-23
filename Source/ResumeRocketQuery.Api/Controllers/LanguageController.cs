@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ResumeRocketQuery.Services;
 using System.Collections.Generic;
+using ResumeRocketQuery.Api.Builder;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -39,7 +40,6 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var result = new CreateJobPostingResponse
             {
-                DatePosted = jobPostingResult.DatePosted,
                 Description = jobPostingResult.Description,
                 Keywords    = jobPostingResult.Keywords,
                 Perks = jobPostingResult.Perks, 

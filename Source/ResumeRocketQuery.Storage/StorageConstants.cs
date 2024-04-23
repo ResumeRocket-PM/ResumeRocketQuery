@@ -126,15 +126,35 @@ namespace ResumeRocketQuery.Storage
 				@resume,
 				@position,
 				@companyName
-				)";
+				);
+
+                SELECT LAST_INSERT_ID();";
 
 
-            public static string SelectResume = @"
-				select * 
+            public static string SelectResumes = @"
+				select applyDate,
+				jobUrl, 
+				accountID,
+				status,
+				resume,
+				position,
+				companyName,
+                ResumeId
 				from resume 
 				where accountID = @accountID";
-				
 
+            public static string SelectResume = @"
+				select 				
+                applyDate,
+				jobUrl, 
+				accountID,
+				status,
+				resume,
+				position,
+				companyName,
+                ResumeId 
+				from resume 
+				where ResumeId = @ResumeID";
 
         }
     }

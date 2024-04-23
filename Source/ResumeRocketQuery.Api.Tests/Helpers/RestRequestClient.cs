@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.Api;
 using Newtonsoft.Json;
+using Azure.Core;
+using Microsoft.Net.Http.Headers;
+using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue;
 
 namespace ResumeRocketQuery.Api.Tests.Helpers
 {
@@ -16,14 +20,34 @@ namespace ResumeRocketQuery.Api.Tests.Helpers
             _client = new HttpClient();
         }
 
-        public async Task<ServiceResponseGeneric<T>> SendRequest<T>(string resource, HttpMethod httpMethod, object requestBody = null, Dictionary<string, string> requestHeaders = null)
+        public async Task<ServiceResponseGeneric<T>> SendRequest<T>(string resource, HttpMethod httpMethod, object requestBody = null, Dictionary<string, string> requestHeaders = null, string fileUpload = null)
         {
             var httpRequestMessage = new HttpRequestMessage(httpMethod, resource);
 
+
             if (requestBody != null)
             {
-                var request = JsonConvert.SerializeObject(requestBody);
-                httpRequestMessage.Content = new StringContent(request, Encoding.UTF8, "application/json");
+                
+                if (fileUpload != null)
+                {
+                    var content = new MultipartFormDataContent();
+
+                    var byteArrayContent = new ByteArrayContent(File.ReadAllBytes(fileUpload));
+                    byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    content.Add(byteArrayContent, "FormFile", Path.GetFileName(fileUpload));
+
+                    var requestBodyJson = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8,
+                        "application/json");
+                    content.Add(requestBodyJson, "Data");
+                    
+                    httpRequestMessage.Content = content;
+                }
+                else
+                {
+                    httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(requestBody),
+                        Encoding.UTF8, "application/json");
+                }
+
             }
 
             if (requestHeaders != null)

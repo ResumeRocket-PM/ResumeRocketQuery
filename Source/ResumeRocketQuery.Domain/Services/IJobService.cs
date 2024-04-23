@@ -1,0 +1,11 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace ResumeRocketQuery.Domain.Services;
+
+public interface IJobService
+{
+    Task<int> CreateJobResumeAsync(Job job);
+    Task<List<Resume>> GetResumes(int accountId);
+    Task<Resume> GetResume(int resumeId);
+}

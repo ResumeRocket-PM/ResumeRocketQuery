@@ -27,8 +27,9 @@ namespace ResumeRocketQuery.Services
             var htmlBody = await jobScraper.ScrapeJobPosting(url);
 
             var prompt = @"
-                          For the same job posting source code provided, pull the following information from the job posting:
+                          For the same job posting HTML, please pull the following fields from the job posting. If they aren't found, leave them as null:
 
+                            * Name of the Company posting this job application
                             * Job posting title
                             * Date published which  can be nullable
                             * A 1 paragraph TLDR of the job posting description
@@ -40,8 +41,8 @@ namespace ResumeRocketQuery.Services
 
                             public class JobPosting:
                             {
+                                public string CompanyName { get; set; }
                                 public string Title { get; set; }
-                                public DateTime DatePosted { get; set; }
                                 public string Description { get; set; }
                                 public List<string> Keywords { get; set; }
                                 public List<string> Perks { get; set; }

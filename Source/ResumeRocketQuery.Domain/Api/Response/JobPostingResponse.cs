@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace ResumeRocketQuery.Domain.Services
+namespace ResumeRocketQuery.Domain.Api.Response
 {
-    public class Resume
+    public class JobPostingResponse 
     {
         public int ResumeID { get; set; }
         public DateTime ApplyDate { get; set; }

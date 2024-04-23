@@ -5,7 +5,6 @@ namespace ResumeRocketQuery.Domain.Api.Response
     public class CreateJobPostingResponse
     {
         public string Title { get; set; }
-        public string DatePosted { get; set; }
         public string Description { get; set; }
         public List<string> Keywords { get; set; }
         public List<string> Perks { get; set; }

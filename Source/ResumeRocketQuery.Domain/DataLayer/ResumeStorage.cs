@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.DataLayer
 {
@@ -14,11 +10,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         public int accountID { get; set; }
         public string status { get; set; }
         public string resume { get; set; }
-
         public string position { get; set; }
         public string companyName { get; set; }
-
-
-
     }
 }

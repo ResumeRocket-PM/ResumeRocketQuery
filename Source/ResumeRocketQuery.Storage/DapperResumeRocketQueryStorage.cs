@@ -174,22 +174,36 @@ namespace ResumeRocketQuery.Storage
             }
         }
 
-        public async Task<List<ResumeStorage>> SelectResumeStorageAsync(int accoutnID)
+        public async Task<List<ResumeStorage>> SelectResumeStoragesAsync(int accountId)
         {
             using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.QueryAsync<ResumeStorage>(
-                    StorageConstants.StoredProcedures.SelectResume,
+                    StorageConstants.StoredProcedures.SelectResumes,
                     new
                     {
-                        accountID = accoutnID,
+                        accountID = accountId,
                     },
                     commandType: CommandType.Text);
 
                 return result.ToList();
-
             }
+        }
 
+        public async Task<ResumeStorage> SelectResumeStorageAsync(int resumeId)
+        {
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<ResumeStorage>(
+                    StorageConstants.StoredProcedures.SelectResume,
+                    new
+                    {
+                        ResumeID = resumeId,
+                    },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
         }
     }
 }

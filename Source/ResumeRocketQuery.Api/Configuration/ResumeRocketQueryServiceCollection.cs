@@ -35,7 +35,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IResumeRocketQueryStorage, DapperResumeRocketQueryStorage>();
 
             services.AddSingleton<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
-            services.AddSingleton<IOpenAiClient, OpenAiClient>(); 
+            services.AddTransient<IOpenAiClient, OpenAiClient>(); 
             services.AddSingleton<IJobScraper, jobScraper>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IAccountService, AccountService>();
@@ -43,6 +43,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<ILanguageService, LanguageService>();
             services.AddSingleton<IPortfolioService, PortfolioService>();
             services.AddSingleton<IPdfService, PdfService>();
+            services.AddSingleton<IJobService, JobService>();
 
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
