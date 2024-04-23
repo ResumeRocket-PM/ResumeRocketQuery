@@ -9,7 +9,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
     public interface IResumeQueryStorage
     {
         // for resume
-        Task<int> InsertResume(ResumeStorage resume);
+        Task<int> InsertResumeStorageAsync(ResumeStorage resume);
         Task<List<ResumeStorage>> SelectResumeStorageAsync(int accountID);
     }
 }

@@ -86,7 +86,7 @@ namespace ResumeRocketQuery.Tests.Fakes
         }
 
         // for resume table
-        public async Task<int> InsertResume(ResumeStorage resume)
+        public async Task<int> InsertResumeStorageAsync(ResumeStorage resume)
         {
             var result = await _memoryStorage.InsertAsync(resume, (x, id) => { });
 

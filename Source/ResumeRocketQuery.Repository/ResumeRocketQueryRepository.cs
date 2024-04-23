@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.DataLayer;
@@ -133,22 +134,52 @@ namespace ResumeRocketQuery.Repository
         }
 
 
-        public async Task<Resume> GetResumeAsync(int accountId)
+        //public async Task<Resume> GetResumeAsync(int accountId)
+        //{
+        //    Resume result = null;
+
+        //    var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStorageAsync(accountId);
+
+        //    if (resumeStorage != null)
+        //    {
+        //        result = new Resume
+        //        {
+        //            accountID = resumeStorage.AccountId,
+        //            Content = resumeStorage.ResumeContent
+        //        };
+        //    }
+
+        //    return result;
+        //}
+
+        //TODO: this is another type of getResumeAsync
+        //because the SelectResumeStorageAsync is going to return the list instead of a single resumeStorage obj
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        public async Task<List<Resume>> GetResumeAsync(int accountId)
         {
             Resume result = null;
 
             var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStorageAsync(accountId);
 
+            List<Resume> resumeList = new();
             if (resumeStorage != null)
             {
-                result = new Resume
+                foreach (var item in resumeStorage)
                 {
-                    AccountId = resumeStorage.AccountId,
-                    Content = resumeStorage.ResumeContent
-                };
+                    result = new Resume
+                    {
+                        AccountId = item.accountID,
+                        Content = item.resume
+                    }; 
+                    resumeList.Add(result);
+                }
             }
 
-            return result;
+            return resumeList;
         }
 
         public async Task<int> CreateResumeAsync(Resume resume)
@@ -157,9 +188,16 @@ namespace ResumeRocketQuery.Repository
 
             var resumeId = await _resumeRocketQueryStorage.InsertResumeStorageAsync(new ResumeStorage
             {
-                AccountId = resume.AccountId,
-                ResumeAlias = Guid.NewGuid().ToString(),
-                ResumeContent = resume.Content
+                accountID = resume.AccountId,
+                //ResumeAlias = Guid.NewGuid().ToString(),
+                resume = resume.Content,
+
+                jobUrl = Guid.NewGuid().ToString(),
+                //accountID = resume.accountID,
+                //status = resume.status,
+                //resume = resume.resume,
+                //position = resume.position,
+                //companyName = resume.companyName,
             });
 
             return resumeId;

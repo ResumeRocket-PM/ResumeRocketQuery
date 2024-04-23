@@ -152,7 +152,7 @@ namespace ResumeRocketQuery.Storage
             }
         }
 
-        public async Task<int> InsertResume(ResumeStorage resume)
+        public async Task<int> InsertResumeStorageAsync(ResumeStorage resume)
         {
             using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {

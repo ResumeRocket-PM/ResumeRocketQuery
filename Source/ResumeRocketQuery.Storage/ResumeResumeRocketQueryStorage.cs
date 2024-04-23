@@ -6,6 +6,7 @@ using ResumeRocketQuery.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
@@ -22,15 +23,16 @@ namespace ResumeRocketQuery.Storage
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }
 
-        public async Task<int> InsertResume(ResumeStorage resume)
+        public async Task<int> InsertResumeStorageAsync(ResumeStorage resume)
         {
             using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
+                DateTime currentDate = DateTime.ParseExact(DateTime.Now.ToString("yyyy-MM-dd"), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 var result = await connection.ExecuteScalarAsync<int>(
                     StorageConstants.StoredProcedures.InsertResume,
                     new
                     {
-                        applyDate = resume.applyDate,
+                        applyDate = currentDate,
                         jobUrl = resume.jobUrl,
                         accountID = resume.accountID,
                         status = resume.status,

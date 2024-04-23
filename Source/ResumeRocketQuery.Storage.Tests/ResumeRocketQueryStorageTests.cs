@@ -260,7 +260,7 @@ namespace ResumeRocketQuery.Storage.Tests
                     AccountConfiguration = Guid.NewGuid().ToString()
                 });
 
-                var resumeID = await systemUnderTest.InsertResume(new ResumeStorage
+                var resumeID = await systemUnderTest.InsertResumeStorageAsync(new ResumeStorage
                 {
                     applyDate = DateTime.Now,
                     jobUrl = Guid.NewGuid().ToString(),
@@ -325,8 +325,8 @@ namespace ResumeRocketQuery.Storage.Tests
                     companyName = secondCompanyName,
                 };
 
-                await systemUnderTest.InsertResume(expected1);
-                await systemUnderTest.InsertResume(expected2);
+                await systemUnderTest.InsertResumeStorageAsync(expected1);
+                await systemUnderTest.InsertResumeStorageAsync(expected2);
 
                 var actual = await systemUnderTest.SelectResumeStorageAsync(accountId);
 

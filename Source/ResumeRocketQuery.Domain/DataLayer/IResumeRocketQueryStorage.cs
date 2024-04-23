@@ -14,7 +14,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<int> InsertPortfolioStorageAsync(PortfolioStorage portfolio);
         Task<PortfolioStorage> SelectPortfolioStorageAsync(int accountId);
 
-        Task<int> InsertResume(ResumeStorage resume);
+        Task<int> InsertResumeStorageAsync(ResumeStorage resume);
         Task<List<ResumeStorage>> SelectResumeStorageAsync(int accountID);
     }
 }
