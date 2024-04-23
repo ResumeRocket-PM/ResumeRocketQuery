@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace ResumeRocketQuery.Storage
 {
     public static class StorageConstants
@@ -73,6 +75,28 @@ namespace ResumeRocketQuery.Storage
 				FROM EmailAddress
 				WHERE IsActive = 1
 				AND AccountID = @AccountID;";
+
+			// for Resumes Table
+			public static string InsertResume = @"
+				Insert into Resumes (
+					AccountID, 
+					jobUrl, 
+					Resume
+				)
+				values 
+				(
+					@AccountID, 
+					@JobUrl, 
+					@resume
+				)";
+
+
+            public static string SelectResume = @"
+				select Resume 
+				from Resumes 
+				where AccountID = @AccountID 
+				and jobUrl = @jobUrl";
+
 
         }
     }
