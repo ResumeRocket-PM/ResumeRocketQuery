@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ResumeRocketQuery.Services;
 using System.Collections.Generic;
+using ResumeRocketQuery.Domain.External;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -15,16 +16,15 @@ namespace ResumeRocketQuery.Api.Controllers
     ///     This is a controller that handles the retrieval and modification of PDFs.
     /// </summary>
     [Authorize]
-    [Route("api/pdf")]
-    public class PdfController : ControllerBase
+    [Route("api/resume")]
+    public class ResumeController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
-        private readonly IPdfService pdfService;
-
-        public PdfController(IServiceResponseBuilder serviceResponseBuilder, IPdfService pdfService)
+        private readonly IJobScraper jobScraper;
+        public ResumeController(IServiceResponseBuilder serviceResponseBuilder, IJobScraper jobScraper)
         {
             this._serviceResponseBuilder = serviceResponseBuilder;
-            this.pdfService = pdfService;
+            this.jobScraper = jobScraper;
         }
 
         /// <summary>
@@ -32,11 +32,10 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpGet]
-        [Route("read")]
-        public async Task<ServiceResponseGeneric<string>> Get(string request)
+        [Route("get")]
+        public async Task<ServiceResponse> Get(string request)
         {
-            var pdfResult = await pdfService.ReadPdfAsync(request);
-            return _serviceResponseBuilder.BuildServiceResponse(pdfResult, HttpStatusCode.OK);
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -44,10 +43,11 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpPost]
-        [Route("update")]
-        public async Task<ServiceResponse> Post([FromBody] string request, string update)
+        [Route("post")]
+        public async Task<ServiceResponse> Post([FromBody] string resume, string jobUrl)
         {
-            var pdfResult = await pdfService.UpdatePdfAsync(request, update); 
+            var result = await jobScraper.ScrapeJobPosting(jobUrl);
+            // Call to Arthur's class to save to table
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
     }

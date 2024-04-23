@@ -7,8 +7,10 @@ namespace ResumeRocketQuery.Domain.Repository
     {
         Task<int> CreateAccountAsync(Account account);
         Task<int> CreatePortfolioAsync(Portfolio portfolio);
+        Task<int> CreateResumeAsync(Resume resume);
         Task<Account> GetAccountAsync(int accountId);
         Task<Account> GetAccountByEmailAddressAsync(string emailAddress);
         Task<Portfolio> GetPortfolioAsync(int accountId);
+        Task<Resume> GetResumeAsync(int accountId);
     }
 }

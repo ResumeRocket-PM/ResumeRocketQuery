@@ -131,5 +131,38 @@ namespace ResumeRocketQuery.Repository
 
             return portfolioId;
         }
+
+
+        public async Task<Resume> GetResumeAsync(int accountId)
+        {
+            Resume result = null;
+
+            var resumeStorage = await _resumeRocketQueryStorage.SelectResumeStorageAsync(accountId);
+
+            if (resumeStorage != null)
+            {
+                result = new Resume
+                {
+                    AccountId = resumeStorage.AccountId,
+                    Content = resumeStorage.ResumeContent
+                };
+            }
+
+            return result;
+        }
+
+        public async Task<int> CreateResumeAsync(Resume resume)
+        {
+            Resume result = null;
+
+            var resumeId = await _resumeRocketQueryStorage.InsertResumeStorageAsync(new ResumeStorage
+            {
+                AccountId = resume.AccountId,
+                ResumeAlias = Guid.NewGuid().ToString(),
+                ResumeContent = resume.Content
+            });
+
+            return resumeId;
+        }
     }
 }
