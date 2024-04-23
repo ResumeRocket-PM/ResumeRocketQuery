@@ -2,6 +2,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.DataLayer;
 using Module.Memory;
+using MySqlConnector;
+using ResumeRocketQuery.Storage;
+using System.Collections.Generic;
+using System.Data;
+using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.Tests.Fakes
 {
@@ -79,5 +84,25 @@ namespace ResumeRocketQuery.Tests.Fakes
 
             return result;
         }
+
+        // for resume table
+        public async Task<int> InsertResume(ResumeStorage resume)
+        {
+            var result = await _memoryStorage.InsertAsync(resume, (x, id) => { });
+
+            return result;
+        }
+
+        public async Task<List<ResumeStorage>> SelectResumeStorageAsync(int accountID)
+        {
+
+            var resumeStorages = await _memoryStorage.SelectAsync<ResumeStorage>();
+
+            var result = resumeStorages.Where(x => x.accountID == accountID);
+
+            return result.ToList();
+        }
+
+
     }
 }

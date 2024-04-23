@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.DataLayer
@@ -12,5 +13,8 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<EmailAddressStorage> SelectEmailAddressStorageByAccountIdAsync(int accountId);
         Task<int> InsertPortfolioStorageAsync(PortfolioStorage portfolio);
         Task<PortfolioStorage> SelectPortfolioStorageAsync(int accountId);
+
+        Task<int> InsertResume(ResumeStorage resume);
+        Task<List<ResumeStorage>> SelectResumeStorageAsync(int accountID);
     }
 }

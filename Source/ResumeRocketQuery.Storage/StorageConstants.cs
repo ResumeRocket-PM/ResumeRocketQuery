@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace ResumeRocketQuery.Storage
 {
     public static class StorageConstants
@@ -102,6 +104,57 @@ namespace ResumeRocketQuery.Storage
 				FROM EmailAddress
 				WHERE IsActive = 1
 				AND AccountID = @AccountID;";
+
+			// for Resumes Table
+			//public static string InsertResume = @"
+			//	Insert into Resume (
+			//		applyDate,
+			//		jobUrl, 
+			//		accountID,
+			//		status,
+			//		resume,
+			//		position,
+			//		companyName
+			//	)
+			//	values 
+			//	(
+			//		@applyDate,
+			//		@jobUrl, 
+			//		@accountID,
+			//		@status
+			//		@resume,
+			//		@position,
+			//		@companyName
+			//	)";
+
+            public static string InsertResume = @"
+				INSERT INTO resume (
+				applyDate,
+				jobUrl, 
+				accountID,
+				status,
+				resume,
+				position,
+				companyName
+				)
+			 VALUES 
+			(
+				@applyDate,
+				@jobUrl, 
+				@accountID,
+				@status,
+				@resume,
+				@position,
+				@companyName
+			 )";
+
+
+            public static string SelectResume = @"
+				select * 
+				from resume 
+				where accountID = @accoutnID";
+				
+
 
         }
     }
