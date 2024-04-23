@@ -6,7 +6,6 @@ using ResumeRocketQuery.Domain.Api.Response;
 using ResumeRocketQuery.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Cors;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -18,10 +17,16 @@ namespace ResumeRocketQuery.Api.Controllers
     public class PortfolioController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
+        private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
+        private readonly IPortfolioService _portfolioService;
 
-        public PortfolioController(IServiceResponseBuilder serviceResponseBuilder)
+        public PortfolioController(IServiceResponseBuilder serviceResponseBuilder,
+            IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder,
+            IPortfolioService portfolioService)
         {
             _serviceResponseBuilder = serviceResponseBuilder;
+            _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
+            _portfolioService = portfolioService;
         }
 
         /// <summary>
@@ -30,36 +35,33 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <returns>A User Object.</returns>
         [HttpGet]
         [Route("details")]
-        public async Task<ServiceResponse<PortfolioResponseBody>> Get()
+        public async Task<ServiceResponseGeneric<PortfolioResponseBody>> Get()
         {
+            var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            //User; //<-- This Object handles user state.
+            var portfolio = await _portfolioService.GetPortfolio(account.AccountId);
+
             var response = new PortfolioResponseBody
             {
-
+                Content = portfolio.Configuration
             };
 
             return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
         }
 
-
         [HttpPost]
-        [Route("details")]
-        public async Task<ServiceResponse<object>> Post([FromBody] PortfolioRequestBody requestBody)
+        [Route("")]
+        public async Task<ServiceResponse> Post([FromBody] PortfolioRequestBody requestBody)
         {
-            //user //<-- This Object handles user state.
-            return _serviceResponseBuilder.BuildServiceResponse(new object(), HttpStatusCode.Created);
+            var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            await _portfolioService.CreatePortfolio(new Portfolio
+            {
+                Configuration = requestBody.Content,
+                AccountId = account.AccountId,
+            });
+
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);
         }
-    }
-
-
-    public class PortfolioResponseBody
-    {
-        public string Content { get; set; }
-    }
-
-    public class PortfolioRequestBody
-    {
-        public string Content { get; set; }
     }
 }

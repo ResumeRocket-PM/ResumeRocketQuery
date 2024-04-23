@@ -3,6 +3,7 @@ using ResumeRocketQuery.Domain.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace ResumeRocketQuery.Api.Filters
 {
@@ -10,7 +11,7 @@ namespace ResumeRocketQuery.Api.Filters
     {
         public async Task OnExceptionAsync(ExceptionContext context)
         {
-            var response = new ServiceResponse<object>
+            var response = new ServiceResponseGeneric<object>
             {
                 Result = null,
                 ResponseMetadata = new ResponseMetadata

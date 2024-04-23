@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.DataLayer;
@@ -96,6 +97,39 @@ namespace ResumeRocketQuery.Repository
             }
 
             return result;
+        }
+
+
+        public async Task<Portfolio> GetPortfolioAsync(int accountId)
+        {
+            Portfolio result = null;
+
+            var portfolioStorage = await _resumeRocketQueryStorage.SelectPortfolioStorageAsync(accountId);
+
+            if (portfolioStorage != null)
+            {
+                result = new Portfolio
+                {
+                    AccountId = portfolioStorage.AccountId,
+                    Configuration = portfolioStorage.PortfolioConfiguration
+                };
+            }
+
+            return result;
+        }
+
+        public async Task<int> CreatePortfolioAsync(Portfolio portfolio)
+        {
+            Portfolio result = null;
+
+            var portfolioId = await _resumeRocketQueryStorage.InsertPortfolioStorageAsync(new PortfolioStorage
+            {
+                AccountId = portfolio.AccountId,
+                PortfolioAlias = Guid.NewGuid().ToString(),
+                PortfolioConfiguration = portfolio.Configuration
+            });
+
+            return portfolioId;
         }
     }
 }

@@ -32,6 +32,60 @@ namespace ResumeRocketQuery.Storage.Tests
             return systemUnderTest;
         }
 
+        public class InsertPortfolioStorageAsync : ResumeRocketQueryStorageTests
+        {
+            [Theory]
+            [InlineData(typeof(DapperResumeRocketQueryStorage))]
+            //[InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            public async Task WHEN_InsertEmailAddressStorageAsync_is_called_THEN_account_is_stored(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    AccountConfiguration = Guid.NewGuid().ToString()
+                });
+
+                var portfolioId = await systemUnderTest.InsertPortfolioStorageAsync(new PortfolioStorage
+                {
+                    PortfolioAlias = Guid.NewGuid().ToString(),
+                    PortfolioConfiguration = Guid.NewGuid().ToString(),
+                    AccountId = accountId
+                });
+
+                Assert.True(portfolioId > 0);
+            }
+
+            [Theory]
+            [InlineData(typeof(DapperResumeRocketQueryStorage))]
+            //[InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            public async Task WHEN_InsertEmailAddressStorageAsync_is_called_THEN_storage_matches(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    AccountConfiguration = Guid.NewGuid().ToString()
+                });
+
+                var expected = new PortfolioStorage
+                {
+                    PortfolioAlias = Guid.NewGuid().ToString(),
+                    PortfolioConfiguration = Guid.NewGuid().ToString(),
+                    AccountId = accountId
+                };
+
+                expected.PortfolioId = await systemUnderTest.InsertPortfolioStorageAsync(expected);
+
+                var actual = await systemUnderTest.SelectPortfolioStorageAsync(expected.AccountId);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
+            }
+        }
+
+
         public class InsertEmailAddressStorageAsync : ResumeRocketQueryStorageTests
         {
             [Theory]

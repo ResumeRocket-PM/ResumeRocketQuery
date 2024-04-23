@@ -16,7 +16,7 @@ namespace ResumeRocketQuery.Api.Tests.Helpers
             _client = new HttpClient();
         }
 
-        public async Task<ServiceResponse<T>> SendRequest<T>(string resource, HttpMethod httpMethod, object requestBody = null, Dictionary<string, string> requestHeaders = null)
+        public async Task<ServiceResponseGeneric<T>> SendRequest<T>(string resource, HttpMethod httpMethod, object requestBody = null, Dictionary<string, string> requestHeaders = null)
         {
             var httpRequestMessage = new HttpRequestMessage(httpMethod, resource);
 
@@ -40,7 +40,7 @@ namespace ResumeRocketQuery.Api.Tests.Helpers
 
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ServiceResponse<T>>(responseContent);
+                var result = JsonConvert.DeserializeObject<ServiceResponseGeneric<T>>(responseContent);
 
                 return result;
             }

@@ -63,5 +63,21 @@ namespace ResumeRocketQuery.Tests.Fakes
 
             return result;
         }
+
+        public async Task<int> InsertPortfolioStorageAsync(PortfolioStorage portfolio)
+        {
+            var result = await _memoryStorage.InsertAsync(portfolio, (x, id) => { x.PortfolioId = id; });
+
+            return result;
+        }
+
+        public async Task<PortfolioStorage> SelectPortfolioStorageAsync(int accountId)
+        {
+            var emailAddressStorages = await _memoryStorage.SelectAsync<PortfolioStorage>();
+
+            var result = emailAddressStorages.FirstOrDefault(x => x.AccountId == accountId);
+
+            return result;
+        }
     }
 }

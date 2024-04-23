@@ -10,7 +10,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<EmailAddressStorage> SelectEmailAddressStorageByEmailAddressAsync(string emailAddress);
         Task<EmailAddressStorage> SelectEmailAddressStorageAsync(int emailAddressId);
         Task<EmailAddressStorage> SelectEmailAddressStorageByAccountIdAsync(int accountId);
-
-
+        Task<int> InsertPortfolioStorageAsync(PortfolioStorage portfolio);
+        Task<PortfolioStorage> SelectPortfolioStorageAsync(int accountId);
     }
 }

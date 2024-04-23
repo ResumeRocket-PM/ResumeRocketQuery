@@ -12,13 +12,29 @@ namespace ResumeRocketQuery.Api.Builder
             HttpStatusCode.Created
         };
 
-        public ServiceResponse<T> BuildServiceResponse<T>(T result, HttpStatusCode statusCode)
+        public ServiceResponseGeneric<T> BuildServiceResponse<T>(T result, HttpStatusCode statusCode)
         {
             var success = _successfulStatusCodes.Contains(statusCode);
 
-            var response = new ServiceResponse<T>
+            var response = new ServiceResponseGeneric<T>
             {
                 Result = result,
+                Succeeded = success,
+                ResponseMetadata = new ResponseMetadata
+                {
+                    HttpStatusCode = (int)statusCode
+                }
+            };
+
+            return response;
+        }
+
+        public ServiceResponse BuildServiceResponse(HttpStatusCode statusCode)
+        {
+            var success = _successfulStatusCodes.Contains(statusCode);
+
+            var response = new ServiceResponse
+            {
                 Succeeded = success,
                 ResponseMetadata = new ResponseMetadata
                 {

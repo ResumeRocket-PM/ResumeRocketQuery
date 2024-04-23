@@ -28,7 +28,7 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpPost]
         [Route("authenticate")]
-        public async Task<ServiceResponse<AuthenticationResponseBody>> Authenticate([FromBody] AuthenticationRequestBody authenticationRequestBody)
+        public async Task<ServiceResponseGeneric<AuthenticationResponseBody>> Authenticate([FromBody] AuthenticationRequestBody authenticationRequestBody)
         {
             var authenticationResponse = await _authenticationService.AuthenticateAccountAsync(new AuthenticateAccountRequest
             {
@@ -48,7 +48,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("account")]
-        public async Task<ServiceResponse<AuthenticationResponseBody>> Post([FromBody] AccountRequestBody authenticationRequestBody)
+        public async Task<ServiceResponseGeneric<AuthenticationResponseBody>> Post([FromBody] AccountRequestBody authenticationRequestBody)
         {
             var accountResponse = await _accountService.CreateAccountAsync(new CreateAccountRequest
             {

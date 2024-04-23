@@ -17,6 +17,41 @@ namespace ResumeRocketQuery.Storage
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }
 
+        public async Task<int> InsertPortfolioStorageAsync(PortfolioStorage portfolio)
+        {
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.ExecuteScalarAsync<int>(
+                    StorageConstants.StoredProcedures.InsertPortfolio,
+                    new
+                    {
+                        AccountId = portfolio.AccountId,
+                        PortfolioAlias = portfolio.PortfolioAlias,
+                        PortfolioConfiguration = portfolio.PortfolioConfiguration
+                    },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
+        }
+
+        public async Task<PortfolioStorage> SelectPortfolioStorageAsync(int accountId)
+        {
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<PortfolioStorage>(
+                    StorageConstants.StoredProcedures.SelectPortfolio,
+                    new
+                    {
+                        AccountID = accountId
+                    },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
+        }
+
+
         public async Task<int> InsertAccountStorageAsync(AccountStorage accountStorage)
         {
             using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))

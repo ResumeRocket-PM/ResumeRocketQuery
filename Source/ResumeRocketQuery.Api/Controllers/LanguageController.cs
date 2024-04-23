@@ -33,7 +33,7 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <returns>A User Object.</returns>
         [HttpPost]
         [Route("jobposting")]
-        public async Task<ServiceResponse<CreateJobPostingResponse>> Post([FromBody]CreateJobPostingRequest request)
+        public async Task<ServiceResponseGeneric<CreateJobPostingResponse>> Post([FromBody]CreateJobPostingRequest request)
         {
             var jobPostingResult = await languageService.CaptureJobPostingAsync(request.Url);
 
