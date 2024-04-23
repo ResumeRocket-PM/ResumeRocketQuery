@@ -7,6 +7,8 @@ using ResumeRocketQuery.Tests.Fakes;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Sprache;
+using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.Storage.Tests
 {
@@ -237,6 +239,115 @@ namespace ResumeRocketQuery.Storage.Tests
                 var actual = await systemUnderTest.SelectEmailAddressStorageByAccountIdAsync(expected.AccountId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
+            }
+        }
+
+        // for resume
+
+        public class InsertResume : ResumeRocketQueryStorageTests
+        {
+            [Theory]
+            [InlineData(typeof(DapperResumeRocketQueryStorage))]
+            //[InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            public async Task when_insert_then_ID_return(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    AccountConfiguration = Guid.NewGuid().ToString()
+                });
+
+                var resumeID = await systemUnderTest.InsertResume(new ResumeStorage
+                {
+                    applyDate = DateTime.Now,
+                    jobUrl = Guid.NewGuid().ToString(),
+                    accountID = accountId,
+                    status = Guid.NewGuid().ToString(),
+                    resume = "test",
+                    position = "A",
+                    companyName = Guid.NewGuid().ToString(),
+
+                });
+
+                Assert.True(resumeID > 0);
+            }
+
+            [Theory]
+            [InlineData(typeof(DapperResumeRocketQueryStorage))]
+            [InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            public async Task when_Select_resume_by_ID_return_the_resume(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    AccountConfiguration = Guid.NewGuid().ToString()
+                });
+
+                DateTime firstDate = DateTime.Now;
+                string firstJobUrl = Guid.NewGuid().ToString();
+                int firstAcID = accountId;
+                string firstStatus = Guid.NewGuid().ToString();
+                string firstResumeText = "adobe resume";
+                string firstCompanyName = "Adobe";
+                var expected1 = new ResumeStorage
+                {
+
+                    applyDate = firstDate,
+                    jobUrl = firstJobUrl,
+                    accountID = accountId,
+                    status = firstStatus,
+                    resume= firstResumeText,
+                    position = "A",
+                    companyName = firstCompanyName,
+
+                };
+
+                DateTime secondDate = DateTime.Now;
+                string secondJobUrl = Guid.NewGuid().ToString();
+                int secondAcID = accountId;
+                string secondStatus = Guid.NewGuid().ToString();
+                string secondResumeText = "adobe resume";
+                string secondCompanyName = "Adobe";
+                var expected2 = new ResumeStorage
+                {
+                    applyDate = secondDate,
+                    jobUrl = secondJobUrl,
+                    accountID = accountId,
+                    status = secondStatus,
+                    resume= secondResumeText,
+                    position = "B",
+                    companyName = secondCompanyName,
+                };
+
+                await systemUnderTest.InsertResume(expected1);
+                await systemUnderTest.InsertResume(expected2);
+
+                var actual = await systemUnderTest.SelectResumeStorageAsync(accountId);
+
+                Assert.True(actual.Count == 2);
+
+                Assert.Equal(firstDate, actual[0].applyDate);
+                Assert.Equal(firstJobUrl, actual[0].jobUrl);
+                Assert.Equal(firstAcID, actual[0].accountID);
+                Assert.Equal(firstStatus, actual[0].status);
+                Assert.Equal(firstResumeText, actual[0].resume);
+                Assert.Equal(firstCompanyName, actual[0].companyName);
+
+                Assert.Equal(secondDate, actual[1].applyDate);
+                Assert.Equal(secondJobUrl, actual[1].jobUrl);
+                Assert.Equal(secondAcID, actual[1].accountID);
+                Assert.Equal(secondStatus, actual[1].status);
+                Assert.Equal(secondResumeText, actual[1].resume);
+                Assert.Equal(secondCompanyName, actual[1].companyName);
+
+                //expected2.ToExpectedObject().ShouldMatch(actual[0]);
+                //expected1.ToExpectedObject().ShouldMatch(actual[1]);
+
+
             }
         }
     }

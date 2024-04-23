@@ -106,25 +106,54 @@ namespace ResumeRocketQuery.Storage
 				AND AccountID = @AccountID;";
 
 			// for Resumes Table
-			public static string InsertResume = @"
-				Insert into Resumes (
-					AccountID, 
-					jobUrl, 
-					Resume
+			//public static string InsertResume = @"
+			//	Insert into Resume (
+			//		applyDate,
+			//		jobUrl, 
+			//		accountID,
+			//		status,
+			//		resume,
+			//		position,
+			//		companyName
+			//	)
+			//	values 
+			//	(
+			//		@applyDate,
+			//		@jobUrl, 
+			//		@accountID,
+			//		@status
+			//		@resume,
+			//		@position,
+			//		@companyName
+			//	)";
+
+            public static string InsertResume = @"
+				INSERT INTO resume (
+				applyDate,
+				jobUrl, 
+				accountID,
+				status,
+				resume,
+				position,
+				companyName
 				)
-				values 
-				(
-					@AccountID, 
-					@JobUrl, 
-					@resume
-				)";
+			 VALUES 
+			(
+				@applyDate,
+				@jobUrl, 
+				@accountID,
+				@status,
+				@resume,
+				@position,
+				@companyName
+			 )";
 
 
             public static string SelectResume = @"
-				select Resume 
-				from Resumes 
-				where AccountID = @AccountID 
-				and jobUrl = @jobUrl";
+				select * 
+				from resume 
+				where accountID = @accoutnID";
+				
 
 
         }

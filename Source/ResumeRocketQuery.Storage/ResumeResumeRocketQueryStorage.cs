@@ -2,6 +2,7 @@
 using MySqlConnector;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,19 +22,21 @@ namespace ResumeRocketQuery.Storage
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }
 
-        public async Task<string> InsertResume( string url, string resume)
+        public async Task<int> InsertResume(ResumeStorage resume)
         {
-            ResumeStorage newResume = new();
             using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                // ExecuteScalarAsync??
-                var result = await connection.ExecuteScalarAsync<string>(
+                var result = await connection.ExecuteScalarAsync<int>(
                     StorageConstants.StoredProcedures.InsertResume,
                     new
                     {
-                        AccountID = newResume.AccountId,
-                        JobURL = url,
-                        Resume = resume
+                        applyDate = resume.applyDate,
+                        jobUrl = resume.jobUrl,
+                        accountID = resume.accountID,
+                        status = resume.status,
+                        resume = resume.resume,
+                        position = resume.position,
+                        companyName = resume.companyName,
                     },
                     commandType: CommandType.Text);
 
@@ -41,20 +44,20 @@ namespace ResumeRocketQuery.Storage
             }
         }
 
-        public async Task<string> SelectResumeStorageAsync(string Url, int accountID)
+
+        public async Task<List<ResumeStorage>> SelectResumeStorageAsync(int accoutnID)
         {
             using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryFirstOrDefaultAsync<string>(
+                var result = await connection.QueryAsync<ResumeStorage>(
                     StorageConstants.StoredProcedures.SelectResume,
                     new
                     {
-                        JobUrl = Url,
-                        AccountID = accountID
+                        accountID = accoutnID,
                     },
-                    commandType: CommandType.Text) ;
+                    commandType: CommandType.Text);
 
-                return result;
+                return result.ToList();
 
             }
 
