@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.Services;
 
@@ -11,6 +12,6 @@ namespace ResumeRocketQuery.Domain.Repository
         Task<Account> GetAccountAsync(int accountId);
         Task<Account> GetAccountByEmailAddressAsync(string emailAddress);
         Task<Portfolio> GetPortfolioAsync(int accountId);
-        Task<Resume> GetResumeAsync(int accountId);
+        Task<List<Resume>> GetResumeAsync(int accountId);
     }
 }
