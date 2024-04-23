@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Sprache;
 using ResumeRocketQuery.Domain.Services;
+using System.Globalization;
 
 namespace ResumeRocketQuery.Storage.Tests
 {
@@ -287,7 +288,8 @@ namespace ResumeRocketQuery.Storage.Tests
                     AccountConfiguration = Guid.NewGuid().ToString()
                 });
 
-                DateTime firstDate = DateTime.Now;
+                DateTime firstDate = DateTime.ParseExact(DateTime.Now.ToString("yyyy-MM-dd"), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                ;
                 string firstJobUrl = Guid.NewGuid().ToString();
                 int firstAcID = accountId;
                 string firstStatus = Guid.NewGuid().ToString();
@@ -306,7 +308,7 @@ namespace ResumeRocketQuery.Storage.Tests
 
                 };
 
-                DateTime secondDate = DateTime.Now;
+                DateTime secondDate = DateTime.ParseExact(DateTime.Now.ToString("yyyy-MM-dd"), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 string secondJobUrl = Guid.NewGuid().ToString();
                 int secondAcID = accountId;
                 string secondStatus = Guid.NewGuid().ToString();
