@@ -23,6 +23,17 @@ namespace ResumeRocketQuery.Services
         {
             JobResult jobResult = await _languageService.CaptureJobPostingAsync(job.JobUrl);
 
+            //Nate Put logic here.
+            //Parse the Pdf bytes from the Job Object.
+            //Take the Text of the Resume
+            //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
+            //Store this as part of the ResumeContent dictionary.
+            string reccomendations = null;
+
+            var resumeContent = job.Resume;
+
+            resumeContent.Add("Reccomendations:", reccomendations);
+
             var result = await _resumeRocketQueryRepository.CreateResumeAsync(new Resume
             {
                 AccountID = job.AccountId,
@@ -30,7 +41,7 @@ namespace ResumeRocketQuery.Services
                 CompanyName = jobResult.CompanyName,
                 JobUrl = job.JobUrl,
                 Position = jobResult.Title,
-                ResumeContent = job.Resume,
+                ResumeContent = resumeContent,
                 Status = "Pending"
             });
 
