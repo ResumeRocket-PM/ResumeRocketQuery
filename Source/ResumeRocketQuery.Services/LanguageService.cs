@@ -27,10 +27,10 @@ namespace ResumeRocketQuery.Services
             var htmlBody = await jobScraper.ScrapeJobPosting(url);
 
             var prompt = @"
-                          For the same job posting HTML, please pull the following fields from the job posting. If they aren't found, leave them as null:
+                          For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
 
                             * Name of the Company posting this job application
-                            * Position title
+                            * the title of the position detailed in the job posting
                             * Date published which  can be nullable
                             * A 1 paragraph TLDR of the job posting description
                             * The top 10 keywords of the job posting
@@ -47,7 +47,11 @@ namespace ResumeRocketQuery.Services
                                 public List<string> Keywords { get; set; }
                                 public List<string> Perks { get; set; }
                                 public List<string> Requirements { get; set; }
-                            }";
+                            }
+
+                            The following input is the job posting html
+
+                            {{$input}}";
 
             var result = await openAiClient.SendMessageAsync(prompt, htmlBody);
 
