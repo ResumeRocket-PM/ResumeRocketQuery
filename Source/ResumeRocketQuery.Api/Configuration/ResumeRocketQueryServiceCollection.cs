@@ -37,18 +37,17 @@ namespace ResumeRocketQuery.Api.Configuration
 
             services.AddSingleton<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
             services.AddTransient<IOpenAiClient, OpenAiClient>(); 
-            services.AddSingleton<IJobScraper, jobScraper>();
-            services.AddSingleton<IAuthenticationService, AuthenticationService>();
-            services.AddSingleton<IAccountService, AccountService>();
-            services.AddSingleton<IAuthenticationHelper, AuthenticationHelper>();
-            services.AddSingleton<ILanguageService, LanguageService>();
-            services.AddSingleton<IPortfolioService, PortfolioService>();
-            services.AddSingleton<IPdfService, PdfService>();
-            services.AddSingleton<IJobService, JobService>();
+            services.AddTransient<IJobScraper, jobScraper>();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
+            services.AddTransient<ILanguageService, LanguageService>();
+            services.AddTransient<IPortfolioService, PortfolioService>();
+            services.AddTransient<IPdfService, PdfService>();
+            services.AddTransient<IJobService, JobService>();
 
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
-
 
             ConfigureJwtAuthentication(services);
             ConfigureMiddlewareServices(services);

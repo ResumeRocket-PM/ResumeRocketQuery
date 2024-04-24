@@ -22,8 +22,11 @@ namespace ResumeRocketQuery.Services.Tests
 
         public class CaptureJobPostingAsync : LanguageServiceTests
         {
-            [Fact]
-            public async Task WHEN_CaptureJobPostingAsync_is_called_THEN_account_is_created()
+            [Theory]
+            [InlineData("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907")]
+            [InlineData("https://openai.com/careers/endpoint-engineer")]
+            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            public async Task WHEN_CaptureJobPostingAsync_is_called_THEN_account_is_created(string url)
             {
                 var expected = new 
                 {

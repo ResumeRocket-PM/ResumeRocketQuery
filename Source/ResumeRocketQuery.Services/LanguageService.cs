@@ -30,7 +30,7 @@ namespace ResumeRocketQuery.Services
                           For the same job posting HTML, please pull the following fields from the job posting. If they aren't found, leave them as null:
 
                             * Name of the Company posting this job application
-                            * Job posting title
+                            * Position title
                             * Date published which  can be nullable
                             * A 1 paragraph TLDR of the job posting description
                             * The top 10 keywords of the job posting
