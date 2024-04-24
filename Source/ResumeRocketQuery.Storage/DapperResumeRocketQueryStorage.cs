@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -204,6 +205,13 @@ namespace ResumeRocketQuery.Storage
 
                 return result;
             }
+        }
+
+        public async Task UpdateResumeStorageAsync(ResumeStorage resumeStorage)
+        {
+            //Given the ResumeId on the ResumeStorage Object,
+            //Update the record with that Id, and set the status to whatever the status of this object is.
+            throw new NotImplementedException();
         }
     }
 }

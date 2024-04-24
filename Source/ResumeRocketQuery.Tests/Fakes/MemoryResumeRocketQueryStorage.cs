@@ -111,5 +111,11 @@ namespace ResumeRocketQuery.Tests.Fakes
 
             return result;
         }
+
+        public async Task UpdateResumeStorageAsync(ResumeStorage resumeStorage)
+        {
+            await _memoryStorage.UpdateAsync<ResumeStorage>(x => x.ResumeID == resumeStorage.ResumeID,
+                x => x.status = resumeStorage.status);
+        }
     }
 }

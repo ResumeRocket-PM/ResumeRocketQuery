@@ -28,11 +28,11 @@ namespace ResumeRocketQuery.Services
             //Take the Text of the Resume
             //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
             //Store this as part of the ResumeContent dictionary.
-            string reccomendations = null;
+            string reccomendations = "";
 
             var resumeContent = job.Resume;
 
-            resumeContent.Add("Reccomendations:", reccomendations);
+            resumeContent.Add("Reccomendations", reccomendations);
 
             var result = await _resumeRocketQueryRepository.CreateResumeAsync(new Resume
             {
@@ -56,6 +56,11 @@ namespace ResumeRocketQuery.Services
         public async Task<Resume> GetResume(int resumeId)
         {
             return await _resumeRocketQueryRepository.GetResumeAsync(resumeId);
+        }
+
+        public async Task UpdateResume(int resumeId, string status)
+        {
+            throw new NotImplementedException();
         }
     }
 }

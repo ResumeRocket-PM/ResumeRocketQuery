@@ -88,6 +88,16 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(new JobPostingsResponse(result), HttpStatusCode.NotFound);
         }
 
+        [HttpPut]
+        [Route("postings/{resumeId}")]
+        public async Task<ServiceResponse> UpdateStaus(int resumeId, string status)
+        {
+            await _jobService.UpdateResume(resumeId, status);
+
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
+        }
+
+
         [HttpPost]
         [Route("postings")]
         public async Task<ServiceResponse> CreateJobPosting([FromForm] CreateJobRequest request)

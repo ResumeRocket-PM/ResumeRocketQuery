@@ -50,7 +50,7 @@ namespace ResumeRocketQuery.Services.Tests
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
                     Position = "Software Engineer",
-                    ResumeContent = new Dictionary<string, string>(),
+                    ResumeContent = new Dictionary<string, string>() { { "Reccomendations", "" } },
                     ResumeID = resumeId,
                     Status = "Pending"
                 };
@@ -120,7 +120,7 @@ namespace ResumeRocketQuery.Services.Tests
                         ApplyDate = Expect.Any<DateTime>(),
                         CompanyName = Expect.Any<string>(),
                         Position = "Software Engineer",
-                        ResumeContent = new Dictionary<string, string>(),
+                        ResumeContent = new Dictionary<string, string> {{"Reccomendations", "" } },
                         ResumeID = resumeId1,
                         Status = "Pending"
                     },
@@ -131,7 +131,7 @@ namespace ResumeRocketQuery.Services.Tests
                         ApplyDate = Expect.Any<DateTime>(),
                         CompanyName = Expect.Any<string>(),
                         Position = "Software Engineer",
-                        ResumeContent = new Dictionary<string, string>(),
+                        ResumeContent = new Dictionary<string, string>() {{"Reccomendations", "" } },
                         ResumeID = resumeId2,
                         Status = "Pending"
                     }

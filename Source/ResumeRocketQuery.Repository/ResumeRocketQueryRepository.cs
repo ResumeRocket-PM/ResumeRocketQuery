@@ -194,5 +194,10 @@ namespace ResumeRocketQuery.Repository
 
             return result;
         }
+
+        public async Task UpdateResume(int resumeId, string status)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
