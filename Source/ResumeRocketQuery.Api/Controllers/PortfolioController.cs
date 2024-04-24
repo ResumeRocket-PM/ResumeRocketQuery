@@ -45,7 +45,7 @@ namespace ResumeRocketQuery.Api.Controllers
             {
                 var response = new PortfolioResponseBody
                 {
-                    Content = portfolio.Configuration
+                    Content = portfolio?.Configuration ?? string.Empty
                 };
 
                 return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
