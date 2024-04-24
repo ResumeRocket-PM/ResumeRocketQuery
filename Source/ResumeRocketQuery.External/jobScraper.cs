@@ -7,38 +7,30 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.Net.Http;
 using NScrape;
+using System.Text.RegularExpressions;
 
 namespace ResumeRocketQuery.External
 {
     
     public class jobScraper : IJobScraper 
     {
-        //private string Url;
-        public class Scraper() 
-        {
-        }
-
         public async Task<string> ScrapeJobPosting(string url)
         {
             try
             {
-                //string temp_url = "https://www.1800contacts.com/job-listing?gh_jid=5849626";
                 var httpClient = new HttpClient();
-                var html = await httpClient.GetStringAsync(url);//.Result;
+
+                var html = await httpClient.GetStringAsync(url);
 
                 var scraper = new TestScraper(html);
+
                 var result = scraper.get_HTML_Body();
 
-
-                Console.WriteLine(html.ToString());
-
-                return html;
+                return result;
 
             }
             catch (Exception e)
             {
-                //Console.WriteLine($"Error occurred while scraping: {e.Message}");
-                //return null;
                 throw new Exception($"Error occurred while scraping: {e.Message}");
             }
         }
@@ -54,11 +46,16 @@ namespace ResumeRocketQuery.External
 
         public string get_HTML_Body()
         {
-            //var node = HtmlDocument.DocumentNode.Element("//body");//.Descendants().SingleOrDefault(n => n.Attributes.Contains("class") && n.Attributes["class"].Value == "myforecast-current");
             var node = HtmlDocument.DocumentNode.SelectSingleNode("//html");
+
+
             if (node != null)
             {
-                return node.InnerText;
+                var result = Regex.Replace(node.InnerText, @"[^a-zA-Z0-9 -]", string.Empty);
+                
+                result = Regex.Replace(result, @"\s\s+", " ");
+
+                return result;
             }
 
             throw new ScrapeException("Could not scrape conditions.", Html);

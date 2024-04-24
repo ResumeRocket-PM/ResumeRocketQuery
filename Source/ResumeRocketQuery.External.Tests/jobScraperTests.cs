@@ -25,34 +25,15 @@ namespace ResumeRocketQuery.Repository.Tests
 
         public class CreateAccountAsync : jobScraperTests
         {
-            [Fact]
-            public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_stored()
+            [Theory]
+            [InlineData("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907")]
+            [InlineData("https://openai.com/careers/endpoint-engineer")]
+            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_stored(string url)
             {
-                //jobScraper jbs = new();
-                var result = await _systemUnderTest.ScrapeJobPosting("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907");
-                //string content = result;
-                Console.WriteLine(result);
+                var result = await _systemUnderTest.ScrapeJobPosting(url);
+
                 Assert.NotNull(result);
-
-                //try
-                //{
-                //    // Specify the file path on your desktop
-                //    string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                //    string filePath = Path.Combine(desktopPath, "example.txt");
-
-                //    // Write the string to the text file
-                //    //string content = "Hello, world!";
-                //    File.WriteAllText(filePath, result.ToString());
-
-                //    Console.WriteLine("String has been written to the text file.");
-                //}
-                //catch (Exception ex)
-                //{
-                //    Console.WriteLine($"An error occurred: {ex.Message}");
-                //}
-
-                //throw new Exception($"html {result.ToString()}");
-                //await _systemUnderTest.scrapJobPosting("help me please");
             }
         }
     }

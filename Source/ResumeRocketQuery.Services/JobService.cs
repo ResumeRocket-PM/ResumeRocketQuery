@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.Domain.DataLayer;
@@ -48,11 +49,13 @@ namespace ResumeRocketQuery.Services
 
             resumeContent.Add("Reccomendations", reccomendations);
 
+            var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
+
             var result = await _resumeRocketQueryRepository.CreateResumeAsync(new Resume
             {
                 AccountID = job.AccountId,
                 ApplyDate = DateTime.Now,
-                CompanyName = jobResult.CompanyName,
+                CompanyName = regex,
                 JobUrl = job.JobUrl,
                 Position = jobResult.Title,
                 ResumeContent = resumeContent,

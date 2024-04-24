@@ -38,7 +38,7 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var resumeId = await  _systemUnderTest.CreateJobResumeAsync(new Job
                 {
-                    Resume = new Dictionary<string, string>(),
+                    Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
                     AccountId = account.AccountId
                 });
@@ -50,7 +50,6 @@ namespace ResumeRocketQuery.Services.Tests
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
                     Position = "Software Engineer",
-                    ResumeContent = new Dictionary<string, string>() { { "Reccomendations", "" } },
                     ResumeID = resumeId,
                     Status = "Pending"
                 };
@@ -86,13 +85,15 @@ namespace ResumeRocketQuery.Services.Tests
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
                     Position = "Software Engineer",
-                    ResumeContent = new Dictionary<string, string>() { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" }, { "Reccomendations", "" } },
                     ResumeID = resumeId,
                     Status = "Pending"
                 };
 
                 var actual = await _systemUnderTest.GetResume(resumeId);
 
+                Assert.True(actual.ResumeContent.ContainsKey("FileBytes"));
+                Assert.True(actual.ResumeContent.ContainsKey("FileName"));
+                Assert.True(actual.ResumeContent.ContainsKey("Reccomendations"));
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
 
@@ -110,12 +111,51 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
-                    Resume = new Dictionary<string, string>(),
+                    Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
                     AccountId = account.AccountId
                 });
 
                 Assert.True(resumeId > 0);
+            }
+
+
+            [Theory]
+            [InlineData("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907")]
+            [InlineData("https://openai.com/careers/endpoint-engineer")]
+            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            public async Task GIVEN_jobUrl_WHEN_CreateJobResumeAsync_THEN_result_is_correct(string jobUrl)
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
+                {
+                    Resume = new Dictionary<string, string> {{ "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
+                    JobUrl = jobUrl,
+                    AccountId = account.AccountId,
+                });
+
+                var expected = new
+                {
+                    JobUrl = jobUrl,
+                    AccountID = account.AccountId,
+                    ApplyDate = Expect.Any<DateTime>(),
+                    CompanyName = Expect.Any<string>(),
+                    Position = "Software Engineer",
+                    ResumeID = resumeId,
+                    Status = "Pending"
+                };
+
+                var actual = await _systemUnderTest.GetResume(resumeId);
+
+                Assert.True(actual.ResumeContent.ContainsKey("FileBytes"));
+                Assert.True(actual.ResumeContent.ContainsKey("FileName"));
+                Assert.True(actual.ResumeContent.ContainsKey("Reccomendations"));
+                expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
 
@@ -135,14 +175,14 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
-                    Resume = new Dictionary<string, string>(),
+                    Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
                     AccountId = account.AccountId
                 });
 
                 var resumeId2 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
-                    Resume = new Dictionary<string, string>(),
+                    Resume = new Dictionary<string, string>{{ "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
                     AccountId = account.AccountId
                 });
@@ -156,7 +196,6 @@ namespace ResumeRocketQuery.Services.Tests
                         ApplyDate = Expect.Any<DateTime>(),
                         CompanyName = Expect.Any<string>(),
                         Position = "Software Engineer",
-                        ResumeContent = new Dictionary<string, string> {{"Reccomendations", "" } },
                         ResumeID = resumeId1,
                         Status = "Pending"
                     },
@@ -167,7 +206,6 @@ namespace ResumeRocketQuery.Services.Tests
                         ApplyDate = Expect.Any<DateTime>(),
                         CompanyName = Expect.Any<string>(),
                         Position = "Software Engineer",
-                        ResumeContent = new Dictionary<string, string>() {{"Reccomendations", "" } },
                         ResumeID = resumeId2,
                         Status = "Pending"
                     }
@@ -192,9 +230,9 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
-                    Resume = new Dictionary<string, string>(),
+                    Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
-                    AccountId = account.AccountId
+                    AccountId = account.AccountId,
                 });
 
                 //var resumeId2 = await _systemUnderTest.CreateJobResumeAsync(new Job
