@@ -39,8 +39,10 @@ namespace ResumeRocketQuery.Services
             //Take the Text of the Resume
             var pdfText = await pdfService.ReadPdfAsync(pdf);
             //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
-            var prompt = "Based on this job description\n\n"+jobResult.Description+"\n\nand these 10 keywords selected from the job posting" +
-                jobResult.Keywords + "\n\n provide bullet point suggestions on what needs to be changed for the following resume content\n\n{{$input}}";
+
+            var prompt = $"Based on this job description: \r\n\r\n<DESCRIPTION BEGINS>{jobResult.Description}<DESCRIPTION ENDS>\r\n\r\n " +
+                         $"and these 10 keywords selected from the job posting\n\n<DESCRIPTION BEGINS>{jobResult.Keywords}<DESCRIPTION ENDS>\n\n " +
+                         "Provide a list of suggestions, separated by the new line character: '\n', on what needs to be changed for the following resume content\n\n{{$input}}";
 
             //Store this as part of the ResumeContent dictionary.
             string reccomendations = await openAiClient.SendMessageAsync(prompt, pdfText);
