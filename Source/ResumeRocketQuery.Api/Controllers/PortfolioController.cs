@@ -41,12 +41,17 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var portfolio = await _portfolioService.GetPortfolio(account.AccountId);
 
-            var response = new PortfolioResponseBody
+            if (portfolio != null)
             {
-                Content = portfolio.Configuration
-            };
+                var response = new PortfolioResponseBody
+                {
+                    Content = portfolio.Configuration
+                };
 
-            return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+                return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+            }
+
+            return _serviceResponseBuilder.BuildServiceResponse<PortfolioResponseBody>(null, HttpStatusCode.NotFound);
         }
 
         [HttpPost]

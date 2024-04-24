@@ -24,6 +24,7 @@ using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.External;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
@@ -55,6 +56,13 @@ namespace ResumeRocketQuery.Api.Configuration
 
         private void ConfigureMiddlewareServices(IServiceCollection services)
         {
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue;
+                x.MemoryBufferThreshold = int.MaxValue;
+            });
+
             services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
             services.AddCors(options =>

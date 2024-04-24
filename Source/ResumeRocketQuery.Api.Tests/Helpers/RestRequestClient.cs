@@ -34,7 +34,7 @@ namespace ResumeRocketQuery.Api.Tests.Helpers
 
                     var byteArrayContent = new ByteArrayContent(File.ReadAllBytes(fileUpload));
                     byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                    content.Add(byteArrayContent, "FormFile", Path.GetFileName(fileUpload));
+                    content.Add(byteArrayContent, "File", Path.GetFileName(fileUpload));
 
                     var requestBodyJson = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8,
                         "application/json");

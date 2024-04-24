@@ -59,7 +59,7 @@ namespace ResumeRocketQuery.Api.Controllers
                     Status = resumeResult.Status,
                 };
 
-                return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.NotFound);
+                return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
             }
 
             return _serviceResponseBuilder.BuildServiceResponse<JobPostingResponse>(null, HttpStatusCode.NotFound);
@@ -85,7 +85,7 @@ namespace ResumeRocketQuery.Api.Controllers
                 Status = x.Status,
             }).ToList();
 
-            return _serviceResponseBuilder.BuildServiceResponse(new JobPostingsResponse(result), HttpStatusCode.NotFound);
+            return _serviceResponseBuilder.BuildServiceResponse(new JobPostingsResponse(result), HttpStatusCode.OK);
         }
 
         [HttpPut]
@@ -100,7 +100,7 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpPost]
         [Route("postings")]
-        public async Task<ServiceResponse> CreateJobPosting([FromForm] CreateJobRequest request)
+        public async Task<ServiceResponse> CreateJobPosting([FromForm] IFormFile file, [FromForm] string data)
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
@@ -108,15 +108,15 @@ namespace ResumeRocketQuery.Api.Controllers
 
             using (var ms = new MemoryStream())
             {
-                request.FormFile.CopyTo(ms);
+                file.CopyTo(ms);
                 var fileByteArray = ms.ToArray();
                 string fileBytes = Convert.ToBase64String(fileByteArray);
 
-                resultResume.Add("FileName", request.FormFile.FileName);
+                resultResume.Add("FileName", file.FileName);
                 resultResume.Add("FileBytes", fileBytes);
             }
 
-            var createRequest = JsonConvert.DeserializeObject<CreateJobPostingRequest>(request.Data);
+            var createRequest = JsonConvert.DeserializeObject<CreateJobPostingRequest>(data);
 
             await _jobService.CreateJobResumeAsync(new Job
             {
