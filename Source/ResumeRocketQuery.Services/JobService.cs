@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
 
@@ -60,7 +61,12 @@ namespace ResumeRocketQuery.Services
 
         public async Task UpdateResume(int resumeId, string status)
         {
-            throw new NotImplementedException();
+            //Resume resume = await _resumeRocketQueryRepository.GetResumeAsync(resumeId);
+            ResumeStorage resumeStorage = new();
+            resumeStorage.status = status;
+            resumeStorage.ResumeID = resumeId;
+            await _resumeRocketQueryRepository.UpdateResume(resumeStorage);
+            //throw new NotImplementedException();
         }
     }
 }

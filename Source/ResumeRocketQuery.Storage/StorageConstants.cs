@@ -156,6 +156,7 @@ namespace ResumeRocketQuery.Storage
 				from resume 
 				where ResumeId = @ResumeID";
 
+			public static string changeStatus = @"UPDATE resume SET status = @status WHERE resumeID = @resumeID";
         }
     }
 }

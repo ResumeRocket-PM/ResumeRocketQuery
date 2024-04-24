@@ -9,4 +9,6 @@ public interface IJobService
     Task<List<Resume>> GetResumes(int accountId);
     Task<Resume> GetResume(int resumeId);
     Task UpdateResume(int resumeId, string status);
+    //Task UpdateResume(int resumeId, string status)
+
 }

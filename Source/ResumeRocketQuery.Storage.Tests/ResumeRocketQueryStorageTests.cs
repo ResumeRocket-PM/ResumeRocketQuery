@@ -348,7 +348,43 @@ namespace ResumeRocketQuery.Storage.Tests
 
                 //expected2.ToExpectedObject().ShouldMatch(actual[0]);
                 //expected1.ToExpectedObject().ShouldMatch(actual[1]);
+            }
 
+            [Theory]
+            [InlineData(typeof(DapperResumeRocketQueryStorage))]
+            [InlineData(typeof(MemoryResumeRocketQueryStorage))]
+            public async Task Resume_status_change_correct(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    AccountConfiguration = Guid.NewGuid().ToString()
+                });
+
+                string beforeUpdate = "before Update status";
+                var resumeID = await systemUnderTest.InsertResumeStorageAsync(new ResumeStorage
+                {
+                    applyDate = DateTime.Now,
+                    jobUrl = Guid.NewGuid().ToString(),
+                    accountID = accountId,
+                    status = beforeUpdate,
+                    resume = "test",
+                    position = "A",
+                    companyName = Guid.NewGuid().ToString(),
+
+                });
+                string afterUpdate = "after Update status";
+
+                ResumeStorage update = new();
+                update.ResumeID = resumeID;
+                update.status = afterUpdate;
+                await systemUnderTest.UpdateResumeStorageAsync(update);
+
+                var rs = await systemUnderTest.SelectResumeStorageAsync(resumeID);
+                Assert.Equal(afterUpdate,rs.status);
+                Assert.NotEqual(beforeUpdate,rs.status);
 
             }
         }
@@ -386,5 +422,7 @@ namespace ResumeRocketQuery.Storage.Tests
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
+
+
     }
 }

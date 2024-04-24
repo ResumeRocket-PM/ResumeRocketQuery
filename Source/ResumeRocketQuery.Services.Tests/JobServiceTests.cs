@@ -141,6 +141,56 @@ namespace ResumeRocketQuery.Services.Tests
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
+
+            [Fact]
+            public async Task update_resume_work_correctly()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var jobUrl =
+                    "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907";
+
+                var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
+                {
+                    Resume = new Dictionary<string, string>(),
+                    JobUrl = jobUrl,
+                    AccountId = account.AccountId
+                });
+
+                //var resumeId2 = await _systemUnderTest.CreateJobResumeAsync(new Job
+                //{
+                //    Resume = new Dictionary<string, string>(),
+                //    JobUrl = jobUrl,
+                //    AccountId = account.AccountId
+                //});
+                //expected.ToExpectedObject().ShouldMatch(actual);
+
+                
+
+                var actualOld = await _systemUnderTest.GetResume(resumeId1);
+                string updateStatus = "update Status from jobServie";
+                Assert.NotEqual(updateStatus, actualOld.Status);
+
+                await _systemUnderTest.UpdateResume(resumeId1, updateStatus);
+                var actualnew = await _systemUnderTest.GetResume(resumeId1);
+                Assert.Equal(updateStatus, actualnew.Status);
+
+
+
+                //expected.ToExpectedObject().ShouldMatch(actual);
+
+                //var actualOld = await _systemUnderTest.GetResume(1);
+                //string updateStatus = "update Status from jobServie";
+                //Assert.NotEqual(updateStatus, actualOld.Status);
+
+                //await _systemUnderTest.UpdateResume(1, updateStatus);
+                //var actualnew = await _systemUnderTest.GetResume(1);
+                //Assert.Equal(updateStatus, actualnew.Status);
+            }
         }
     }
 }

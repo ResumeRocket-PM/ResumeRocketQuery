@@ -8,6 +8,7 @@ using Dapper;
 using MySqlConnector;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.Storage
 {
@@ -211,7 +212,20 @@ namespace ResumeRocketQuery.Storage
         {
             //Given the ResumeId on the ResumeStorage Object,
             //Update the record with that Id, and set the status to whatever the status of this object is.
-            throw new NotImplementedException();
+            using (var connection = new MySqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<int>(
+                    StorageConstants.StoredProcedures.changeStatus,
+                new
+                {
+                    resumeID = resumeStorage.ResumeID,
+                    status = resumeStorage.status,
+                },
+                commandType: CommandType.Text);
+
+                //var changeStatus = await connection.query
+
+            }
         }
     }
 }

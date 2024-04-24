@@ -7,6 +7,8 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using ResumeRocketQuery.Domain.DataLayer;
+using System.Data;
 
 namespace ResumeRocketQuery.Repository.Tests
 {
@@ -271,6 +273,60 @@ namespace ResumeRocketQuery.Repository.Tests
                 var actual = await _systemUnderTest.GetResumesAsync(accountId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
+            }
+
+            [Fact]
+            public async Task update_status_correctly_Test()
+            {
+                var accountId = await _systemUnderTest.CreateAccountAsync(new Account
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@email.com",
+                    Authentication = new Authentication
+                    {
+                        Salt = Guid.NewGuid().ToString(),
+                        HashedPassword = Guid.NewGuid().ToString()
+                    }
+                });
+
+                string oldstatus = "old status from Repository";
+                Resume newResume = new Resume
+                {
+                    AccountID = accountId,
+                    ApplyDate = DateTime.Today,
+                    CompanyName = "Amazon",
+                    JobUrl = "amazon.com/job",
+                    Position = "Software Engineer",
+                    ResumeContent = new Dictionary<string, string>
+                        {
+                            {"FileType", ".Pdf"},
+                            {"Bytes",Guid.NewGuid().ToString()}
+                        },
+                    Status = oldstatus
+                };
+
+                int newRId = await _systemUnderTest.CreateResumeAsync(newResume);
+                Resume resume = await _systemUnderTest.GetResumeAsync(newRId);
+                Assert.Equal(oldstatus, resume.Status);
+
+                string updateStatus = "update status from reporsitory";
+                ResumeStorage rs = new ResumeStorage
+                {
+                    ResumeID = newRId,
+                    status = updateStatus,
+                };
+                await _systemUnderTest.UpdateResume(rs);
+                Resume updateResume = await _systemUnderTest.GetResumeAsync(newRId);
+                Assert.NotEqual(oldstatus, updateResume.Status);
+                Assert.Equal(updateStatus, updateResume.Status);
+
+
+
+                //Assert.Equal(old)
+
+                //var actual = await _systemUnderTest.GetResumesAsync(accountId);
+
+                //expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
     }

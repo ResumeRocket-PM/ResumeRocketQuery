@@ -195,9 +195,20 @@ namespace ResumeRocketQuery.Repository
             return result;
         }
 
-        public async Task UpdateResume(int resumeId, string status)
+        public async Task UpdateResume(ResumeStorage resumeStorage)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _resumeRocketQueryStorage.UpdateResumeStorageAsync(resumeStorage);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            //if ()
+
+            //throw new NotImplementedException();
         }
     }
 }
