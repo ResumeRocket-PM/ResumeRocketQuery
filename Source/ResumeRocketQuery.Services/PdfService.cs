@@ -11,6 +11,7 @@ using UglyToad.PdfPig.Core;
 using UglyToad.PdfPig.Fonts.Standard14Fonts;
 using UglyToad.PdfPig.Writer;
 using System.IO;
+using System.Net.Http;
 
 namespace ResumeRocketQuery.External
 {
@@ -20,6 +21,21 @@ namespace ResumeRocketQuery.External
         {
             StringBuilder resumeText = new StringBuilder();
             using (var pdf = PdfDocument.Open(filepath))
+            {
+                foreach (var page in pdf.GetPages())
+                {
+                    // Extract based on order in the underlying document with newlines and spaces.
+                    var text = ContentOrderTextExtractor.GetText(page);
+                    resumeText.Append(text);
+                }
+            }
+            return resumeText.ToString();
+        }
+
+        public async Task<string> ReadPdfAsync(MemoryStream bytes)
+        {
+            StringBuilder resumeText = new StringBuilder();
+            using (var pdf = PdfDocument.Open(bytes))
             {
                 foreach (var page in pdf.GetPages())
                 {
