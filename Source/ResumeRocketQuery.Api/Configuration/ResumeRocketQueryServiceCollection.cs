@@ -25,6 +25,7 @@ using ResumeRocketQuery.External;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http.Features;
+using ResumeRocketQuery.Service;
 
 namespace ResumeRocketQuery.Api.Configuration
 {

@@ -122,7 +122,7 @@ namespace ResumeRocketQuery.Repository
 
         public async Task<int> CreatePortfolioAsync(Portfolio portfolio)
         {
-            Portfolio result = null;
+            Portfolio result = null; //TODO is this needed?
 
             var portfolioId = await _resumeRocketQueryStorage.InsertPortfolioStorageAsync(new PortfolioStorage
             {

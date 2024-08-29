@@ -8,6 +8,8 @@ using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
+using System.Diagnostics;
 
 namespace ResumeRocketQuery.Services
 {
@@ -99,7 +101,7 @@ namespace ResumeRocketQuery.Services
             }
             catch (Exception e)
             {
-                // ignored
+                Debug.WriteLine(e); // ignored
             }
 
             return result;

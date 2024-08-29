@@ -4,61 +4,73 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
-using UglyToad.PdfPig;
-using UglyToad.PdfPig.Content;
-using UglyToad.PdfPig.Core;
-using UglyToad.PdfPig.Fonts.Standard14Fonts;
-using UglyToad.PdfPig.Writer;
+using iText;
 using System.IO;
 using System.Net.Http;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Layout.Element;
+using iText.Layout;
+using iText.IO.Font;
+using iText.IO.Image;
+using iText.Kernel.Font;
+using iText.Kernel.Geom;
+using Org.BouncyCastle.Utilities;
 
-namespace ResumeRocketQuery.External
+namespace ResumeRocketQuery.Service
 {
     public class PdfService : IPdfService
     {
         public async Task<string> ReadPdfAsync(string filepath)
         {
-            StringBuilder resumeText = new StringBuilder();
-            using (var pdf = PdfDocument.Open(filepath))
+            var pageText = new StringBuilder();
+            using (PdfDocument document = new PdfDocument(new PdfReader(filepath)))
             {
-                foreach (var page in pdf.GetPages())
+                var pageNumbers = document.GetNumberOfPages();
+                for (int page = 1; page <= pageNumbers; page++)
                 {
-                    // Extract based on order in the underlying document with newlines and spaces.
-                    var text = ContentOrderTextExtractor.GetText(page);
-                    resumeText.Append(text);
+                    FilteredEventListener listener = new FilteredEventListener();
+                    LocationTextExtractionStrategy extractionStrategy = listener
+                        .AttachEventListener(new LocationTextExtractionStrategy());
+                    PdfCanvasProcessor parser = new PdfCanvasProcessor(extractionStrategy);
+                    parser.ProcessPageContent(document.GetFirstPage());
+                    pageText.Append(extractionStrategy.GetResultantText());
                 }
+                return pageText.ToString();
             }
-            return resumeText.ToString();
         }
 
         public async Task<string> ReadPdfAsync(MemoryStream bytes)
         {
-            StringBuilder resumeText = new StringBuilder();
-            using (var pdf = PdfDocument.Open(bytes))
+            var pageText = new StringBuilder();
+            using (PdfDocument document = new PdfDocument(new PdfReader(bytes)))
             {
-                foreach (var page in pdf.GetPages())
+                var pageNumbers = document.GetNumberOfPages();
+                for (int page = 1; page <= pageNumbers; page++)
                 {
-                    // Extract based on order in the underlying document with newlines and spaces.
-                    var text = ContentOrderTextExtractor.GetText(page);
-                    resumeText.Append(text);
+                    FilteredEventListener listener = new FilteredEventListener();
+                    LocationTextExtractionStrategy extractionStrategy = listener
+                        .AttachEventListener(new LocationTextExtractionStrategy());
+                    PdfCanvasProcessor parser = new PdfCanvasProcessor(extractionStrategy);
+                    parser.ProcessPageContent(document.GetFirstPage());
+                    pageText.Append(extractionStrategy.GetResultantText());
                 }
+                return pageText.ToString();
             }
-            return resumeText.ToString();
         }
 
         public async Task<string> UpdatePdfAsync(string filepath, string update)
         {
-            using (PdfDocumentBuilder builder = new PdfDocumentBuilder())
-            {
-                PdfPageBuilder page = builder.AddPage(PageSize.A4);
-                // Fonts must be registered with the document builder prior to use to prevent duplication.
-                PdfDocumentBuilder.AddedFont font = builder.AddStandard14Font(Standard14Font.Helvetica);
-                page.AddText(update, 12, new PdfPoint(25, 700), font);
-                byte[] documentBytes = builder.Build();
-                File.WriteAllBytes(filepath, documentBytes);
-            }
-            return filepath;
+            FileInfo file = new FileInfo(filepath);
+            if (!file.Exists)
+                file.Directory.Create();
+            var writer = new PdfWriter(file);
+            var pdf = new PdfDocument(writer);
+            var doc = new Document(pdf);
+            doc.Add(new Paragraph(update));
+            doc.Close();
+            return file.FullName;
         }
     }
 }
