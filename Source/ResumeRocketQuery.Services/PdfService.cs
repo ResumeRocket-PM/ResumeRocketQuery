@@ -30,12 +30,8 @@ namespace ResumeRocketQuery.Service
                 var pageNumbers = document.GetNumberOfPages();
                 for (int page = 1; page <= pageNumbers; page++)
                 {
-                    FilteredEventListener listener = new FilteredEventListener();
-                    LocationTextExtractionStrategy extractionStrategy = listener
-                        .AttachEventListener(new LocationTextExtractionStrategy());
-                    PdfCanvasProcessor parser = new PdfCanvasProcessor(extractionStrategy);
-                    parser.ProcessPageContent(document.GetFirstPage());
-                    pageText.Append(extractionStrategy.GetResultantText());
+                    ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                    pageText.Append(PdfTextExtractor.GetTextFromPage(document.GetPage(page), strategy));
                 }
                 return pageText.ToString();
             }
@@ -49,12 +45,8 @@ namespace ResumeRocketQuery.Service
                 var pageNumbers = document.GetNumberOfPages();
                 for (int page = 1; page <= pageNumbers; page++)
                 {
-                    FilteredEventListener listener = new FilteredEventListener();
-                    LocationTextExtractionStrategy extractionStrategy = listener
-                        .AttachEventListener(new LocationTextExtractionStrategy());
-                    PdfCanvasProcessor parser = new PdfCanvasProcessor(extractionStrategy);
-                    parser.ProcessPageContent(document.GetFirstPage());
-                    pageText.Append(extractionStrategy.GetResultantText());
+                    ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                    pageText.Append(PdfTextExtractor.GetTextFromPage(document.GetPage(page), strategy));
                 }
                 return pageText.ToString();
             }
@@ -62,7 +54,8 @@ namespace ResumeRocketQuery.Service
 
         public async Task<string> UpdatePdfAsync(string filepath, string update)
         {
-            FileInfo file = new FileInfo(filepath);
+            string name = filepath.Replace(".pdf", "");
+            FileInfo file = new FileInfo(name+DateTime.Now.ToString("yyyyMMddHHmmffff")+".pdf");
             if (!file.Exists)
                 file.Directory.Create();
             var writer = new PdfWriter(file);

@@ -26,7 +26,8 @@ namespace ResumeRocketQuery.Services.Tests
             [Fact]
             public async Task WHEN_ReadPdfAsync_is_called_THEN_response_is_NOT_NULL()
             {
-                var response = await _systemUnderTest.ReadPdfAsync(@"./Samples/studentAthleteResume.pdf");
+                var dir = System.IO.Directory.GetCurrentDirectory();
+                var response = await _systemUnderTest.ReadPdfAsync(@"./Samples/Resume_Template.pdf");
                 Assert.True(response != null);
             }
         }
@@ -36,7 +37,7 @@ namespace ResumeRocketQuery.Services.Tests
             [Fact]
             public async Task WHEN_UpdatePdfAsync_is_called_THEN_response_is_OK()
             {
-                var response = await _systemUnderTest.UpdatePdfAsync(@"./Samples/studentAthleteResume.pdf", "Here is the resume update");
+                var response = await _systemUnderTest.UpdatePdfAsync(@"./Samples/Resume_Template.pdf", "Here is the resume update");
                 Assert.True(response != null);
             }
         }
