@@ -44,7 +44,7 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var response = new AccountResponseBody
             {
-                EmailAddress = accountResponse.EmailAddress
+                Email = accountResponse.EmailAddress
             };
 
             return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);

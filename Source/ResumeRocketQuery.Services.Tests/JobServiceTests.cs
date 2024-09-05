@@ -171,7 +171,7 @@ namespace ResumeRocketQuery.Services.Tests
                 });
 
                 var jobUrl =
-                    "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907";
+                    "https://www.ziprecruiter.com/jobs-search?location=Lehi%2C+UT&lvk=MjrBto82OnrPhjk0zEFM2A.--NVzGmSiic";
 
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {

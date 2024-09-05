@@ -1,4 +1,5 @@
 using ResumeRocketQuery.Domain.Services;
+using System.Collections.Generic;
 
 namespace ResumeRocketQuery.Domain.DataLayer
 {
@@ -6,5 +7,13 @@ namespace ResumeRocketQuery.Domain.DataLayer
     {
         public string AccountAlias { get; set; }
         public Authentication Authentication { get; set; }
+        public string Name { get; set; }
+        public string ProfilePhotoUrl { get; set; }
+        public string Title { get; set; }
+        public string Location { get; set; }
+        public string PortfolioLink { get; set; }
+        public List<string> Skills { get; set; }
+        public List<Experience> Experience { get; set; }
+        public List<Education> Education { get; set; }
     }
 }

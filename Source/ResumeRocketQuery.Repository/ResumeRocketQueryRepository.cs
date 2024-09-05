@@ -27,7 +27,15 @@ namespace ResumeRocketQuery.Repository
                 {
                     HashedPassword = account.Authentication.HashedPassword,
                     Salt = account.Authentication.Salt
-                }
+                },
+                Title = account.Title,
+                Skills = account.Skills,    
+                ProfilePhotoUrl = account.ProfilePhotoUrl,
+                PortfolioLink = account.PortfolioLink,
+                Experience = account.Experience,
+                Education = account.Education,
+                Location = account.Location,
+                Name = account.Name
             };
 
             var result = await _resumeRocketQueryStorage.InsertAccountStorageAsync(new AccountStorage
@@ -66,7 +74,16 @@ namespace ResumeRocketQuery.Repository
                     {
                         Salt = accountConfiguration.Authentication.Salt,
                         HashedPassword = accountConfiguration.Authentication.HashedPassword
-                    }
+                    },
+                    
+                    Name = accountConfiguration.Name,
+                    Location = accountConfiguration.Location,
+                    Education = accountConfiguration.Education,
+                    Experience = accountConfiguration.Experience,
+                    PortfolioLink = accountConfiguration.PortfolioLink,
+                    ProfilePhotoUrl = accountConfiguration.ProfilePhotoUrl,
+                    Skills = accountConfiguration.Skills,
+                    Title = accountConfiguration.Title,
                 };
             }
 

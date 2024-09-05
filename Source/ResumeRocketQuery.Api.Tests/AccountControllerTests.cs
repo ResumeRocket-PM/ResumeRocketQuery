@@ -47,7 +47,7 @@ namespace ResumeRocketQuery.Api.Tests
                         },
                         Result = new
                         {
-                            EmailAddress = email
+                            Email = email
                         }
                     };
 

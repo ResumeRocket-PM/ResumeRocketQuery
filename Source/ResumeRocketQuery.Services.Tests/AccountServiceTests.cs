@@ -5,6 +5,7 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using System.Security.Principal;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -46,13 +47,22 @@ namespace ResumeRocketQuery.Services.Tests
                 var createResponse = await _systemUnderTest.CreateAccountAsync(new CreateAccountRequest
                 {
                     EmailAddress = emailAddress,
-                    Password = Guid.NewGuid().ToString()
+                    Password = Guid.NewGuid().ToString(),
                 });
 
                 var expected = new
                 {
                     EmailAddress = emailAddress,
-                    AccountId = createResponse.AccountId
+                    AccountId = createResponse.AccountId,
+
+                    Title = account.Title,
+                    Skills = account.Skills,
+                    ProfilePhotoUrl = account.ProfilePhotoUrl,
+                    PortfolioLink = account.PortfolioLink,
+                    Experience = account.Experience,
+                    Education = account.Education,
+                    Location = account.Location,
+                    Name = account.Name
                 };
 
                 var actual = await _systemUnderTest.GetAccountAsync(expected.AccountId);

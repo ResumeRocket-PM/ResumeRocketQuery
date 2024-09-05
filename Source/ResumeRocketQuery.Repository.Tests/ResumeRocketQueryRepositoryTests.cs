@@ -36,6 +36,39 @@ namespace ResumeRocketQuery.Repository.Tests
                     {
                         Salt = Guid.NewGuid().ToString(),
                         HashedPassword = Guid.NewGuid().ToString()
+                    },
+
+
+                    Name = "John Doe",
+                    ProfilePhotoUrl = "https://link/to/profile/photo",
+                    Title = "Software Engineer",
+                    Location = "Salt Lake City, UT",
+                    PortfolioLink = "https://resume-rocket/u1234567/portfolio",
+                    Resume = "<<resume>>",
+                    Skills = new List<string> { "Java", "Python", "C++" },
+                    Experience = new List<Experience>
+                    {
+                        new Experience
+                        {
+                            Company = "Google",
+                            Position = "Software Engineer",
+                            Type = "<<Full-time/part-time/Internship>>",
+                            Description = "worked on google search team, improved algorithm",
+                            StartDate = DateTime.Parse("01/01/2019"),
+                            EndDate = DateTime.Parse("01/01/2021")
+                        },
+                    },
+                    Education = new List<Education>
+                    {
+                        new Education
+                        {
+                            SchoolName = "University of Utah",
+                            Degree = "BS",
+                            Major = "Computer Science",
+                            Minor = "Music",
+                            GraduationDate = DateTime.Parse("01/01/2019"),
+                            Courses = new List<string> { "Data Structures", "Algorithms", "Computer Networks" }
+                        },
                     }
                 });
 
@@ -53,6 +86,37 @@ namespace ResumeRocketQuery.Repository.Tests
                     {
                         Salt = Guid.NewGuid().ToString(),
                         HashedPassword = Guid.NewGuid().ToString()
+                    },
+
+                    Name = "John Doe",
+                    ProfilePhotoUrl = "https://link/to/profile/photo",
+                    Title = "Software Engineer",
+                    Location = "Salt Lake City, UT",
+                    PortfolioLink = "https://resume-rocket/u1234567/portfolio",
+                    Skills = new List<string> { "Java", "Python", "C++" },
+                    Experience = new List<Experience>
+                    {
+                        new Experience
+                        {
+                            Company = "Google",
+                            Position = "Software Engineer",
+                            Type = "<<Full-time/part-time/Internship>>",
+                            Description = "worked on google search team, improved algorithm",
+                            StartDate = DateTime.Parse("01/01/2019"),
+                            EndDate = DateTime.Parse("01/01/2021")
+                        },
+                    },
+                    Education = new List<Education>
+                    {
+                        new Education
+                        {
+                            SchoolName = "University of Utah",
+                            Degree = "BS",
+                            Major = "Computer Science",
+                            Minor = "Music",
+                            GraduationDate = DateTime.Parse("01/01/2019"),
+                            Courses = new List<string> { "Data Structures", "Algorithms", "Computer Networks" }
+                        },
                     }
                 };
 
@@ -77,6 +141,38 @@ namespace ResumeRocketQuery.Repository.Tests
                     {
                         Salt = Guid.NewGuid().ToString(),
                         HashedPassword = Guid.NewGuid().ToString()
+                    },
+
+                    Name = "John Doe",
+                    ProfilePhotoUrl = "https://link/to/profile/photo",
+                    Title = "Software Engineer",
+                    Location = "Salt Lake City, UT",
+                    PortfolioLink = "https://resume-rocket/u1234567/portfolio",
+                    Resume = "<<resume>>",
+                    Skills = new List<string> { "Java", "Python", "C++" },
+                    Experience = new List<Experience>
+                    {
+                        new Experience
+                        {
+                            Company = "Google",
+                            Position = "Software Engineer",
+                            Type = "<<Full-time/part-time/Internship>>",
+                            Description = "worked on google search team, improved algorithm",
+                            StartDate = DateTime.Parse("01/01/2019"),
+                            EndDate = DateTime.Parse("01/01/2021")
+                        },
+                    },
+                    Education = new List<Education>
+                    {
+                        new Education
+                        {
+                            SchoolName = "University of Utah",
+                            Degree = "BS",
+                            Major = "Computer Science",
+                            Minor = "Music",
+                            GraduationDate = DateTime.Parse("01/01/2019"),
+                            Courses = new List<string> { "Data Structures", "Algorithms", "Computer Networks" }
+                        },
                     }
                 };
 
@@ -101,7 +197,7 @@ namespace ResumeRocketQuery.Repository.Tests
                     {
                         Salt = Guid.NewGuid().ToString(),
                         HashedPassword = Guid.NewGuid().ToString()
-                    }
+                    },
                 });
 
                 var portfolioId = await _systemUnderTest.CreatePortfolioAsync(new Portfolio
