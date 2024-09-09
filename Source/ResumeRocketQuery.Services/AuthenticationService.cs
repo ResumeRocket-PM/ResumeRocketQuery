@@ -4,12 +4,12 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.Configuration;
-using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Services
 {

@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Services
 {

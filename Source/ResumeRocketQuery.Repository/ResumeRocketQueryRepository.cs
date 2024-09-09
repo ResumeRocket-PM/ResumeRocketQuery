@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.DataLayer;
-using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Repository
 {

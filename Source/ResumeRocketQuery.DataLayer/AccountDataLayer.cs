@@ -1,0 +1,78 @@
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using ResumeRocketQuery.Domain.Configuration;
+using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services.Repository;
+using System.Data;
+using System.Security.Principal;
+
+namespace ResumeRocketQuery.DataLayer
+{
+    public class AccountDataLayer : IAccountDataLayer
+    {
+        private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
+
+        public AccountDataLayer(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
+        {
+            _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
+        }
+
+        public async Task<int> InsertAccountStorageAsync(AccountStorage account)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.ExecuteScalarAsync<int>(
+                    DataLayerConstants.StoredProcedures.Account.InsertAccount,
+                    new
+                    {
+                        accountAlias = account.AccountAlias,
+                        firstName = account.FirstName,
+                        lastName = account.LastName,
+                        profilePhotoLink = account.ProfilePhotoLink,
+                        title = account.Title,
+                        stateLocation = account.StateLocation,
+                        portfolioLink = account.PortfolioLink,
+                    },
+                    commandType: CommandType.Text);
+                return result;
+            }
+        }
+
+        public async Task<Account> GetAccountAsync(int accountId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<Account>(
+                    DataLayerConstants.StoredProcedures.Account.SelectAccount,
+                    new
+                    {
+                        accountID = accountId,
+                    },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
+        }
+
+        public async Task UpdateAccountStorageAsync(AccountStorage accountStorage)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Account.UpdateAccount,
+                    new
+                    {
+                        accountId = accountStorage.AccountId,
+                        accountAlias = accountStorage.AccountAlias,
+                        firstName = accountStorage.FirstName,
+                        lastName = accountStorage.LastName,
+                        profilePhotoLink = accountStorage.ProfilePhotoLink,
+                        title = accountStorage.Title,
+                        stateLocation = accountStorage.StateLocation,
+                        portfolioLink = accountStorage.PortfolioLink,
+                    },
+                    commandType: CommandType.Text);
+            }
+        }
+    }
+}

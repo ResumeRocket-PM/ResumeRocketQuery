@@ -1,6 +1,6 @@
-namespace ResumeRocketQuery.Domain.DataLayer
+﻿namespace ResumeRocketQuery.Domain.Services.Repository
 {
-    public class AccountStorage
+    public class Account
     {
         public int AccountId { get; set; }
         public string AccountAlias { get; set; }

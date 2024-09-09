@@ -1,5 +1,5 @@
-﻿using ResumeRocketQuery.Domain.Repository;
-using ResumeRocketQuery.Domain.Services;
+﻿using ResumeRocketQuery.Domain.Services;
+using ResumeRocketQuery.Domain.Services.Repository;
 using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Services

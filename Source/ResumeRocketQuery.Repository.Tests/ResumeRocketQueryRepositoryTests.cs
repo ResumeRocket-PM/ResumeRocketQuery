@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExpectedObjects;
-using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using ResumeRocketQuery.Domain.DataLayer;
 using System.Data;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Repository.Tests
 {

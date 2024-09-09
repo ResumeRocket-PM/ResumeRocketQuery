@@ -4,7 +4,6 @@ using ResumeRocketQuery.Api.Filters;
 using ResumeRocketQuery.Domain.Api;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
-using ResumeRocketQuery.Domain.Repository;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
 using ResumeRocketQuery.Repository;
@@ -26,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http.Features;
 using ResumeRocketQuery.Service;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Api.Configuration
 {

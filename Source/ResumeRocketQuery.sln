@@ -22,9 +22,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.Repository.Tests", "ResumeRocketQuery.Repository.Tests\ResumeRocketQuery.Repository.Tests.csproj", "{35BDA412-57DC-4B08-9B77-537E576AFA48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.External", "ResumeRocketQuery.External\ResumeRocketQuery.External.csproj", "{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.External", "ResumeRocketQuery.External\ResumeRocketQuery.External.csproj", "{4B2B3268-4E1F-4306-9DEE-F85A8C5A6A84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.External.Tests", "ResumeRocketQuery.External.Tests\ResumeRocketQuery.External.Tests.csproj", "{DED01952-5146-4ABB-A5EE-1902153AC20B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResumeRocketQuery.External.Tests", "ResumeRocketQuery.External.Tests\ResumeRocketQuery.External.Tests.csproj", "{DED01952-5146-4ABB-A5EE-1902153AC20B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.DataLayer", "ResumeRocketQuery.DataLayer\ResumeRocketQuery.DataLayer.csproj", "{5110E169-AD5B-420E-8D15-1DE8E24EAB2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeRocketQuery.DataLayerIntegrationTests", "ResumeRocketQuery.DataLayerIntegrationTests\ResumeRocketQuery.DataLayerIntegrationTests.csproj", "{1F32EFC5-D879-42D9-831F-A189C66430E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +84,14 @@ Global
 		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DED01952-5146-4ABB-A5EE-1902153AC20B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5110E169-AD5B-420E-8D15-1DE8E24EAB2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5110E169-AD5B-420E-8D15-1DE8E24EAB2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5110E169-AD5B-420E-8D15-1DE8E24EAB2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5110E169-AD5B-420E-8D15-1DE8E24EAB2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F32EFC5-D879-42D9-831F-A189C66430E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F32EFC5-D879-42D9-831F-A189C66430E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F32EFC5-D879-42D9-831F-A189C66430E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F32EFC5-D879-42D9-831F-A189C66430E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
