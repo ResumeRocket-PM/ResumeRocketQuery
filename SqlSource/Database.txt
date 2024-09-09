@@ -1,0 +1,54 @@
+CREATE TABLE Accounts (
+    AccountId INT PRIMARY KEY IDENTITY(1,1),  -- Auto-incrementing primary key
+    AccountAlias UNIQUEIDENTIFIER NOT NULL,
+    [FirstName] NVARCHAR(100),
+	[LastName] NVARCHAR(100),
+    ProfilePhotoLink varchar(2080),
+    Title NVARCHAR(100),
+    [StateLocation] NVARCHAR(100),
+    PortfolioLink NVARCHAR(255),
+	InsertDate Datetime NOT NULL DEFAULT GetDate(),
+	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
+);
+
+CREATE TABLE EmailAddresses (
+	EmailAddressId INT PRIMARY KEY IDENTITY(1,1),
+    AccountId INT NOT NULL,
+    [EmailAddress] NVARCHAR(255) NOT NULL UNIQUE,
+	InsertDate Datetime NOT NULL DEFAULT GetDate(),
+	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
+	FOREIGN KEY (AccountId) REFERENCES Accounts(AccountId)
+);
+
+CREATE TABLE Logins (
+	LoginId INT PRIMARY KEY IDENTITY(1,1),
+    AccountId INT NOT NULL,
+    [Salt] NVARCHAR(255),
+    [Hash] NVARCHAR(255),
+	InsertDate Datetime NOT NULL DEFAULT GetDate(),
+	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
+	FOREIGN KEY (AccountId) REFERENCES Accounts(AccountId)
+);
+
+CREATE TABLE Educations (
+    EducationId INT PRIMARY KEY IDENTITY(1,1),  -- Auto-incrementing primary key
+	AccountId INT NOT NULL,
+    SchoolName NVARCHAR(255) NOT NULL,
+    Degree NVARCHAR(255) NOT NULL,
+    Major NVARCHAR(255),
+    Minor NVARCHAR(255),
+    GraduationDate DATETIME NOT NULL,
+	InsertDate Datetime NOT NULL DEFAULT GetDate(),
+	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
+	FOREIGN KEY (AccountId) REFERENCES Accounts(AccountId)
+);
+
+-- Create table for Courses (assuming a many-to-one relationship with Education)
+CREATE TABLE EducationCourses (
+    CourseId INT PRIMARY KEY IDENTITY(1,1),  -- Auto-incrementing primary key
+    EducationId INT NOT NULL,
+    CourseName NVARCHAR(255) NOT NULL,
+	InsertDate Datetime NOT NULL DEFAULT GetDate(),
+	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
+    FOREIGN KEY (EducationId) REFERENCES Educations(EducationId)
+);
