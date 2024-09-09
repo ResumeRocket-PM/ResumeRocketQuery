@@ -54,15 +54,6 @@ namespace ResumeRocketQuery.Services.Tests
                 {
                     EmailAddress = emailAddress,
                     AccountId = createResponse.AccountId,
-
-                    Title = account.Title,
-                    Skills = account.Skills,
-                    ProfilePhotoUrl = account.ProfilePhotoUrl,
-                    PortfolioLink = account.PortfolioLink,
-                    Experience = account.Experience,
-                    Education = account.Education,
-                    Location = account.Location,
-                    Name = account.Name
                 };
 
                 var actual = await _systemUnderTest.GetAccountAsync(expected.AccountId);
