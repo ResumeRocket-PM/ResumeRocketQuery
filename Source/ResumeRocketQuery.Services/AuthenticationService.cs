@@ -10,22 +10,26 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
 using ResumeRocketQuery.Domain.Services.Repository;
+using ResumeRocketQuery.Domain.DataLayer;
 
 namespace ResumeRocketQuery.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
-        private readonly IResumeRocketQueryRepository _resumeRocketQueryRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
+        private readonly IEmailAddressDataLayer _emailAddressDataLayer;
+        private readonly ILoginDataLayer _loginDataLayer;
 
         public AuthenticationService(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings,
-            IResumeRocketQueryRepository resumeRocketQueryRepository,
-            IAuthenticationHelper authenticationHelper)
+            IAuthenticationHelper authenticationHelper,
+            IEmailAddressDataLayer emailAddressDataLayer,
+            ILoginDataLayer loginDataLayer)
         {
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
-            _resumeRocketQueryRepository = resumeRocketQueryRepository;
             _authenticationHelper = authenticationHelper;
+            _emailAddressDataLayer = emailAddressDataLayer;
+            _loginDataLayer = loginDataLayer;
         }
 
         public async Task<AuthenticateAccountResponse> AuthenticateAccountAsync(AuthenticateAccountRequest authenticateAccountRequest)
@@ -35,19 +39,21 @@ namespace ResumeRocketQuery.Services
                 IsAuthenticated = false
             };
 
-            var account = await _resumeRocketQueryRepository.GetAccountByEmailAddressAsync(authenticateAccountRequest.EmailAddress);
+            var account = await _emailAddressDataLayer.GetAccountByEmailAddressAsync(authenticateAccountRequest.EmailAddress);
 
             if (account != null)
             {
+                var login = await _loginDataLayer.GetLoginAsync(account.AccountId);
+
                 var passwordHashResponse = await _authenticationHelper.GeneratePasswordHashAsync(new PasswordHashRequest
                 {
-                    Salt = account.Authentication.Salt,
+                    Salt = login.Salt,
                     Password = authenticateAccountRequest.Password
                 });
 
-                if (passwordHashResponse.HashedPassword == account.Authentication.HashedPassword)
+                if (passwordHashResponse.HashedPassword == login.Hash)
                 {
-                    var jsonWebToken = CreateJsonWebToken(account);
+                    var jsonWebToken = CreateJsonWebToken(account.AccountId);
 
                     result.IsAuthenticated = true;
                     result.JsonWebToken = jsonWebToken;
@@ -57,7 +63,7 @@ namespace ResumeRocketQuery.Services
             return result;
         }
 
-        public string CreateJsonWebToken(Account account)
+        public string CreateJsonWebToken(int accountId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_resumeRocketQueryConfigurationSettings.AuthenticationPrivateKey);
@@ -66,7 +72,7 @@ namespace ResumeRocketQuery.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("AccountId", account.AccountId.ToString())
+                    new Claim("AccountId", accountId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

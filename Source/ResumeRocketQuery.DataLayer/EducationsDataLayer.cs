@@ -71,11 +71,11 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task<List<EducationStorage>> GetEducationAsync(int accountId)
+        public async Task<List<Education>> GetEducationAsync(int accountId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryAsync<EducationStorage>(
+                var result = await connection.QueryAsync<Education>(
                     DataLayerConstants.StoredProcedures.Education.SelectEducation,
                     new { AccountId = accountId },
                     commandType: CommandType.Text);

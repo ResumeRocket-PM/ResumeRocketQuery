@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Domain.Services
 {

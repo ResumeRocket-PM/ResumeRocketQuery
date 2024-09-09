@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
 using ResumeRocketQuery.Domain.Services.Repository;
@@ -8,22 +9,28 @@ namespace ResumeRocketQuery.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IResumeRocketQueryRepository _resumeRocketQueryRepository;
+        private readonly IAccountDataLayer _accountDataLayer;
+        private readonly IEmailAddressDataLayer _emailAddressDataLayer;
+        private readonly ILoginDataLayer _loginDataLayer;
         private readonly IAuthenticationService _authenticationService;
         private readonly IAuthenticationHelper _authenticationHelper;
 
         public AccountService(IAuthenticationHelper authenticationHelper,
-            IResumeRocketQueryRepository resumeRocketQueryRepository, 
+            IAccountDataLayer accountDataLayer, 
+            IEmailAddressDataLayer emailAddressDataLayer,
+            ILoginDataLayer loginDataLayer,
             IAuthenticationService authenticationService)
         {
             _authenticationHelper = authenticationHelper;
-            _resumeRocketQueryRepository = resumeRocketQueryRepository;
+            _accountDataLayer = accountDataLayer;
+            _emailAddressDataLayer = emailAddressDataLayer;
+            _loginDataLayer = loginDataLayer;
             _authenticationService = authenticationService;
         }
 
         public async Task<CreateAccountResponse> CreateAccountAsync(CreateAccountRequest createAccountRequest)
         {
-            var existingEmail = await _resumeRocketQueryRepository.GetAccountByEmailAddressAsync(createAccountRequest.EmailAddress);
+            var existingEmail = await _emailAddressDataLayer.GetAccountByEmailAddressAsync(createAccountRequest.EmailAddress);
 
             if (existingEmail != null)
             {
@@ -38,31 +45,38 @@ namespace ResumeRocketQuery.Services
                 Password = createAccountRequest.Password
             });
 
-            var account = new Account
+            var accountStorage = new AccountStorage
             {
-                EmailAddress = createAccountRequest.EmailAddress,
                 AccountAlias = Guid.NewGuid().ToString(),
-                Authentication = new Authentication
-                {
-                    Salt = passwordSalt,
-                    HashedPassword = passwordResponse.HashedPassword
-                },
             };
 
-            account.AccountId = await _resumeRocketQueryRepository.CreateAccountAsync(account);
+            accountStorage.AccountId = await _accountDataLayer.InsertAccountStorageAsync(accountStorage);
 
-            var jsonWebToken = _authenticationService.CreateJsonWebToken(account);
+            await _emailAddressDataLayer.InsertEmailAddressStorageAsync(new EmailAddressStorage
+            {
+                AccountId = accountStorage.AccountId,
+                EmailAddress = createAccountRequest.EmailAddress
+            });
+
+            await _loginDataLayer.InsertLoginStorageAsync(new LoginStorage
+            {
+                AccountId = accountStorage.AccountId,
+                Hash = passwordResponse.HashedPassword,
+                Salt = passwordSalt
+            });
+
+            var jsonWebToken = _authenticationService.CreateJsonWebToken(accountStorage.AccountId);
 
             return new CreateAccountResponse
             {
-                AccountId = account.AccountId,
+                AccountId = accountStorage.AccountId,
                 JsonWebToken = jsonWebToken
             };
         }
 
         public async Task<Account> GetAccountAsync(int accountId)
         {
-            var account = await _resumeRocketQueryRepository.GetAccountAsync(accountId);
+            var account = await _accountDataLayer.GetAccountAsync(accountId);
 
             return account;
         }

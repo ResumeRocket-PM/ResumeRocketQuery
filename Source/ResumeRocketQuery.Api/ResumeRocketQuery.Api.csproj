@@ -14,9 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ResumeRocketQuery.External\ResumeRocketQuery.External.csproj" />
-    <ProjectReference Include="..\ResumeRocketQuery.Repository\ResumeRocketQuery.Repository.csproj" />
     <ProjectReference Include="..\ResumeRocketQuery.Services\ResumeRocketQuery.Services.csproj" />
-    <ProjectReference Include="..\ResumeRocketQuery.Storage\ResumeRocketQuery.Storage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

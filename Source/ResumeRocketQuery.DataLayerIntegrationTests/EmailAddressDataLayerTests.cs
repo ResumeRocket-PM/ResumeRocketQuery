@@ -103,5 +103,26 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             expected.ToExpectedObject().ShouldMatch(actual);
         }
+
+        [Theory]
+        [InlineData(typeof(EmailAddressDataLayer))]
+        public async Task WHEN_GetAccountByEmailAddressAsync_is_called_THEN_correct_email_address_is_returned(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var expected = new EmailAddressStorage
+            {
+                EmailAddress = "test@example.com",
+                AccountId = 1
+            };
+
+            var emailAddressId = await systemUnderTest.InsertEmailAddressStorageAsync(expected);
+
+            expected.EmailAddressId = emailAddressId;
+
+            var actual = await systemUnderTest.GetAccountByEmailAddressAsync(expected.EmailAddress);
+
+            expected.ToExpectedObject().ShouldMatch(actual);
+        }
     }
 }

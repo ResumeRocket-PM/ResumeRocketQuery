@@ -1,14 +1,8 @@
-using System;
 using System.Threading.Tasks;
-using ExpectedObjects;
-using ResumeRocketQuery.Domain.Repository;
-using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using ResumeRocketQuery.Domain.External;
-using ResumeRocketQuery.External;
-using System.IO;
 
 namespace ResumeRocketQuery.Repository.Tests
 {

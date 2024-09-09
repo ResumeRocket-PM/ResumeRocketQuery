@@ -47,6 +47,12 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT EmailAddressId, EmailAddress, AccountId
                     FROM EmailAddress
                     WHERE AccountId = @AccountId;";
+
+
+                public const string SelectAccountByEmailAddress = @"
+                    SELECT EmailAddressId, EmailAddress, AccountId
+                    FROM EmailAddress
+                    WHERE EmailAddress = @EmailAddress;";
             }
 
             public class Logins

@@ -8,5 +8,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<int> InsertEmailAddressStorageAsync(EmailAddressStorage emailAddress);
         Task UpdateEmailAddressStorageAsync(EmailAddressStorage emailAddressStorage);
         Task<EmailAddressRepository> GetEmailAddressAsync(int emailAddressId);
+        Task<EmailAddressRepository> GetAccountByEmailAddressAsync(string emailAddress);
     }
 }

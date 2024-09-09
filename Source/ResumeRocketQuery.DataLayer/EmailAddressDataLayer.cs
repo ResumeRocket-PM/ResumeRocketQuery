@@ -54,8 +54,21 @@ namespace ResumeRocketQuery.DataLayer
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.QueryFirstOrDefaultAsync<EmailAddressRepository>(
-                    DataLayerConstants.StoredProcedures.EmailAddress.SelectEmailAddress,
+                    DataLayerConstants.StoredProcedures.EmailAddress.SelectAccountByEmailAddress,
                     new { EmailAddressId = emailAddressId },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
+        }
+
+        public async Task<EmailAddressRepository> GetAccountByEmailAddressAsync(string emailAddress)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<EmailAddressRepository>(
+                    DataLayerConstants.StoredProcedures.EmailAddress.SelectAccountByEmailAddress,
+                    new { EmailAddress = emailAddress },
                     commandType: CommandType.Text);
 
                 return result;
