@@ -72,7 +72,9 @@ namespace ResumeRocketQuery.Repository.Tests
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
-                    For the provided webpage source code for a job posting, return a JSON array where every element is a string. Those elements should be the top 10 keywords I can use to update my resume with.",
+                    For the provided webpage source code for a job posting, return a JSON array where every element is a string. 
+                    Those elements will be the top 10 keywords that can used to update a resume. There should be no other text in
+                    the response, only the JSON text which is in plain text, not markdown code block syntax.",
                     jobPosting);
 
                 var jsonResult = JsonConvert.DeserializeObject<List<String>>(response);

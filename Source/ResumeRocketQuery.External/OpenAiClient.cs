@@ -24,7 +24,7 @@ namespace ResumeRocketQuery.External
         {
             var builder = Kernel.CreateBuilder();
             builder.AddOpenAIChatCompletion(
-                "gpt-3.5-turbo", // OpenAI Model name
+                "gpt-4o", // OpenAI Model name
                 "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"); // OpenAI API Key
             var kernel = builder.Build();
             var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message});
