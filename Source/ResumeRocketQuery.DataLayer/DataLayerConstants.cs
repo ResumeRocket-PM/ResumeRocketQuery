@@ -31,6 +31,40 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE AccountId = @accountId;";
             }
 
+            public class Applications
+            {
+                public const string InsertApplication = @"
+
+                    DECLARE @StatusID int;
+
+                    SELECT @StatusID = StatusId
+                    FROM ApplicationStatus
+                    WHERE Status = @Status;
+
+                    INSERT INTO Applications (AccountId, ApplyDate, StatusId, Position, CompanyName, InsertDate, UpdateDate)
+                    VALUES (@AccountId, @ApplyDate, @StatusId, @Position, @CompanyName, GETDATE(), GETDATE());
+                    SELECT SCOPE_IDENTITY();";
+
+                public const string UpdateApplication = @"
+
+                    DECLARE @StatusID int;
+
+                    SELECT @StatusID = StatusId
+                    FROM ApplicationStatus
+                    WHERE Status = @Status;
+
+                    UPDATE Applications
+                    SET StatusId = @StatusID,
+                        UpdateDate = GETDATE()
+                    WHERE ApplicationId = @ApplicationId;";
+
+                public const string SelectApplicationByAccount = @"
+                    SELECT ApplicationId, AccountId, ApplyDate, s.Status, Position, CompanyName
+                    FROM Applications a
+                    JOIN ApplicationStatus s on a.StatusId = s.StatusId
+                    WHERE AccountId = @AccountId;";
+            }
+
             public class EmailAddress
             {
                 public const string InsertEmailAddress = @"

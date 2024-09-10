@@ -34,6 +34,7 @@ namespace ResumeRocketQuery.Api.Configuration
         {
             services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>();
 
+            services.AddSingleton<IApplicationDataLayer, ApplicationDataLayer>();
             services.AddSingleton<IAccountDataLayer, AccountDataLayer>();
             services.AddSingleton<IEducationDataLayer, EducationDataLayer>();
             services.AddSingleton<IEmailAddressDataLayer, EmailAddressDataLayer>();
