@@ -1,3 +1,5 @@
+using System;
+
 namespace ResumeRocketQuery.Domain.DataLayer
 {
     public class AccountStorage

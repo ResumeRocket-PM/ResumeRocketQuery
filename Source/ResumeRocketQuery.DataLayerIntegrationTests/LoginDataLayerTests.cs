@@ -11,15 +11,18 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
     [Rollback]
     public class LoginDataLayerTests
     {
+        private IServiceProvider _serviceProvider;
+        private IAccountDataLayer _accountDataLayer;
+
+        public LoginDataLayerTests()
+        {
+            _serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+            _accountDataLayer = _serviceProvider.GetService<IAccountDataLayer>();
+        }
+
         private ILoginDataLayer GetSystemUnderTest(Type storageType)
         {
-            var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
-
-            var config = serviceProvider.GetService<IResumeRocketQueryConfigurationSettings>();
-
-            ILoginDataLayer systemUnderTest = (ILoginDataLayer)Activator.CreateInstance(storageType);
-
-            return systemUnderTest;
+            return _serviceProvider.GetService<ILoginDataLayer>();
         }
 
         [Theory]

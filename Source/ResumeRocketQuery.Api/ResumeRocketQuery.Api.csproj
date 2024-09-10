@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ResumeRocketQuery.DataLayer\ResumeRocketQuery.DataLayer.csproj" />
     <ProjectReference Include="..\ResumeRocketQuery.External\ResumeRocketQuery.External.csproj" />
     <ProjectReference Include="..\ResumeRocketQuery.Services\ResumeRocketQuery.Services.csproj" />
   </ItemGroup>

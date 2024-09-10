@@ -1,4 +1,6 @@
-﻿namespace ResumeRocketQuery.Domain.Services.Repository
+﻿using System;
+
+namespace ResumeRocketQuery.Domain.Services.Repository
 {
     public class Account
     {

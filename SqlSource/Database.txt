@@ -1,6 +1,6 @@
 CREATE TABLE Accounts (
     AccountId INT PRIMARY KEY IDENTITY(1,1),  -- Auto-incrementing primary key
-    AccountAlias UNIQUEIDENTIFIER NOT NULL,
+    AccountAlias varchar(36) NOT NULL,
     [FirstName] NVARCHAR(100),
 	[LastName] NVARCHAR(100),
     ProfilePhotoLink varchar(2080),
@@ -51,4 +51,43 @@ CREATE TABLE EducationCourses (
 	InsertDate Datetime NOT NULL DEFAULT GetDate(),
 	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
     FOREIGN KEY (EducationId) REFERENCES Educations(EducationId)
+);
+
+
+CREATE TABLE [ApplicationStatus](
+	[StatusId] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[Status] varchar(50),
+	[InsertDate] [datetime] NOT NULL DEFAULT (getdate()),
+);
+
+
+CREATE TABLE [Applications](
+	[ApplicationId] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[AccountId] [int] NOT NULL,
+	[ApplyDate] DATETIME NOT NULL,
+	[StatusId] int,
+	[Position] varchar(100),
+	CompanyName varchar(100),
+	[InsertDate] [datetime] NOT NULL DEFAULT (getdate()),
+	[UpdateDate] [datetime] NOT NULL DEFAULT (getdate()),
+	FOREIGN KEY (AccountId) REFERENCES Accounts(AccountId),
+	FOREIGN KEY (StatusId) REFERENCES ApplicationStatus([StatusId])
+);
+
+CREATE TABLE [Portfolio](
+	[PortfolioId] [int] IDENTITY(1,1) NOT NULL Primary Key,
+	[AccountId] [int] NOT NULL,
+	[Configuration] [varchar](max) NULL,
+	[InsertDate] [datetime] NOT NULL DEFAULT (getdate()),
+	[UpdateDate] [datetime] NOT NULL DEFAULT (getdate()),
+	FOREIGN KEY (AccountId) REFERENCES Accounts(AccountId)
+);
+
+CREATE TABLE Resumes (
+    ResumeId INT PRIMARY KEY IDENTITY(1,1),  -- Auto-incrementing primary key
+	AccountId INT NOT NULL,
+    Resume NVARCHAR(max) NOT NULL,
+	InsertDate Datetime NOT NULL DEFAULT GetDate(),
+	UpdateDate Datetime NOT NULL DEFAULT GetDate(),
+	FOREIGN KEY (AccountId) REFERENCES Accounts(AccountId)
 );

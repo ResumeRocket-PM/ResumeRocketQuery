@@ -1,0 +1,120 @@
+﻿using ExpectedObjects;
+using Microsoft.Extensions.DependencyInjection;
+using ResumeRocketQuery.DataLayer;
+using ResumeRocketQuery.Domain.Configuration;
+using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Tests.Helpers;
+using Xunit;
+
+namespace ResumeRocketQuery.DataLayerIntegrationTests
+{
+    [Rollback]
+    public class ResumeDataLayerTests
+    {
+        private IServiceProvider _serviceProvider;
+        private IAccountDataLayer _accountDataLayer;
+
+        public ResumeDataLayerTests()
+        {
+            _serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+            _accountDataLayer = _serviceProvider.GetService<IAccountDataLayer>();
+        }
+
+        private IResumeDataLayer GetSystemUnderTest(Type storageType)
+        {
+            return _serviceProvider.GetService<IResumeDataLayer>();
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_InsertResumeAsync_is_called_THEN_resume_is_stored(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = 1,
+                Resume = "Sample Resume Text"
+            });
+
+            Assert.True(resumeId > 0);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_InsertResumeAsync_is_called_THEN_storage_matches(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var insertRequest = new ResumeStorage
+            {
+                AccountId = 1,
+                Resume = "Sample Resume Text"
+            };
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(insertRequest);
+            insertRequest.ResumeId = resumeId;
+
+            var expected = new[]
+            {
+                insertRequest
+            };
+
+            var actual = await systemUnderTest.GetResumeAsync(insertRequest.AccountId);
+
+            expected.ToExpectedObject().ShouldMatch(actual);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_UpdateResumeAsync_is_called_THEN_resume_is_updated(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = 1,
+                Resume = "Sample Resume Text"
+            });
+
+            var updatedResume = new ResumeStorage
+            {
+                ResumeId = resumeId,
+                AccountId = 1,
+                Resume = "Updated Resume Text",
+            };
+
+            var expected = new[]
+            {
+                updatedResume
+            };
+
+            await systemUnderTest.UpdateResumeAsync(updatedResume);
+
+            var actual = await systemUnderTest.GetResumeAsync(updatedResume.AccountId);
+
+            expected.ToExpectedObject().ShouldMatch(actual);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_DeleteResumeAsync_is_called_THEN_resume_is_deleted(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = 1,
+                Resume = "Sample Resume Text"
+            });
+
+            await systemUnderTest.DeleteResumeAsync(resumeId);
+
+            var actual = await systemUnderTest.GetResumeAsync(resumeId);
+
+            Assert.Null(actual);
+        }
+    }
+
+
+}

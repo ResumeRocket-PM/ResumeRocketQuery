@@ -74,11 +74,17 @@ namespace ResumeRocketQuery.Services
             };
         }
 
-        public async Task<Account> GetAccountAsync(int accountId)
+        public async Task<AccountDetails> GetAccountAsync(int accountId)
         {
             var account = await _accountDataLayer.GetAccountAsync(accountId);
 
-            return account;
+            var emailAddress = await _emailAddressDataLayer.GetEmailAddressAsync(accountId);
+
+            return new AccountDetails
+            {
+                AccountId = accountId,
+                EmailAddress = emailAddress.EmailAddress
+            };
         }
     }
 }

@@ -1,33 +1,33 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using System.Data;
 using System.Security.Principal;
 
 namespace ResumeRocketQuery.DataLayer
 {
-    public class EmailAddressDataLayer : IEmailAddressDataLayer
+    public class ResumeDataLayer : IResumeDataLayer
     {
         private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
 
-        public EmailAddressDataLayer(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
+        public ResumeDataLayer(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
         {
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }
 
-        public async Task<int> InsertEmailAddressStorageAsync(EmailAddressStorage emailAddress)
+        public async Task<int> InsertResumeAsync(ResumeStorage resume)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 var result = await connection.ExecuteScalarAsync<int>(
-                    DataLayerConstants.StoredProcedures.EmailAddress.InsertEmailAddress,
+                    DataLayerConstants.StoredProcedures.Resume.InsertResume,
                     new
                     {
-                        EmailAddress = emailAddress.EmailAddress,
-                        AccountId = emailAddress.AccountId
+                        AccountId = resume.AccountId,
+                        Resume = resume.Resume
                     },
                     commandType: CommandType.Text);
 
@@ -35,44 +35,42 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task UpdateEmailAddressStorageAsync(EmailAddressStorage emailAddressStorage)
+        public async Task UpdateResumeAsync(ResumeStorage resume)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 await connection.ExecuteAsync(
-                    DataLayerConstants.StoredProcedures.EmailAddress.UpdateEmailAddress,
+                    DataLayerConstants.StoredProcedures.Resume.UpdateResume,
                     new
                     {
-                        EmailAddress = emailAddressStorage.EmailAddress,
-                        AccountId = emailAddressStorage.AccountId
+                        ResumeId = resume.ResumeId,
+                        Resume = resume.Resume
                     },
                     commandType: CommandType.Text);
             }
         }
 
-        public async Task<EmailAddressRepository> GetEmailAddressAsync(int accountId)
+        public async Task<List<ResumeStorage>> GetResumeAsync(int accountId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryFirstOrDefaultAsync<EmailAddressRepository>(
-                    DataLayerConstants.StoredProcedures.EmailAddress.SelectEmailAddress,
+                var result = await connection.QueryAsync<ResumeStorage>(
+                    DataLayerConstants.StoredProcedures.Resume.SelectResume,
                     new { AccountId = accountId },
                     commandType: CommandType.Text);
 
-                return result;
+                return result.ToList();
             }
         }
 
-        public async Task<EmailAddressRepository> GetAccountByEmailAddressAsync(string emailAddress)
+        public async Task DeleteResumeAsync(int resumeId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryFirstOrDefaultAsync<EmailAddressRepository>(
-                    DataLayerConstants.StoredProcedures.EmailAddress.SelectAccountByEmailAddress,
-                    new { EmailAddress = emailAddress },
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Resume.DeleteResume,
+                    new { ResumeId = resumeId },
                     commandType: CommandType.Text);
-
-                return result;
             }
         }
     }

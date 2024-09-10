@@ -1,16 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using ExpectedObjects;
-using ResumeRocketQuery.Domain.Repository;
-using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using ResumeRocketQuery.Domain.External;
 using System.IO;
-using Json.More;
-using System.Text.Json;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Newtonsoft.Json;

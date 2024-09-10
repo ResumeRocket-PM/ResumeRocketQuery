@@ -2,7 +2,6 @@ using System;
 using ResumeRocketQuery.Api.Configuration;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
-using ResumeRocketQuery.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +29,7 @@ namespace ResumeRocketQuery.Tests.Helpers
 
         private void RegisterMemoryFake(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<IResumeRocketQueryStorage, MemoryResumeRocketQueryStorage>();
+            //serviceCollection.AddSingleton<IResumeRocketQueryStorage, MemoryResumeRocketQueryStorage>();
         }
     }
 }

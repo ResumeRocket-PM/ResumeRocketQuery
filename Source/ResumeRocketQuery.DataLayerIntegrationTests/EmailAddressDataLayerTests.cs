@@ -11,15 +11,18 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
     [Rollback]
     public class EmailAddressDataLayerTests
     {
+        private IServiceProvider _serviceProvider;
+        private IAccountDataLayer _accountDataLayer;
+
+        public EmailAddressDataLayerTests()
+        {
+            _serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+            _accountDataLayer = _serviceProvider.GetService<IAccountDataLayer>();
+        }
+
         private IEmailAddressDataLayer GetSystemUnderTest(Type storageType)
         {
-            var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
-
-            var config = serviceProvider.GetService<IResumeRocketQueryConfigurationSettings>();
-
-            IEmailAddressDataLayer systemUnderTest = (IEmailAddressDataLayer)Activator.CreateInstance(storageType);
-
-            return systemUnderTest;
+            return _serviceProvider.GetService<IEmailAddressDataLayer>();
         }
 
         [Theory]
@@ -28,10 +31,21 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var emailAddressId = await systemUnderTest.InsertEmailAddressStorageAsync(new EmailAddressStorage
             {
                 EmailAddress = "test@example.com",
-                AccountId = 1
+                AccountId = accountId
             });
 
             Assert.True(emailAddressId > 0);
@@ -43,10 +57,21 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var expected = new EmailAddressStorage
             {
                 EmailAddress = "test@example.com",
-                AccountId = 1
+                AccountId = accountId
             };
 
             var emailAddressId = await systemUnderTest.InsertEmailAddressStorageAsync(expected);
@@ -63,17 +88,28 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var emailAddressId = await systemUnderTest.InsertEmailAddressStorageAsync(new EmailAddressStorage
             {
                 EmailAddress = "test@example.com",
-                AccountId = 1
+                AccountId = accountId
             });
 
             var updatedEmailAddress = new EmailAddressStorage
             {
                 EmailAddressId = emailAddressId,
                 EmailAddress = "updated@example.com",
-                AccountId = 1
+                AccountId = accountId
             };
 
             await systemUnderTest.UpdateEmailAddressStorageAsync(updatedEmailAddress);
@@ -89,10 +125,21 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var expected = new EmailAddressStorage
             {
                 EmailAddress = "test@example.com",
-                AccountId = 1
+                AccountId = accountId
             };
 
             var emailAddressId = await systemUnderTest.InsertEmailAddressStorageAsync(expected);
@@ -110,10 +157,21 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var expected = new EmailAddressStorage
             {
                 EmailAddress = "test@example.com",
-                AccountId = 1
+                AccountId = accountId
             };
 
             var emailAddressId = await systemUnderTest.InsertEmailAddressStorageAsync(expected);

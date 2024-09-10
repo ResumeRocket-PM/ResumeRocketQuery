@@ -34,24 +34,24 @@ namespace ResumeRocketQuery.DataLayer
             public class EmailAddress
             {
                 public const string InsertEmailAddress = @"
-                    INSERT INTO EmailAddress (EmailAddress, AccountId)
+                    INSERT INTO EmailAddresses (EmailAddress, AccountId)
                     VALUES (@EmailAddress, @AccountId);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateEmailAddress = @"
-                    UPDATE EmailAddress
-                    SET EmailAddress = @EmailAddress,
+                    UPDATE EmailAddresses
+                    SET EmailAddress = @EmailAddress
                     WHERE AccountId = @AccountId;";
 
                 public const string SelectEmailAddress = @"
                     SELECT EmailAddressId, EmailAddress, AccountId
-                    FROM EmailAddress
+                    FROM EmailAddresses
                     WHERE AccountId = @AccountId;";
 
 
                 public const string SelectAccountByEmailAddress = @"
                     SELECT EmailAddressId, EmailAddress, AccountId
-                    FROM EmailAddress
+                    FROM EmailAddresses
                     WHERE EmailAddress = @EmailAddress;";
             }
 
@@ -99,6 +99,51 @@ namespace ResumeRocketQuery.DataLayer
                 public const string DeleteEducation = @"
                     DELETE FROM Educations
                     WHERE EducationId = @EducationId;";
+            }
+
+            public class Portfolio
+            {
+                public const string InsertPortfolio = @"
+                    INSERT INTO Portfolios (AccountId, Configuration, InsertDate)
+                    VALUES (@AccountId, @Configuration, @InsertDate);
+                    SELECT SCOPE_IDENTITY();";
+
+
+                public const string UpdatePortfolio = @"
+                    UPDATE Portfolios
+                    SET Configuration = @Configuration,
+                        UpdateDate = GetDate()
+                    WHERE PortfolioId = @PortfolioId;";
+
+
+                // Select
+                public const string SelectPortfolio = @"
+                    SELECT PortfolioId, AccountId, Configuration, InsertDate, UpdateDate
+                    FROM Portfolios
+                    WHERE AccountId = @AccountId;";
+
+            }
+
+            public class Resume
+            {
+                public const string InsertResume = @"
+                    INSERT INTO Resumes (AccountId, Resume)
+                    VALUES (@AccountId, @Resume);
+                    SELECT SCOPE_IDENTITY();";
+
+                public const string UpdateResume = @"
+                    UPDATE Resumes
+                    SET Resume = @Resume
+                    WHERE ResumeId = @ResumeId;";
+
+                public const string SelectResume = @"
+                    SELECT ResumeId, AccountId, Resume
+                    FROM Resumes
+                    WHERE AccountId = @AccountId;";
+
+                public const string DeleteResume = @"
+                    DELETE FROM Resumes
+                    WHERE ResumeId = @ResumeId;";
             }
         }
     }

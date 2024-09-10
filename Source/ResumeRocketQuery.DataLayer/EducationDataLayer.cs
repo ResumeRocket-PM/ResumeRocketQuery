@@ -8,11 +8,11 @@ using System.Security.Principal;
 
 namespace ResumeRocketQuery.DataLayer
 {
-    public class EducationsDataLayer : IEducationDataLayer
+    public class EducationDataLayer : IEducationDataLayer
     {
         private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
 
-        public EducationsDataLayer(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
+        public EducationDataLayer(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
         {
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }

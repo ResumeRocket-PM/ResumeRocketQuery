@@ -6,10 +6,8 @@ using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
-using ResumeRocketQuery.Repository;
 using ResumeRocketQuery.Services;
 using ResumeRocketQuery.Services.Helper;
-using ResumeRocketQuery.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +24,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http.Features;
 using ResumeRocketQuery.Service;
 using ResumeRocketQuery.Domain.Services.Repository;
+using ResumeRocketQuery.DataLayer;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
@@ -34,18 +33,23 @@ namespace ResumeRocketQuery.Api.Configuration
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>();
-            services.AddSingleton<IResumeRocketQueryStorage, DapperResumeRocketQueryStorage>();
 
-            services.AddSingleton<IResumeRocketQueryRepository, ResumeRocketQueryRepository>();
-            services.AddTransient<IOpenAiClient, OpenAiClient>(); 
-            services.AddTransient<IJobScraper, jobScraper>();
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
-            services.AddTransient<IAccountService, AccountService>();
-            services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
-            services.AddTransient<ILanguageService, LanguageService>();
-            services.AddTransient<IPortfolioService, PortfolioService>();
-            services.AddTransient<IPdfService, PdfService>();
-            services.AddTransient<IJobService, JobService>();
+            services.AddSingleton<IAccountDataLayer, AccountDataLayer>();
+            services.AddSingleton<IEducationDataLayer, EducationDataLayer>();
+            services.AddSingleton<IEmailAddressDataLayer, EmailAddressDataLayer>();
+            services.AddSingleton<ILoginDataLayer, LoginDataLayer>();
+            services.AddSingleton<IPortfolioDataLayer, PortfolioDataLayer>();
+            services.AddSingleton<IResumeDataLayer, ResumeDataLayer>();
+
+            services.AddSingleton<IOpenAiClient, OpenAiClient>(); 
+            services.AddSingleton<IJobScraper, jobScraper>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            services.AddSingleton<IAccountService, AccountService>();
+            services.AddSingleton<IAuthenticationHelper, AuthenticationHelper>();
+            services.AddSingleton<ILanguageService, LanguageService>();
+            services.AddSingleton<IPortfolioService, PortfolioService>();
+            services.AddSingleton<IPdfService, PdfService>();
+            services.AddSingleton<IJobService, JobService>();
 
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();

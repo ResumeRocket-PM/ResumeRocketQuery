@@ -36,9 +36,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = password
                 });
 
-                var account = await accountService.GetAccountAsync(accountId.AccountId);
-
-                var jsonWebToken = _systemUnderTest.CreateJsonWebToken(account);
+                var jsonWebToken = _systemUnderTest.CreateJsonWebToken(accountId.AccountId);
 
                 var actual = _systemUnderTest.ValidateJsonWebToken(jsonWebToken);
 
@@ -72,9 +70,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = password
                 });
 
-                var account = await accountService.GetAccountAsync(accountId.AccountId);
-
-                var actual = _systemUnderTest.CreateJsonWebToken(account);
+                var actual = _systemUnderTest.CreateJsonWebToken(accountId.AccountId);
 
                 Assert.NotNull(actual);
             }
