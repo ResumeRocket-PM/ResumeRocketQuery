@@ -6,7 +6,7 @@ namespace ResumeRocketQuery.Domain.Services
     public class Resume
     {
         public int ResumeID { get; set; }
-        public DateTime ApplyDate { get; set; }
+        public DateTime? ApplyDate { get; set; }
         public string JobUrl { get; set; }
         public int AccountID { get; set; }
         public string Status { get; set; }

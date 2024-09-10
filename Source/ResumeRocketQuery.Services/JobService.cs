@@ -11,6 +11,7 @@ using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using ResumeRocketQuery.Service;
+using Newtonsoft.Json;
 
 namespace ResumeRocketQuery.Services
 {
@@ -19,17 +20,20 @@ namespace ResumeRocketQuery.Services
         private readonly IPdfService _pdfService;
         private readonly IOpenAiClient _openAiClient;
         private readonly IResumeDataLayer _resumeDataLayer;
+        private readonly IApplicationDataLayer _applicationDataLayer;
         private readonly ILanguageService _languageService;
 
         public JobService(IPdfService pdfService, 
             IOpenAiClient openAiClient, 
             ILanguageService languageService,
-            IResumeDataLayer resumeDataLayer)
+            IResumeDataLayer resumeDataLayer,
+            IApplicationDataLayer applicationDataLayer)
         {
             _pdfService = pdfService;
             _openAiClient = openAiClient;
             _languageService = languageService;
             _resumeDataLayer = resumeDataLayer;
+            _applicationDataLayer = applicationDataLayer;
         }
 
         public async Task<int> CreateJobResumeAsync(Job job)
@@ -57,41 +61,63 @@ namespace ResumeRocketQuery.Services
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
-            //var result = await _resumeRocketQueryRepository.CreateResumeAsync(new Resume
-            //{
-            //    AccountID = job.AccountId,
-            //    ApplyDate = DateTime.Now,
-            //    CompanyName = regex,
-            //    JobUrl = job.JobUrl,
-            //    Position = jobResult.Title,
-            //    ResumeContent = resumeContent,
-            //    Status = "Pending"
-            //});
+            var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                Resume = JsonConvert.SerializeObject(resumeContent)
+            });
 
-            //return result;
+            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+            {
+                JobPostingUrl = job.JobUrl,
+                AccountId = job.AccountId,
+                ApplyDate = DateTime.Now,
+                CompanyName = regex,
+                Position = jobResult.Title,
+                Status = "Pending",
+                ResumeId = resumeId
+            });
 
-            throw new NotImplementedException();
+
+            return result;
         }
 
-        public async Task<List<Resume>> GetResumes(int accountId)
+        public async Task<List<Resume>> GetJobPostings(int accountId)
         {
-            throw new NotImplementedException();
+            var applications = await _applicationDataLayer.GetApplicationsAsync(accountId);
+
+            return applications.Select(ConvertApplication).ToList();
         }
 
         public async Task<Resume> GetResume(int resumeId)
         {
-            throw new NotImplementedException();
+            var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
+
+            var result = ConvertApplication(application);
+
+            return result;
         }
 
         public async Task UpdateResume(int resumeId, string status)
         {
-            throw new NotImplementedException();
-            //Resume resume = await _resumeRocketQueryRepository.GetResumeAsync(resumeId);
-            //ResumeStorage resumeStorage = new();
-            //resumeStorage.status = status;
-            //resumeStorage.ResumeID = resumeId;
-            //await _resumeRocketQueryRepository.UpdateResume(resumeStorage);
-            //throw new NotImplementedException();
+            await _applicationDataLayer.UpdateApplicationAsync(new ApplicationStorage
+            {
+                ApplicationId = resumeId,
+                Status = status
+            });
+        }
+
+        private Resume ConvertApplication(Application x)
+        {
+            return new Resume
+            {
+                CompanyName = x.CompanyName,
+                AccountID = x.AccountId,
+                ApplyDate = x.ApplyDate,
+                JobUrl = string.Empty,
+                Position = x.Position,
+                ResumeID = x.ApplicationId,
+                Status = x.Status,
+            };
         }
     }
 }

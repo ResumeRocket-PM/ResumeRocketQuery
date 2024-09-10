@@ -71,7 +71,7 @@ namespace ResumeRocketQuery.Api.Controllers
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            var resumeResult = await _jobService.GetResumes(account.AccountId);
+            var resumeResult = await _jobService.GetJobPostings(account.AccountId);
 
             var result = resumeResult.Select(x => new JobPostingResponse
             {

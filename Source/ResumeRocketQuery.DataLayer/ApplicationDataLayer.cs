@@ -29,7 +29,8 @@ namespace ResumeRocketQuery.DataLayer
                         ApplyDate = application.ApplyDate,
                         Status = application.Status,
                         Position = application.Position,
-                        CompanyName = application.CompanyName
+                        CompanyName = application.CompanyName,
+                        JobPostingUrl = application.JobPostingUrl,
                     },
                     commandType: CommandType.Text);
 
@@ -52,7 +53,7 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task<List<Application>> GetApplicationAsync(int accountId)
+        public async Task<List<Application>> GetApplicationsAsync(int accountId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
@@ -65,5 +66,17 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
+        public async Task<Application> GetApplicationAsync(int applicationId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<Application>(
+                    DataLayerConstants.StoredProcedures.Applications.SelectApplication,
+                    new { ApplicationId = applicationId },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
+        }
     }
 }

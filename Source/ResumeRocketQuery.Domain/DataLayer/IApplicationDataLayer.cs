@@ -8,6 +8,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
     {
         Task<int> InsertApplicationAsync(ApplicationStorage application);
         Task UpdateApplicationAsync(ApplicationStorage application);
-        Task<List<Application>> GetApplicationAsync(int accountId);
+        Task<List<Application>> GetApplicationsAsync(int accountId);
+        Task<Application> GetApplicationAsync(int applicationId);
     }
 }

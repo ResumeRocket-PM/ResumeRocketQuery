@@ -211,7 +211,7 @@ namespace ResumeRocketQuery.Services.Tests
                     }
                 };
 
-                var actual = await _systemUnderTest.GetResumes(account.AccountId);
+                var actual = await _systemUnderTest.GetJobPostings(account.AccountId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }

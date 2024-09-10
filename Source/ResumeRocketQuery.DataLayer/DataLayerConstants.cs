@@ -41,8 +41,8 @@ namespace ResumeRocketQuery.DataLayer
                     FROM ApplicationStatus
                     WHERE Status = @Status;
 
-                    INSERT INTO Applications (AccountId, ApplyDate, StatusId, Position, CompanyName, InsertDate, UpdateDate)
-                    VALUES (@AccountId, @ApplyDate, @StatusId, @Position, @CompanyName, GETDATE(), GETDATE());
+                    INSERT INTO Applications (AccountId, ApplyDate, StatusId, Position, CompanyName, JobPostingUrl, InsertDate, UpdateDate)
+                    VALUES (@AccountId, @ApplyDate, @StatusId, @Position, @CompanyName, @JobPostingUrl,GETDATE(), GETDATE());
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateApplication = @"
@@ -59,10 +59,16 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE ApplicationId = @ApplicationId;";
 
                 public const string SelectApplicationByAccount = @"
-                    SELECT ApplicationId, AccountId, ApplyDate, s.Status, Position, CompanyName
+                    SELECT ApplicationId, AccountId, ApplyDate, s.Status, Position, CompanyName, JobPostingUrl
                     FROM Applications a
                     JOIN ApplicationStatus s on a.StatusId = s.StatusId
                     WHERE AccountId = @AccountId;";
+
+                public const string SelectApplication = @"
+                    SELECT ApplicationId, AccountId, ApplyDate, s.Status, Position, CompanyName, JobPostingUrl
+                    FROM Applications a
+                    JOIN ApplicationStatus s on a.StatusId = s.StatusId
+                    WHERE ApplicationId = @ApplicationId;";
             }
 
             public class EmailAddress
