@@ -45,6 +45,7 @@ namespace ResumeRocketQuery.External
 
             // Navigate to the target URL
             driver.Navigate().GoToUrl(this._url);
+
             // Set up a wait to ensure dynamic content is loaded
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
@@ -53,6 +54,7 @@ namespace ResumeRocketQuery.External
 
             // Now that the page is fully loaded, get the page source
             string pageSource = driver.PageSource;
+            
             driver.Quit();
 
             return pageSource;
@@ -89,57 +91,87 @@ namespace ResumeRocketQuery.External
         /// provide all the input field from the given html, and put those input field name into the list
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> InputFieldNames()
+        public async Task<List<string>> TextInputFieldNames()
         {
             //TODO: this line is not useful, because this is a async method, there has to be an "await", but I haven't find a way to fix it
             var useless = await _httpClient.GetStringAsync(this._url);
 
-            string htmlPage = SetupDynamicContent();
+            try
+            {
+                string htmlPage = SetupDynamicContent();
 
-            var scraper = new TestScraper(htmlPage);
+                var scraper = new TestScraper(htmlPage);
 
-            return scraper.findInputField();
+                return scraper.findInputField("text", "name");
+            }
+            catch (Exception e) 
+            {
+
+                throw new Exception($"{e}");
+            }
+        }
+
+        public async Task<List<string>> CheckBoxInputFieldNames()
+        {
+            //TODO: this line is not useful, because this is a async method, there has to be an "await", but I haven't find a way to fix it
+            var useless = await _httpClient.GetStringAsync(this._url);
+
+            try
+            {
+                string htmlPage = SetupDynamicContent();
+
+                var scraper = new TestScraper(htmlPage);
+
+                return scraper.findInputField("checkbox","label");
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception($"{e}");
+            }
         }
 
         /// <summary>
         /// auto filled all the value into related value part of the input field of the html and submit that request
+        /// 
+        /// reference: "https://youtu.be/9zCJyLruWaE?si=O6_iC8q-wQjyJeiy"
         /// </summary>
         /// <param name="filedInputs"></param>
         /// <returns></returns>
-        public async Task<string> submitFilledForm(Dictionary<string, string> filedInputs)
+        public async Task<bool> submitFilledForm(Dictionary<string, string> filedInputs)
         {
+
+            try
+            {
+                IWebDriver testDriver = new ChromeDriver();
+                testDriver.Navigate().GoToUrl(this._url);
+
+                foreach (KeyValuePair<string, string> entry in filedInputs)
+                {
+                    IWebElement inputEle = testDriver.FindElement(By.Name(entry.Key));
+                    //if (entry.Value == "cb")//cb: checkbox
+                    //{
+                    //    if (!inputEle.Selected)
+                    //    {
+                    //        inputEle.Click();
+                    //    }
+                    //}
+                    if (inputEle != null)
+                    {
+                        inputEle.SendKeys(entry.Value);
+                    }
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            //-------code below are useless--------
             var fillContent = new FormUrlEncodedContent(filedInputs);
-
             var response = await _httpClient.PostAsync(this._url, fillContent);
-
-
-            if (response.IsSuccessStatusCode)
-            {
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                // Save the response HTML to a file
-                string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "result.html");
-                File.WriteAllText(filePath, responseBody);
-
-                // Initialize WebDriver (make sure ChromeDriver is in your PATH)
-                IWebDriver driver = new ChromeDriver();
-
-                // Navigate to an about:blank page
-                driver.Navigate().GoToUrl("about:blank");
-
-                // Inject the HTML into the page using JavaScript
-                IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
-                js.ExecuteScript("document.write(arguments[0]);", responseBody);
-
-                // Optional: Maximize the window
-                driver.Manage().Window.Maximize();
-
-                return responseBody;
-            }
-            else
-            {
-                return $"Error: {response.StatusCode}";
-            }
         }
 
 
@@ -158,7 +190,6 @@ namespace ResumeRocketQuery.External
             // e.g.target == "//html"
             var node = HtmlDocument.DocumentNode.SelectSingleNode(target);
 
-
             if (node != null)
             {
                 var result = Regex.Replace(node.InnerText, @"[^a-zA-Z0-9 -]", string.Empty);
@@ -173,20 +204,25 @@ namespace ResumeRocketQuery.External
 
         /// <summary>
         /// find all field from the scraped html and put the filed names into the list
+        /// 
+        /// parameter "inputType": it should be the type of input marked in HTML (e.g. text, dropdowns, check box, radio button)
         /// </summary>
+        /// <param name="inputType"></param>
         /// <returns></returns>
-        public List<string> findInputField()
+        /// <exception cref="ScrapeException"></exception>
+        public List<string> findInputField(string inputType, string attributeName)
         {
             List<string> fieldNames = new List<string>();
 
             //HtmlDocument.LoadHtml(this.Html);
-            var inputFields = HtmlDocument.DocumentNode.SelectNodes("//input[@name]");
+            var inputFields = HtmlDocument.DocumentNode.SelectNodes($"//input[@type='{inputType}']");
 
             if (inputFields != null)
             {
                 foreach (var inputField in inputFields)
                 {
-                    string fieldName = inputField.GetAttributeValue("name", "");
+                    string fieldName = inputField.GetAttributeValue($"{attributeName}", "");
+                    //string fieldId = inputField.GetAttributeValue("id","");
                     if (!string.IsNullOrEmpty(fieldName))
                     {
                         fieldNames.Add(fieldName);
@@ -194,7 +230,7 @@ namespace ResumeRocketQuery.External
                 }
                 return fieldNames;
             }
-            throw new ScrapeException("Could not scrape conditions.", Html);
+            throw new ScrapeException($"Could not scrape conditions with the type {inputType}, please make sure the type is correct.", Html);
 
         }
 
