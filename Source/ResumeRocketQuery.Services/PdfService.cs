@@ -55,7 +55,7 @@ namespace ResumeRocketQuery.Service
         public async Task<string> UpdatePdfAsync(string filepath, string update)
         {
             string name = filepath.Replace(".pdf", "");
-            FileInfo file = new FileInfo(name+DateTime.Now.ToString("yyyyMMddHHmmffff")+".pdf");
+            FileInfo file = new FileInfo(name+"-"+DateTime.Now.ToString("yyyyMMddHHmmffff")+".pdf");
             if (!file.Exists)
                 file.Directory.Create();
             var writer = new PdfWriter(file);
