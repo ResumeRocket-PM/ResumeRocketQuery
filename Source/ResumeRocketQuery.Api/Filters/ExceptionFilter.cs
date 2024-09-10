@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.Api.Filters
 {
@@ -11,25 +12,38 @@ namespace ResumeRocketQuery.Api.Filters
     {
         public async Task OnExceptionAsync(ExceptionContext context)
         {
+
             var response = new ServiceResponseGeneric<object>
             {
                 Result = null,
                 ResponseMetadata = new ResponseMetadata
                 {
+                    // Default response
                     HttpStatusCode = 500,
-                    Exception = context.Exception.Message
+                    Exception = context.Exception.Message // Don't expose this in production
                 },
                 Succeeded = false
             };
 
+            if (context.Exception is Domain.Services.ValidationException validationException)
+            {
+                // Handle ValidationException separately
+                response.ResponseMetadata.HttpStatusCode = 400; // Bad Request
+                response.ResponseMetadata.Exception = "One or more validation errors occurred.";
+            }
+
+            // Serialize the response object to JSON
             var jsonObject = JsonConvert.SerializeObject(response);
 
-            context.HttpContext.Response.StatusCode = 500;
+            // Set the response status code and content type
+            context.HttpContext.Response.StatusCode = response.ResponseMetadata.HttpStatusCode;
             context.HttpContext.Response.ContentType = "application/json";
 
+            // Write the serialized JSON to the response body
             await context.HttpContext.Response.WriteAsync(jsonObject);
 
-            await context.HttpContext.Response.CompleteAsync();
+            // Mark the exception as handled
+            context.ExceptionHandled = true;
         }
     }
 }
