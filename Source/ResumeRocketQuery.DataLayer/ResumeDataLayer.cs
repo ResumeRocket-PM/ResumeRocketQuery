@@ -50,16 +50,29 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task<List<ResumeStorage>> GetResumeAsync(int accountId)
+        public async Task<List<ResumeRepository>> GetResumesAsync(int accountId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryAsync<ResumeStorage>(
-                    DataLayerConstants.StoredProcedures.Resume.SelectResume,
+                var result = await connection.QueryAsync<ResumeRepository>(
+                    DataLayerConstants.StoredProcedures.Resume.SelectResumeByAccount,
                     new { AccountId = accountId },
                     commandType: CommandType.Text);
 
                 return result.ToList();
+            }
+        }
+
+        public async Task<ResumeRepository> GetResumeAsync(int resumeId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<ResumeRepository>(
+                    DataLayerConstants.StoredProcedures.Resume.SelectResume,
+                    new { ResumeId = resumeId },
+                    commandType: CommandType.Text);
+
+                return result;
             }
         }
 

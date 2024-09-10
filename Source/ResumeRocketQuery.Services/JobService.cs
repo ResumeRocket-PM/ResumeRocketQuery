@@ -63,7 +63,8 @@ namespace ResumeRocketQuery.Services
 
             var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
-                Resume = JsonConvert.SerializeObject(resumeContent)
+                Resume = JsonConvert.SerializeObject(resumeContent),
+                AccountId = job.AccountId,
             });
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
@@ -77,22 +78,31 @@ namespace ResumeRocketQuery.Services
                 ResumeId = resumeId
             });
 
+            return result;
+        }
+
+        public async Task<List<ApplicationResult>> GetJobPostings(int accountId)
+        {
+            var applications = await _applicationDataLayer.GetApplicationsAsync(accountId);
+
+
+            List<ApplicationResult> result = new List<ApplicationResult>();
+
+            foreach (var application in applications)
+            {
+                var applicationResult = await ConvertApplication(application);
+
+                result.Add(applicationResult);
+            }
 
             return result;
         }
 
-        public async Task<List<Resume>> GetJobPostings(int accountId)
-        {
-            var applications = await _applicationDataLayer.GetApplicationsAsync(accountId);
-
-            return applications.Select(ConvertApplication).ToList();
-        }
-
-        public async Task<Resume> GetResume(int resumeId)
+        public async Task<ApplicationResult> GetResume(int resumeId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
 
-            var result = ConvertApplication(application);
+            var result = await ConvertApplication(application);
 
             return result;
         }
@@ -106,9 +116,18 @@ namespace ResumeRocketQuery.Services
             });
         }
 
-        private Resume ConvertApplication(Application x)
+        private async Task<ApplicationResult> ConvertApplication(Application x)
         {
-            return new Resume
+            var resumeContent = new Dictionary<string, string>();
+
+            if (x.ResumeId.HasValue)
+            {
+                var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
+
+                resumeContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(resumeResult.Resume);
+            }
+
+            return new ApplicationResult
             {
                 CompanyName = x.CompanyName,
                 AccountID = x.AccountId,
@@ -117,6 +136,7 @@ namespace ResumeRocketQuery.Services
                 Position = x.Position,
                 ResumeID = x.ApplicationId,
                 Status = x.Status,
+                ResumeContent = resumeContent
             };
         }
     }

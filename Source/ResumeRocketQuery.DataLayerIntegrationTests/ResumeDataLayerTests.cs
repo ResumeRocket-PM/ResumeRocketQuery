@@ -82,7 +82,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
                 insertRequest
             };
 
-            var actual = await systemUnderTest.GetResumeAsync(insertRequest.AccountId);
+            var actual = await systemUnderTest.GetResumesAsync(insertRequest.AccountId);
 
             expected.ToExpectedObject().ShouldMatch(actual);
         }
@@ -124,7 +124,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             await systemUnderTest.UpdateResumeAsync(updatedResume);
 
-            var actual = await systemUnderTest.GetResumeAsync(updatedResume.AccountId);
+            var actual = await systemUnderTest.GetResumesAsync(updatedResume.AccountId);
 
             expected.ToExpectedObject().ShouldMatch(actual);
         }
@@ -156,7 +156,39 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             var actual = await systemUnderTest.GetResumeAsync(resumeId);
 
-            Assert.Empty(actual);
+            Assert.Null(actual);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_GetResumeAsync_is_called_THEN_storage_matches(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var expected = new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text"
+            };
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(expected);
+
+            expected.ResumeId = resumeId;
+
+            var actual = await systemUnderTest.GetResumeAsync(expected.ResumeId);
+
+            expected.ToExpectedObject().ShouldMatch(actual);
         }
     }
 

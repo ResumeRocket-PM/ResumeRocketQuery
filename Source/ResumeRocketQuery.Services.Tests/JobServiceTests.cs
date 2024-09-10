@@ -246,7 +246,7 @@ namespace ResumeRocketQuery.Services.Tests
                 
 
                 var actualOld = await _systemUnderTest.GetResume(resumeId1);
-                string updateStatus = "update Status from jobServie";
+                string updateStatus = "Accepted";
                 Assert.NotEqual(updateStatus, actualOld.Status);
 
                 await _systemUnderTest.UpdateResume(resumeId1, updateStatus);

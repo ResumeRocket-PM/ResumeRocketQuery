@@ -1,4 +1,4 @@
-﻿using ResumeRocketQuery.Domain.Services.Repository;
+﻿using ResumeRocketQuery.Domain.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,6 +9,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<int> InsertResumeAsync(ResumeStorage resume);
         Task UpdateResumeAsync(ResumeStorage resume);
         Task DeleteResumeAsync(int resumeId);
-        Task<List<ResumeStorage>> GetResumeAsync(int accountId);
+        Task<List<ResumeRepository>> GetResumesAsync(int accountId);
+        Task<ResumeRepository> GetResumeAsync(int resumeId);
     }
 }

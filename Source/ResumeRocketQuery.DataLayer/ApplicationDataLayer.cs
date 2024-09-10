@@ -31,6 +31,7 @@ namespace ResumeRocketQuery.DataLayer
                         Position = application.Position,
                         CompanyName = application.CompanyName,
                         JobPostingUrl = application.JobPostingUrl,
+                        ResumeId = application.ResumeId
                     },
                     commandType: CommandType.Text);
 

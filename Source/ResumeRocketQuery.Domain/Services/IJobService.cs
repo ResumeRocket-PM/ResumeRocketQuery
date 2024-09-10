@@ -6,9 +6,8 @@ namespace ResumeRocketQuery.Domain.Services;
 public interface IJobService
 {
     Task<int> CreateJobResumeAsync(Job job);
-    Task<List<Resume>> GetJobPostings(int accountId);
-    Task<Resume> GetResume(int resumeId);
+    Task<List<ApplicationResult>> GetJobPostings(int accountId);
+    Task<ApplicationResult> GetResume(int resumeId);
     Task UpdateResume(int resumeId, string status);
-    //Task UpdateResume(int resumeId, string status)
 
 }
