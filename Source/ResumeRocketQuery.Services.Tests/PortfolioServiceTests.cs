@@ -40,7 +40,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Configuration = portfolio
                 };
 
-                await _systemUnderTest.CreatePortfolio(expected);
+                expected.PortfolioId = await _systemUnderTest.CreatePortfolio(expected);
 
                 var actual = await _systemUnderTest.GetPortfolio(account.AccountId);
 

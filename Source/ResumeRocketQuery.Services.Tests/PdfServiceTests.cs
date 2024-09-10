@@ -11,6 +11,7 @@ using Xunit;
 
 namespace ResumeRocketQuery.Services.Tests
 {
+    [Collection("PdfServiceTests")]
     public class PdfServiceTests
     {
         private IPdfService _systemUnderTest;

@@ -18,16 +18,18 @@ namespace ResumeRocketQuery.Services
     {
         private readonly IPdfService _pdfService;
         private readonly IOpenAiClient _openAiClient;
-        private readonly IResumeDataLayer _resumeRocketQueryRepository;
+        private readonly IResumeDataLayer _resumeDataLayer;
         private readonly ILanguageService _languageService;
 
         public JobService(IPdfService pdfService, 
             IOpenAiClient openAiClient, 
-            ILanguageService languageService)
+            ILanguageService languageService,
+            IResumeDataLayer resumeDataLayer)
         {
             _pdfService = pdfService;
             _openAiClient = openAiClient;
             _languageService = languageService;
+            _resumeDataLayer = resumeDataLayer;
         }
 
         public async Task<int> CreateJobResumeAsync(Job job)
@@ -55,9 +57,6 @@ namespace ResumeRocketQuery.Services
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
-            throw new NotImplementedException();
-
-
             //var result = await _resumeRocketQueryRepository.CreateResumeAsync(new Resume
             //{
             //    AccountID = job.AccountId,
@@ -69,26 +68,23 @@ namespace ResumeRocketQuery.Services
             //    Status = "Pending"
             //});
 
-
             //return result;
+
+            throw new NotImplementedException();
         }
 
         public async Task<List<Resume>> GetResumes(int accountId)
         {
-            //return await _resumeRocketQueryRepository.GetResumesAsync(accountId);
             throw new NotImplementedException();
         }
 
         public async Task<Resume> GetResume(int resumeId)
         {
-            //return await _resumeRocketQueryRepository.GetResumeAsync(resumeId);
-
             throw new NotImplementedException();
         }
 
         public async Task UpdateResume(int resumeId, string status)
         {
-
             throw new NotImplementedException();
             //Resume resume = await _resumeRocketQueryRepository.GetResumeAsync(resumeId);
             //ResumeStorage resumeStorage = new();

@@ -31,9 +31,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var loginId = await systemUnderTest.InsertLoginStorageAsync(new LoginStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Salt = "randomSalt",
                 Hash = "hashedPassword"
             });
@@ -47,9 +58,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var expected = new LoginStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Salt = "randomSalt",
                 Hash = "hashedPassword"
             };
@@ -68,9 +90,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var loginId = await systemUnderTest.InsertLoginStorageAsync(new LoginStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Salt = "randomSalt",
                 Hash = "hashedPassword"
             });
@@ -78,7 +111,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var updatedLogin = new LoginStorage
             {
                 LoginId = loginId,
-                AccountId = 1,
+                AccountId = accountId,
                 Salt = "newSalt",
                 Hash = "newHashedPassword"
             };
@@ -96,9 +129,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var expected = new LoginStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Salt = "randomSalt",
                 Hash = "hashedPassword"
             };

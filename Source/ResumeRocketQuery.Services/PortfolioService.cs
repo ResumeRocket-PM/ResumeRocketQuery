@@ -14,13 +14,15 @@ namespace ResumeRocketQuery.Services
             _portfolioDataLayer = portfolioDataLayer;
         }
 
-        public async Task CreatePortfolio(Portfolio portfolio)
+        public async Task<int> CreatePortfolio(Portfolio portfolio)
         {
-            await _portfolioDataLayer.InsertPortfolioAsync(new PortfolioStorage
+            var result = await _portfolioDataLayer.InsertPortfolioAsync(new PortfolioStorage
             {
                 AccountId = portfolio.AccountId,
                 Configuration = portfolio.Configuration,
             });
+
+            return result;
         }
 
         public async Task<Portfolio> GetPortfolio(int accountId)

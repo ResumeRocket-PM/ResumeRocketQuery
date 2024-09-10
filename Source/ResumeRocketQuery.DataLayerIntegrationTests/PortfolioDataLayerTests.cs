@@ -31,9 +31,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var portfolioId = await systemUnderTest.InsertPortfolioAsync(new PortfolioStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Configuration = "Sample Configuration"
             });
 
@@ -46,9 +57,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var expected = new PortfolioStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Configuration = "Sample Configuration"
             };
 
@@ -66,16 +88,27 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var portfolioId = await systemUnderTest.InsertPortfolioAsync(new PortfolioStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Configuration = "Sample Configuration"
             });
 
             var updatedPortfolio = new PortfolioStorage
             {
                 PortfolioId = portfolioId,
-                AccountId = 1,
+                AccountId = accountId,
                 Configuration = "Updated Configuration",
             };
 

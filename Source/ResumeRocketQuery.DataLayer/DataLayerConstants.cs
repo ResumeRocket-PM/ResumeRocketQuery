@@ -104,13 +104,13 @@ namespace ResumeRocketQuery.DataLayer
             public class Portfolio
             {
                 public const string InsertPortfolio = @"
-                    INSERT INTO Portfolios (AccountId, Configuration, InsertDate)
-                    VALUES (@AccountId, @Configuration, @InsertDate);
+                    INSERT INTO Portfolio (AccountId, Configuration)
+                    VALUES (@AccountId, @Configuration);
                     SELECT SCOPE_IDENTITY();";
 
 
                 public const string UpdatePortfolio = @"
-                    UPDATE Portfolios
+                    UPDATE Portfolio
                     SET Configuration = @Configuration,
                         UpdateDate = GetDate()
                     WHERE PortfolioId = @PortfolioId;";
@@ -118,8 +118,8 @@ namespace ResumeRocketQuery.DataLayer
 
                 // Select
                 public const string SelectPortfolio = @"
-                    SELECT PortfolioId, AccountId, Configuration, InsertDate, UpdateDate
-                    FROM Portfolios
+                    SELECT PortfolioId, AccountId, Configuration
+                    FROM Portfolio
                     WHERE AccountId = @AccountId;";
 
             }

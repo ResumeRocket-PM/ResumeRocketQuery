@@ -31,9 +31,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Resume = "Sample Resume Text"
             });
 
@@ -46,9 +57,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var insertRequest = new ResumeStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Resume = "Sample Resume Text"
             };
 
@@ -71,16 +93,27 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Resume = "Sample Resume Text"
             });
 
             var updatedResume = new ResumeStorage
             {
                 ResumeId = resumeId,
-                AccountId = 1,
+                AccountId = accountId,
                 Resume = "Updated Resume Text",
             };
 
@@ -102,9 +135,20 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
             var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
             {
-                AccountId = 1,
+                AccountId = accountId,
                 Resume = "Sample Resume Text"
             });
 
@@ -112,7 +156,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             var actual = await systemUnderTest.GetResumeAsync(resumeId);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
     }
 

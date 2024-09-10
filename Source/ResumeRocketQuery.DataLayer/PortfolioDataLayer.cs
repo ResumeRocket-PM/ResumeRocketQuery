@@ -27,8 +27,7 @@ namespace ResumeRocketQuery.DataLayer
                     new
                     {
                         AccountId = portfolio.AccountId,
-                        Configuration = portfolio.Configuration,
-                        InsertDate = DateTime.UtcNow
+                        Configuration = portfolio.Configuration
                     },
                     commandType: CommandType.Text);
 
