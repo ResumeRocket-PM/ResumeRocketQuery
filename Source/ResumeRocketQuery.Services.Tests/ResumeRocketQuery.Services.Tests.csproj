@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Samples\Resume_Template.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Samples\studentAthleteResume.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

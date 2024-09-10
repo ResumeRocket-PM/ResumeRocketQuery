@@ -43,7 +43,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IResumeDataLayer, ResumeDataLayer>();
 
             services.AddSingleton<IOpenAiClient, OpenAiClient>(); 
-            services.AddSingleton<IJobScraper, jobScraper>();
+            services.AddTransient<IJobScraper, jobScraper>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IAuthenticationHelper, AuthenticationHelper>();

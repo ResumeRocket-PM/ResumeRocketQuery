@@ -86,7 +86,7 @@ namespace ResumeRocketQuery.Services
                 {{$input}}";
 
             //Store this as part of the ResumeContent dictionary.
-            string response = await openAiClient.SendMessageAsync(prompt, pdfText);
+            string response = await _openAiClient.SendMessageAsync(prompt, pdfText);
             var recommendations = "";
 
             try
