@@ -9,8 +9,8 @@ namespace ResumeRocketQuery.Domain.Api.Response
         public string Position { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }
 

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.Api;
@@ -44,13 +45,32 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var response = new AccountResponseBody
             {
-                Email = accountResponse.EmailAddress,
-                Title = accountResponse.Title,
-                PortfolioLink = accountResponse.PortfolioLink,
-                Location = accountResponse.StateLocation,
                 FirstName = accountResponse.FirstName,
                 LastName = accountResponse.LastName,
                 ProfilePhotoUrl = accountResponse.ProfilePhotoLink,
+                Title = accountResponse.Title,
+                Email = accountResponse.EmailAddress,
+                Location = accountResponse.StateLocation,
+                PortfolioLink = accountResponse.PortfolioLink,
+                Resume = null,
+                Skills = accountResponse.Skills,
+                Experience = accountResponse.Experience.Select(e => new Experience
+                {
+                    Company = e.Company,
+                    Description = e.Description,
+                    EndDate = e.EndDate,
+                    Position = e.Position,
+                    StartDate = e.StartDate,
+                    Type = e.Type
+                }).ToList(),
+                Education = accountResponse.Education.Select(edu => new Education
+                {
+                    Degree = edu.Degree,
+                    GraduationDate = edu.GraduationDate,
+                    Major = edu.Major,
+                    Minor = edu.Minor,
+                    SchoolName = edu.SchoolName
+                }).ToList()
             };
 
             return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
