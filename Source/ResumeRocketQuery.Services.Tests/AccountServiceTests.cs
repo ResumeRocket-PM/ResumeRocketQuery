@@ -114,7 +114,7 @@ namespace ResumeRocketQuery.Services.Tests
                     AccountAlias = Guid.NewGuid().ToString()
                 });
 
-                var emailAddress = "john.doe@gmail.com";
+                var emailAddress = $"{Guid.NewGuid().ToString()}@gmail.com";
 
                 await _emailAddressDataLayer.InsertEmailAddressStorageAsync(new EmailAddressStorage
                 {
@@ -141,9 +141,9 @@ namespace ResumeRocketQuery.Services.Tests
                     Position = "Software Engineer",
                     StartDate = new DateTime(2020, 6, 1),
                     EndDate = new DateTime(2022, 7, 1),
-                    Description = "Developed web applications."
+                    Description = "Developed web applications.",
+                    Type = "FullTime"
                 });
-
 
                 var expected = new
                 {
