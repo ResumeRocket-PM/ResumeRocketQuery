@@ -14,6 +14,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System.IO;
+using OpenQA.Selenium.DevTools.V128.FileSystem;
 //using Microsoft.Extensions.Logging;
 
 namespace ResumeRocketQuery.External
@@ -34,7 +35,7 @@ namespace ResumeRocketQuery.External
         /// to make sure that all html content is loaded completely
         /// </summary>
         /// <returns></returns>
-        private string SetupDynamicContent()
+        private string SetupDynamicContent(string waitedEle = "input")
         {
             // Set up Chrome options for headless mode
             ChromeOptions options = new ChromeOptions();
@@ -50,7 +51,7 @@ namespace ResumeRocketQuery.External
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
             // Wait for the specific element to be present
-            wait.Until(d => d.FindElement(By.TagName("input")));
+            wait.Until(d => d.FindElement(By.TagName($"{waitedEle}")));
 
             // Now that the page is fully loaded, get the page source
             string pageSource = driver.PageSource;
@@ -72,9 +73,10 @@ namespace ResumeRocketQuery.External
             {
                 var html = await _httpClient.GetStringAsync(this._url);
 
-                var scraper = new TestScraper(html);
+                string htmlpage = SetupDynamicContent("div");
+                var scraper = new TestScraper(htmlpage);
 
-                scraper = new TestScraper(html);
+                //scraper = new TestScraper(html);
 
                 var result = scraper.get_HTML_Body(target);
 
@@ -174,6 +176,34 @@ namespace ResumeRocketQuery.External
             var response = await _httpClient.PostAsync(this._url, fillContent);
         }
 
+        public async Task<bool> SaveHtmlFile(string fileName)
+        {
+            try
+            {
+                //IWebDriver driver = new ChromeDriver();
+
+                //// Navigate to the target URL
+                //driver.Navigate().GoToUrl(this._url);
+
+                //// Set up a wait to ensure dynamic content is loaded
+                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+                //// Wait for the specific element to be present
+                //wait.Until(d => d.FindElement(By.TagName($"div")));
+
+                //// Now that the page is fully loaded, get the page source
+                //string htmlContent = driver.PageSource;
+
+                string htmlContent = SetupDynamicContent("div");
+                string htmlPage = await this._httpClient.GetStringAsync(this._url);
+                System.IO.File.WriteAllText($"{fileName}.html", htmlContent);
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{e}");
+            }
+        }
 
     }
 

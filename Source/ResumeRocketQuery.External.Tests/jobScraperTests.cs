@@ -37,7 +37,14 @@ namespace ResumeRocketQuery.Repository.Tests
                 //var result = await _systemUnderTest.ScrapeJobPosting(url);
                 //Assert.NotNull(result);
             }
-
+            [Theory]
+            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            public async Task TestScrapeSavedFile(string url)
+            {
+                _systemUnderTest.ScrapeSetup(url);
+                var result = await _systemUnderTest.SaveHtmlFile("testpage");
+                Assert.True(result);
+            }
             [Theory]
             [InlineData("https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ")]
             public async Task TestFindTextInputField(string url)
