@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
@@ -13,9 +14,9 @@ namespace ResumeRocketQuery.Services
         private readonly IEmailAddressDataLayer _emailAddressDataLayer;
         private readonly ILoginDataLayer _loginDataLayer;
         private readonly IAuthenticationService _authenticationService;
-        private readonly ISkillDataLayer skillDataLayer;
-        private readonly IEducationDataLayer educationDataLayer;
-        private readonly IExperienceDataLayer experienceDataLayer;
+        private readonly ISkillDataLayer _skillDataLayer;
+        private readonly IEducationDataLayer _educationDataLayer;
+        private readonly IExperienceDataLayer _experienceDataLayer;
         private readonly IAuthenticationHelper _authenticationHelper;
 
         public AccountService(IAuthenticationHelper authenticationHelper,
@@ -33,9 +34,9 @@ namespace ResumeRocketQuery.Services
             _emailAddressDataLayer = emailAddressDataLayer;
             _loginDataLayer = loginDataLayer;
             _authenticationService = authenticationService;
-            this.skillDataLayer = skillDataLayer;
-            this.educationDataLayer = educationDataLayer;
-            this.experienceDataLayer = experienceDataLayer;
+            _skillDataLayer = skillDataLayer;
+            _educationDataLayer = educationDataLayer;
+            _experienceDataLayer = experienceDataLayer;
         }
 
         public async Task<CreateAccountResponse> CreateAccountAsync(CreateAccountRequest createAccountRequest)
@@ -90,7 +91,11 @@ namespace ResumeRocketQuery.Services
 
             var emailAddress = await _emailAddressDataLayer.GetEmailAddressAsync(accountId);
 
-            var skills = await _sk
+            var skills = await _skillDataLayer.GetSkillAsync(accountId);
+
+            var education = await _educationDataLayer.GetEducationAsync(accountId);
+
+            var experience = await _experienceDataLayer.GetExperienceAsync(accountId);
 
             return new AccountDetails
             {
@@ -102,7 +107,28 @@ namespace ResumeRocketQuery.Services
                 ProfilePhotoLink = account.ProfilePhotoLink,
                 StateLocation = account.StateLocation,
                 Title = account.Title,
-                Skills = account.
+                Skills = skills.Select(x => x.Description).ToList(),
+                Education = education.Select(x => new Education
+                {
+                    AccountId = x.AccountId,
+                    Degree = x.Degree,
+                    EducationId = x.EducationId,
+                    GraduationDate = x.GraduationDate,
+                    Major = x.Major,
+                    Minor = x.Minor,
+                    SchoolName = x.SchoolName   
+                }).ToList(),
+                Experience = experience.Select(x => new Experience
+                {
+                    AccountId = x.AccountId,
+                    Company = x.Company,
+                    Description = x.Description,
+                    EndDate = x.EndDate,
+                    ExperienceId = x.ExperienceId,
+                    Position = x.Position,
+                    StartDate = x.StartDate,
+                    Type = x.Type   
+                }).ToList(),
             };
         }
     }
