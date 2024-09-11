@@ -12,10 +12,11 @@ namespace ResumeRocketQuery.Domain.External
     {
 
         void ScrapeSetup(string url);
-        Task<string> ScrapeJobPosting(string url);
+        Task<string> ScrapeJobPosting(string target);
         Task<List<string>> TextInputFieldNames();
         Task<List<string>> CheckBoxInputFieldNames();
         Task<bool> submitFilledForm(Dictionary<string, string> filedInputs);
+        Task<bool> SaveHtmlFile(string fileName);
 
     }
 }
