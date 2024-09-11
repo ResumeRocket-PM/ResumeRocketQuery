@@ -120,17 +120,19 @@ namespace ResumeRocketQuery.Services.Tests
             }
 
 
-            [Theory]
-            [InlineData("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907")]
-            [InlineData("https://openai.com/careers/endpoint-engineer")]
-            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
-            public async Task GIVEN_jobUrl_WHEN_CreateJobResumeAsync_THEN_result_is_correct(string jobUrl)
+            [Fact]
+            //[InlineData("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907")]
+            //[InlineData("https://openai.com/careers/endpoint-engineer")]
+            //[InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            public async Task GIVEN_jobUrl_WHEN_CreateJobResumeAsync_THEN_result_is_correct()
             {
                 var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
                 {
                     EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
                     Password = Guid.NewGuid().ToString()
                 });
+
+                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {

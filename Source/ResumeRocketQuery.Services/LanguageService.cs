@@ -4,7 +4,7 @@ using ResumeRocketQuery.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -24,7 +24,8 @@ namespace ResumeRocketQuery.Services
         //Create a Method that takes in a URL.
         public async Task<JobResult> CaptureJobPostingAsync(string url)
         {
-            var htmlBody = await jobScraper.ScrapeJobPosting(url);
+            jobScraper.ScrapeSetup(url);
+            var htmlBody = await jobScraper.ScrapeJobPosting("//html");
 
             var prompt = @"
                           For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
@@ -49,15 +50,27 @@ namespace ResumeRocketQuery.Services
                                 public List<string> Requirements { get; set; }
                             }
 
+                            Your return content will only contain the requested JSON, no additional text.
+                            Additionally, there will be no formatting applied to the return content like
+                            markdown code block syntax.
+
                             The following input is the job posting html
 
                             {{$input}}";
 
             var result = await openAiClient.SendMessageAsync(prompt, htmlBody);
+            result = FormatPreCheck(result);
 
             return JsonConvert.DeserializeObject<JobResult>(result);
         }
         //Pass the Prompt that we've created, and the HTML into the External class.
         //Deserialize the result as our JobResult class.
+
+        public static string FormatPreCheck(string json)
+        {
+            json = Regex.Replace(json, @"^```json", "");
+            json = Regex.Replace(json, @"$```", "");
+            return json;
+        }
     }
 }

@@ -103,7 +103,7 @@ namespace ResumeRocketQuery.Services
 
             var resumeContent = job.Resume;
 
-            resumeContent.Add("Reccomendations", recommendations);
+            resumeContent.Add("Recommendations", recommendations); //replace key FileBytes with new Pdf bytes
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
