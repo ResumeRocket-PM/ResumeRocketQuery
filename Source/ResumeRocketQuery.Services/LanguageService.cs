@@ -24,7 +24,8 @@ namespace ResumeRocketQuery.Services
         //Create a Method that takes in a URL.
         public async Task<JobResult> CaptureJobPostingAsync(string url)
         {
-            var htmlBody = await jobScraper.ScrapeJobPosting(url);
+            jobScraper.ScrapeSetup(url);
+            var htmlBody = await jobScraper.ScrapeJobPosting("//html");
 
             var prompt = @"
                           For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
