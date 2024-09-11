@@ -190,6 +190,51 @@ namespace ResumeRocketQuery.DataLayer
                     DELETE FROM Resumes
                     WHERE ResumeId = @ResumeId;";
             }
+
+            public class Experience
+            {
+                public const string InsertExperience = @"
+                    INSERT INTO Experience (AccountId, Company, Position, Type, Description, StartDate, EndDate)
+                    VALUES (@AccountId, @Company, @Position, @Type, @Description, @StartDate, @EndDate);
+                    SELECT SCOPE_IDENTITY();";
+
+                public const string UpdateExperience = @"
+                    UPDATE Experience
+                    SET AccountId = @AccountId,
+                        Company = @Company,
+                        Position = @Position,
+                        Type = @Type,
+                        Description = @Description,
+                        StartDate = @StartDate,
+                        EndDate = @EndDate
+                    WHERE ExperienceId = @ExperienceId;";
+
+                public const string SelectExperience = @"
+                    SELECT ExperienceId, AccountId, Company, Position, Type, Description, StartDate, EndDate
+                    FROM Experience
+                    WHERE AccountId = @AccountId;";
+
+                public const string DeleteExperience = @"
+                    DELETE FROM Experience
+                    WHERE ExperienceId = @ExperienceId;";
+            }
+
+            public class Skills
+            {
+                public const string InsertSkill = @"
+                    INSERT INTO Skills (AccountId, Description)
+                    VALUES (@AccountId, @Description);
+                    SELECT SCOPE_IDENTITY();";
+
+                public const string SelectSkill = @"
+                    SELECT SkillId, AccountId, Description
+                    FROM Skills
+                    WHERE AccountId = @AccountId;";
+
+                public const string DeleteSkill = @"
+                    DELETE FROM Skills
+                    WHERE SkillId = @SkillId;";
+            }
         }
     }
 }

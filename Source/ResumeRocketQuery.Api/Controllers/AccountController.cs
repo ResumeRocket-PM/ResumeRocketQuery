@@ -44,7 +44,13 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var response = new AccountResponseBody
             {
-                Email = accountResponse.EmailAddress
+                Email = accountResponse.EmailAddress,
+                Title = accountResponse.Title,
+                PortfolioLink = accountResponse.PortfolioLink,
+                Location = accountResponse.StateLocation,
+                FirstName = accountResponse.FirstName,
+                LastName = accountResponse.LastName,
+                ProfilePhotoUrl = accountResponse.ProfilePhotoLink,
             };
 
             return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);

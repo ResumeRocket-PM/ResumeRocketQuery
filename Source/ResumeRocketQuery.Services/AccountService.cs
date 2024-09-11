@@ -13,19 +13,29 @@ namespace ResumeRocketQuery.Services
         private readonly IEmailAddressDataLayer _emailAddressDataLayer;
         private readonly ILoginDataLayer _loginDataLayer;
         private readonly IAuthenticationService _authenticationService;
+        private readonly ISkillDataLayer skillDataLayer;
+        private readonly IEducationDataLayer educationDataLayer;
+        private readonly IExperienceDataLayer experienceDataLayer;
         private readonly IAuthenticationHelper _authenticationHelper;
 
         public AccountService(IAuthenticationHelper authenticationHelper,
             IAccountDataLayer accountDataLayer, 
             IEmailAddressDataLayer emailAddressDataLayer,
             ILoginDataLayer loginDataLayer,
-            IAuthenticationService authenticationService)
+            IAuthenticationService authenticationService,
+            ISkillDataLayer skillDataLayer,
+            IEducationDataLayer educationDataLayer,
+            IExperienceDataLayer experienceDataLayer
+            )
         {
             _authenticationHelper = authenticationHelper;
             _accountDataLayer = accountDataLayer;
             _emailAddressDataLayer = emailAddressDataLayer;
             _loginDataLayer = loginDataLayer;
             _authenticationService = authenticationService;
+            this.skillDataLayer = skillDataLayer;
+            this.educationDataLayer = educationDataLayer;
+            this.experienceDataLayer = experienceDataLayer;
         }
 
         public async Task<CreateAccountResponse> CreateAccountAsync(CreateAccountRequest createAccountRequest)
@@ -80,10 +90,19 @@ namespace ResumeRocketQuery.Services
 
             var emailAddress = await _emailAddressDataLayer.GetEmailAddressAsync(accountId);
 
+            var skills = await _sk
+
             return new AccountDetails
             {
                 AccountId = accountId,
-                EmailAddress = emailAddress.EmailAddress
+                EmailAddress = emailAddress.EmailAddress,
+                PortfolioLink = account.PortfolioLink,
+                FirstName = account.FirstName,
+                LastName = account.LastName,
+                ProfilePhotoLink = account.ProfilePhotoLink,
+                StateLocation = account.StateLocation,
+                Title = account.Title,
+                Skills = account.
             };
         }
     }

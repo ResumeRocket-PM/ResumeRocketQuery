@@ -34,10 +34,12 @@ namespace ResumeRocketQuery.Api.Configuration
         {
             services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>();
 
+            services.AddSingleton<ISkillDataLayer, SkillDataLayer>();
             services.AddSingleton<IApplicationDataLayer, ApplicationDataLayer>();
             services.AddSingleton<IAccountDataLayer, AccountDataLayer>();
             services.AddSingleton<IEducationDataLayer, EducationDataLayer>();
             services.AddSingleton<IEmailAddressDataLayer, EmailAddressDataLayer>();
+            services.AddSingleton<IExperienceDataLayer, ExperienceDataLayer>();
             services.AddSingleton<ILoginDataLayer, LoginDataLayer>();
             services.AddSingleton<IPortfolioDataLayer, PortfolioDataLayer>();
             services.AddSingleton<IResumeDataLayer, ResumeDataLayer>();
