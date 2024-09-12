@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System;
+﻿using System;
 
-namespace ResumeRocketQuery.Domain.Api.Response
+namespace ResumeRocketQuery.Domain.Api.Request
 {
-    public class Experience
+    public class ExperienceRequest
     {
-        public int ExperienceId { get; set; }
         public string Company { get; set; }
         public string Position { get; set; }
         public string Type { get; set; }
@@ -14,4 +12,5 @@ namespace ResumeRocketQuery.Domain.Api.Response
         public DateTime? EndDate { get; set; }
     }
 }
+
 
