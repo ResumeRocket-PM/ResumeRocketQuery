@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Domain.Api.Response
 {
@@ -7,13 +8,13 @@ namespace ResumeRocketQuery.Domain.Api.Response
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string ProfilePhotoUrl { get; set; }
+        public string ProfilePhotoLink { get; set; }
         public string Title { get; set; }
         public string Email { get; set; }
         public string Location { get; set; }
         public string PortfolioLink { get; set; }
         public string Resume { get; set; }
-        public List<string> Skills { get; set; }
+        public List<Skill> Skills { get; set; }
         public List<Experience> Experience { get; set; }
         public List<Education> Education { get; set; }
 

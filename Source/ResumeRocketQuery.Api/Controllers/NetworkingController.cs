@@ -54,7 +54,7 @@ namespace ResumeRocketQuery.Api.Controllers
             {
                 FirstName = x.FirstName,
                 LastName = x.LastName,
-                ProfilePhotoUrl = x.ProfilePhotoLink,
+                ProfilePhotoLink = x.ProfilePhotoLink,
                 Title = x.Title,
                 Email = x.EmailAddress,
                 Location = x.StateLocation,

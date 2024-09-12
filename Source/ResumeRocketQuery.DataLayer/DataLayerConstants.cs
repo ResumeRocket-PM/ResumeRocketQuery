@@ -156,14 +156,14 @@ namespace ResumeRocketQuery.DataLayer
                     UPDATE Portfolio
                     SET Configuration = @Configuration,
                         UpdateDate = GetDate()
-                    WHERE PortfolioId = @PortfolioId;";
+                    WHERE PortfolioId = @PortfolioId";
 
 
                 // Select
                 public const string SelectPortfolio = @"
                     SELECT PortfolioId, AccountId, Configuration
                     FROM Portfolio
-                    WHERE AccountId = @AccountId;";
+                    WHERE AccountId = @AccountId";
 
             }
 
