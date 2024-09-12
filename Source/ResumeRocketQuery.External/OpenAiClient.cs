@@ -24,7 +24,7 @@ namespace ResumeRocketQuery.External
         {
             var builder = Kernel.CreateBuilder();
             builder.AddOpenAIChatCompletion(
-                "gpt-4o-mini", // OpenAI Model name
+                "gpt-4", // OpenAI Model name
                 "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"); // OpenAI API Key
             var kernel = builder.Build();
             var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message});            
@@ -36,7 +36,7 @@ namespace ResumeRocketQuery.External
         {
             var builder = Kernel.CreateBuilder();
             builder.AddOpenAIChatCompletion(
-                "gpt-4o-mini", // OpenAI Model name
+                "gpt-4", // OpenAI Model name
                 "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"); // OpenAI API Key
             var kernel = builder.Build();
             var chatGPT = kernel.GetRequiredService<IChatCompletionService>();
