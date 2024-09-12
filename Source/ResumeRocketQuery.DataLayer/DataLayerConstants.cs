@@ -18,6 +18,9 @@ namespace ResumeRocketQuery.DataLayer
                     FROM Accounts
                     WHERE AccountId = @accountID;";
 
+                public const string SelectAccountByFilter = @"
+                    ";
+
                 public const string UpdateAccount = @"
                     UPDATE Accounts
                     SET AccountAlias = @accountAlias,
@@ -153,14 +156,14 @@ namespace ResumeRocketQuery.DataLayer
                     UPDATE Portfolio
                     SET Configuration = @Configuration,
                         UpdateDate = GetDate()
-                    WHERE PortfolioId = @PortfolioId;";
+                    WHERE PortfolioId = @PortfolioId";
 
 
                 // Select
                 public const string SelectPortfolio = @"
                     SELECT PortfolioId, AccountId, Configuration
                     FROM Portfolio
-                    WHERE AccountId = @AccountId;";
+                    WHERE AccountId = @AccountId";
 
             }
 
@@ -168,21 +171,21 @@ namespace ResumeRocketQuery.DataLayer
             {
                 public const string InsertResume = @"
                     INSERT INTO Resumes (AccountId, Resume)
-                    VALUES (@AccountId, @Resume);
+                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume));
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateResume = @"
                     UPDATE Resumes
-                    SET Resume = @Resume
+                    SET Resume = CONVERT(VARBINARY(max),@Resume)
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResume = @"
-                    SELECT ResumeId, AccountId, Resume
+                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume
                     FROM Resumes
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResumeByAccount = @"
-                    SELECT ResumeId, AccountId, Resume
+                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 

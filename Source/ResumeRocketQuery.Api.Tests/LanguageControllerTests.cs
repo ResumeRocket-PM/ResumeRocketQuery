@@ -65,7 +65,7 @@ namespace ResumeRocketQuery.Api.Tests
 
                      var actual = await _restRequestClient.SendRequest<CreateJobPostingResponse>(resource, HttpMethod.Post, new CreateJobPostingRequest
                      {
-                         Url = "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907"
+                         Url = "https://www.metacareers.com/jobs/788246929742797/"
                      }, headers);
 
                     expected.ToExpectedObject().ShouldMatch(actual);

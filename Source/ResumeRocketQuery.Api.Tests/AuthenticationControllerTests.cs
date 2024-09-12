@@ -111,7 +111,9 @@ namespace ResumeRocketQuery.Api.Tests
                     var authenticationRequestBody = new AccountRequestBody
                     {
                         EmailAddress = email,
-                        Password = password
+                        Password = password,
+                        FirstName = "John",
+                        LastName = "Doe"
                     };
 
                     var expected = new
@@ -145,7 +147,9 @@ namespace ResumeRocketQuery.Api.Tests
                     var authenticationRequestBody = new AccountRequestBody
                     {
                         EmailAddress = email,
-                        Password = password
+                        Password = password,
+                        FirstName = "John",
+                        LastName = "Doe"
                     };
 
                     var expected = new
@@ -184,7 +188,9 @@ namespace ResumeRocketQuery.Api.Tests
                     var authenticationRequestBody = new AccountRequestBody
                     {
                         EmailAddress = email,
-                        Password = password
+                        Password = password,
+                        FirstName = "John",
+                        LastName = "Doe"
                     };
 
                     var expected = new

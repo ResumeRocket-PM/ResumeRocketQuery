@@ -9,6 +9,7 @@ using System.Security.Principal;
 using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 using System.Collections.Generic;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -47,7 +48,9 @@ namespace ResumeRocketQuery.Services.Tests
                 var actual = await _systemUnderTest.CreateAccountAsync(new CreateAccountRequest
                 {
                     EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
-                    Password = Guid.NewGuid().ToString()
+                    Password = Guid.NewGuid().ToString(),
+                    FirstName = "John",
+                    LastName = "Doe"
                 });
 
                 expected.ToExpectedObject().ShouldMatch(actual);
@@ -155,8 +158,18 @@ namespace ResumeRocketQuery.Services.Tests
                     ProfilePhotoLink = "https://profilephoto.com/johndoe",
                     StateLocation = "CA",
                     Title = "Software Engineer",
-                    Skills = new List<string> { "C#", "ASP.NET" },
-                    Education = new List<object>
+                    Skills = new[]
+                    {
+                        new
+                        { 
+                            Description = "C#"
+                        },
+                        new
+                        {
+                            Description = "ASP.NET"
+                        },
+                    },
+                    Education = new[]
                     {
                         new
                         {
@@ -169,7 +182,7 @@ namespace ResumeRocketQuery.Services.Tests
                             SchoolName = "MIT"
                         }
                     },
-                    Experience = new List<object>
+                    Experience = new[]
                     {
                         new
                         {

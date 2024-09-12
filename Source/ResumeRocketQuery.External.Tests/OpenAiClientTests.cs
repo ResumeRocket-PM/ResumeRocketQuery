@@ -8,6 +8,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace ResumeRocketQuery.Repository.Tests
 {
@@ -45,11 +46,31 @@ namespace ResumeRocketQuery.Repository.Tests
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
-                    State whether the given equality is true or false in one word.",
+                    State whether the given equality is true or false in one word without any punctuation.",
                     @"
                     2+2=4");
 
                 Assert.Equal("true", response.ToLower());
+            }
+
+            [Fact]
+            public async Task WHEN_SendMessageAsync_is_called_in_succession_THEN_chat_history_logged()
+            {
+                List<string> prompts = new List<string>();
+                prompts.Add(
+                    @"Remember the following for this for this chat:
+
+                     * Until I send the keyword ""Respond"" by itself, you are only allowed to respond with ""...""
+                     * That includes in response to this message"
+                );
+                prompts.Add(@"Using the result of the expression: 18+2");
+                prompts.Add(@"compute the value of the of that value divide by 2.");
+                prompts.Add(@"provide the answer as a single numeric value, no other text.");
+                prompts.Add(@"Respond");
+
+                var response = await _systemUnderTest.SendMultiMessageAsync(prompts);
+
+                Assert.Equal("10", response.ToLower());
             }
 
             [Fact]
@@ -58,7 +79,7 @@ namespace ResumeRocketQuery.Repository.Tests
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
-                    State whether the given equality is true or false in one word.",
+                    State whether the given equality is true or false in one word, without any punctuation.",
                     @"
                     2+2=6");
 
@@ -85,24 +106,44 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.Equal(10, jsonResult.Count);
             }
 
-            // TODO - uncomment test after web scraper is truncating the source code
-            /*[Fact]
-            public async Task WHEN_SendMessageAsync_is_called_on_1800contacts_page_source_THEN_assert_keywords()
+            [Fact]
+            public static void WHEN_JSON()
             {
-                var jobPosting = File.ReadAllText(@"C:\Users\Azira\git\resumerocketquery\Source\ResumeRocketQuery.External.Tests\Samples\1800Contacts\1800Contacts.html");
-                var response = await _systemUnderTest.SendMessageAsync(
-                    @"{{$input}} 
+                string json =
+                    @"{
+                      ""html"": ""<html><body><h1>Resume</h1><p><strong>Skills:</strong> SQL, Python, JavaScript, Data Visualization (Tableau), Data Analysis, System Development Life Cycle (SDLC), Team Collaboration.</p><h2>Work Experience</h2><p><strong>IT Service Desk Technician, Nerds at Work</strong></p><ul><li>Collaborated with cross-functional teams to present data insights for improving processes.</li><li>Utilized SQL and Python for data querying, automation, and process optimization.</li></ul><h2>Projects</h2><p><strong>Database Fundamentals Class Project</strong></p><ul><li>Designed relational databases and processed large datasets using SQL and Python.</li><li>Collaborated with team members to analyze data and present insights using data visualization tools.</li></ul></body></html>"",
+                      ""css"": ""body { font-family: Arial, sans-serif; } h1 { color: #333; } h2 { font-size: 1.5em; } p { line-height: 1.6; } ul { list-style-type: square; margin-left: 20px; }"",
+                      ""changes"": [
+                        {
+                          ""section"": ""Skills"",
+                          ""original"": ""Programming: Java, HTML, CSS, C++, SQL, C#, Python, PHP, bash, PowerShell, JavaScript"",
+                          ""modified"": ""SQL, Python, JavaScript, Data Visualization (Tableau), Data Analysis, System Development Life Cycle (SDLC), Team Collaboration""
+                        },
+                        {
+                          ""section"": ""Projects"",
+                          ""original"": ""Lead the design and construction of a physical database, constructed with MySQL on AWS servers"",
+                          ""modified"": ""Designed relational databases and processed large datasets using SQL and Python""
+                        },
+                        {
+                          ""section"": ""Work Experience"",
+                          ""original"": ""Performed internal audits for the Utah site in 2020 and 2021 for both ISO 27001 and PCI"",
+                          ""modified"": ""Collaborated with cross-functional teams to present data insights for improving processes""
+                        },
+                        {
+                          ""section"": ""Projects"",
+                          ""original"": ""Created an entire design document for a proposed dating app including mock interfaces, feasibility matrices"",
+                          ""modified"": ""Collaborated with team members to analyze data and present insights using data visualization tools""
+                        },
+                        {
+                          ""section"": ""Work Experience"",
+                          ""original"": ""Routinely audited physical spare and operational inventory to validate records"",
+                          ""modified"": ""Utilized SQL and Python for data querying, automation, and process optimization""
+                        }
+                      ]
+                    }";
 
-                    For the provided webpage source code for a job posting, return a JSON array where every element is a string. Those elements should be the top 10 keywords I can use to update my resume with.",
-                    jobPosting);
-
-                var jsonResult = JsonConvert.DeserializeObject<List<String>>(response);
-
-                Debug.WriteLine(jsonResult);
-
-                Assert.IsType<List<String>>(jsonResult);
-                Assert.Equal(10, jsonResult.Count);
-            }*/
+                var result = JsonConvert.DeserializeObject<Updates>(json);
+            }
         }
     }
 }

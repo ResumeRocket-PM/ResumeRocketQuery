@@ -59,7 +59,7 @@ namespace ResumeRocketQuery.Api.Tests
                          HttpMethod.Post, 
                          new CreateJobPostingRequest
                          {
-                             Url = "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907"
+                             Url = "https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ"
                          }, headers, fileUpload: "./Samples/Tyler DeBruin Resume.pdf");
 
                     expected.ToExpectedObject().ShouldMatch(actual);

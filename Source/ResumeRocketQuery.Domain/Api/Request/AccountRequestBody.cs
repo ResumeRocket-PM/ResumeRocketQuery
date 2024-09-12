@@ -11,5 +11,13 @@ namespace ResumeRocketQuery.Domain.Api.Request
         [Required]
         [MinLength(6)]
         public string Password { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string LastName { get; set; }
     }
 }

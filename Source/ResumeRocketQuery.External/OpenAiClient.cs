@@ -24,21 +24,32 @@ namespace ResumeRocketQuery.External
         {
             var builder = Kernel.CreateBuilder();
             builder.AddOpenAIChatCompletion(
-                "gpt-4o", // OpenAI Model name
+                "gpt-4o-mini", // OpenAI Model name
                 "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"); // OpenAI API Key
             var kernel = builder.Build();
-            var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message});
-
-        // Used for back and forth chat model, would need to be in a loop with calls to front-end
-            /*var chatGPT = kernel.GetRequiredService<IChatCompletionService>();
-            var chat = new ChatHistory(requirements);
-            for loop here
-            Console.WriteLine($"User: {prompt}");
-            chat.AddUserMessage(prompt);
-            var assistantReply = await chatGPT.GetChatMessageContentAsync(chat, new OpenAIPromptExecutionSettings());
-            chat.AddAssistantMessage(assistantReply.Content);*/
+            var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message});            
 
             return result.ToString();
+        }
+
+        public async Task<string> SendMultiMessageAsync(List<string> prompts)
+        {
+            var builder = Kernel.CreateBuilder();
+            builder.AddOpenAIChatCompletion(
+                "gpt-4o-mini", // OpenAI Model name
+                "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"); // OpenAI API Key
+            var kernel = builder.Build();
+            var chatGPT = kernel.GetRequiredService<IChatCompletionService>();
+            var chat = new ChatHistory();
+            var response = "";
+            foreach (var prompt in prompts)
+            {
+                chat.AddUserMessage(prompt);
+                var assistantReply = await chatGPT.GetChatMessageContentAsync(chat, new OpenAIPromptExecutionSettings());
+                response = assistantReply.Content;
+                chat.AddAssistantMessage(response);
+            }
+            return response;
         }
     }
 }
