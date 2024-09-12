@@ -8,6 +8,7 @@ using ResumeRocketQuery.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
+using System.Collections.Generic;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -74,6 +75,19 @@ namespace ResumeRocketQuery.Api.Controllers
             };
 
             return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Route("details")]
+        public async Task<ServiceResponse> Put([FromBody] Dictionary<string, string> request)
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var accountResponse = await _accountService.GetAccountAsync(user.AccountId);
+
+            await _accountService.UpdateAccount(user.AccountId, request);
+
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
     }
 }

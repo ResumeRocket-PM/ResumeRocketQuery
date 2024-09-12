@@ -53,7 +53,9 @@ namespace ResumeRocketQuery.Api.Controllers
             var accountResponse = await _accountService.CreateAccountAsync(new CreateAccountRequest
             {
                 EmailAddress = authenticationRequestBody.EmailAddress,
-                Password = authenticationRequestBody.Password
+                Password = authenticationRequestBody.Password,
+                LastName = authenticationRequestBody.LastName,
+                FirstName  = authenticationRequestBody.FirstName
             });
 
             var response = new AuthenticationResponseBody

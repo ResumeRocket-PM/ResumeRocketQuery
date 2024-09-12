@@ -47,7 +47,9 @@ namespace ResumeRocketQuery.Services.Tests
                 var actual = await _systemUnderTest.CreateAccountAsync(new CreateAccountRequest
                 {
                     EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
-                    Password = Guid.NewGuid().ToString()
+                    Password = Guid.NewGuid().ToString(),
+                    FirstName = "John",
+                    LastName = "Doe"
                 });
 
                 expected.ToExpectedObject().ShouldMatch(actual);

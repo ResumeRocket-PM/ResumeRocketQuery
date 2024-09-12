@@ -171,21 +171,21 @@ namespace ResumeRocketQuery.DataLayer
             {
                 public const string InsertResume = @"
                     INSERT INTO Resumes (AccountId, Resume)
-                    VALUES (@AccountId, @Resume);
+                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume));
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateResume = @"
                     UPDATE Resumes
-                    SET Resume = @Resume
+                    SET Resume = CONVERT(VARBINARY(max),@Resume)
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResume = @"
-                    SELECT ResumeId, AccountId, Resume
+                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume
                     FROM Resumes
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResumeByAccount = @"
-                    SELECT ResumeId, AccountId, Resume
+                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 
