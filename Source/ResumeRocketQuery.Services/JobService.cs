@@ -105,7 +105,7 @@ namespace ResumeRocketQuery.Services
                 throw e;
             }
 
-            var newPDF = _pdfService.CreatePdfAsync(job.Resume["FileName"], html, css);
+            var newPDF = await _pdfService.CreatePdfAsync(job.Resume["FileName"], html, css);
 
             job.Resume["FileBytes"] = File.ReadAllBytes(newPDF.ToString()).ToString(); ;
             var resumeContent = job.Resume;

@@ -105,8 +105,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl =
-                    "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907";
+                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -222,9 +221,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl =
-                    "https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907";
-
+                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
