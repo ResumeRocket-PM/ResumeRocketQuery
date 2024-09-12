@@ -98,7 +98,6 @@ namespace ResumeRocketQuery.Services
                 Debug.WriteLine("Error parsing returned JSON", e);
                 throw e;
             }
-
             
 
             var resumeContent = job.Resume;
@@ -178,7 +177,7 @@ namespace ResumeRocketQuery.Services
                 CompanyName = x.CompanyName,
                 AccountID = x.AccountId,
                 ApplyDate = x.ApplyDate,
-                JobUrl = string.Empty,
+                JobUrl = x.JobPostingUrl,
                 Position = x.Position,
                 ResumeID = x.ApplicationId,
                 Status = x.Status,
