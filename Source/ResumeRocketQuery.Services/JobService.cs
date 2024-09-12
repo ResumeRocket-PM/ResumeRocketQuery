@@ -80,7 +80,9 @@ namespace ResumeRocketQuery.Services
                 The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
 
                 The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
-                each item details the changes made to the original resume.
+                each item will have the following JSON array item structure: a key for ""section"" with string value specifying the section
+                the original resume that is being addressed, a key of ""original"" with string value that is the original content that was on
+                the resume, and a key for ""modified"" with string value of the suggested change to the ""original"" text.
 
                 {{$input}}";
 

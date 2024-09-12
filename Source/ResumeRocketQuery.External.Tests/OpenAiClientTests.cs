@@ -46,7 +46,7 @@ namespace ResumeRocketQuery.Repository.Tests
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
-                    State whether the given equality is true or false in one word.",
+                    State whether the given equality is true or false in one word without any punctuation.",
                     @"
                     2+2=4");
 
@@ -79,7 +79,7 @@ namespace ResumeRocketQuery.Repository.Tests
                 var response = await _systemUnderTest.SendMessageAsync(
                     @"{{$input}} 
 
-                    State whether the given equality is true or false in one word.",
+                    State whether the given equality is true or false in one word, without any punctuation.",
                     @"
                     2+2=6");
 
@@ -107,7 +107,7 @@ namespace ResumeRocketQuery.Repository.Tests
             }
 
             [Fact]
-            public async Task WHEN_JSON()
+            public static void WHEN_JSON()
             {
                 string json =
                     @"{
