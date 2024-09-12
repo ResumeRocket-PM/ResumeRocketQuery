@@ -163,8 +163,7 @@ namespace ResumeRocketQuery.DataLayer
                 public const string SelectPortfolio = @"
                     SELECT PortfolioId, AccountId, Configuration
                     FROM Portfolio
-                    WHERE AccountId = @AccountId
-                    ORDER BY DESC PortfolioId;";
+                    WHERE AccountId = @AccountId";
 
             }
 
