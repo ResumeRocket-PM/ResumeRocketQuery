@@ -18,6 +18,9 @@ namespace ResumeRocketQuery.DataLayer
                     FROM Accounts
                     WHERE AccountId = @accountID;";
 
+                public const string SelectAccountByFilter = @"
+                    ";
+
                 public const string UpdateAccount = @"
                     UPDATE Accounts
                     SET AccountAlias = @accountAlias,

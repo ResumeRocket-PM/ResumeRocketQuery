@@ -4,7 +4,6 @@ using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services.Repository;
 using System.Data;
-using System.Security.Principal;
 
 namespace ResumeRocketQuery.DataLayer
 {
@@ -72,6 +71,23 @@ namespace ResumeRocketQuery.DataLayer
                         portfolioLink = accountStorage.PortfolioLink,
                     },
                     commandType: CommandType.Text);
+            }
+        }
+
+        public async Task<List<Account>> SelectAccountStoragesByFilterAsync(string filterType, string searchField)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryAsync<Account>(
+                    DataLayerConstants.StoredProcedures.Account.SelectAccountByFilter,
+                    new
+                    {
+                        SearchField = filterType,
+                        SearchParameter = searchField
+                    },
+                    commandType: CommandType.Text);
+
+                return result.ToList();
             }
         }
     }

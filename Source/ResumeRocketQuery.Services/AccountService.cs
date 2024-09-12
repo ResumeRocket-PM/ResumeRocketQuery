@@ -87,28 +87,30 @@ namespace ResumeRocketQuery.Services
 
         public async Task<AccountDetails> GetAccountAsync(int accountId)
         {
-            var account = await _accountDataLayer.GetAccountAsync(accountId);
+            var account = _accountDataLayer.GetAccountAsync(accountId);
 
-            var emailAddress = await _emailAddressDataLayer.GetEmailAddressAsync(accountId);
+            var emailAddress = _emailAddressDataLayer.GetEmailAddressAsync(accountId);
 
-            var skills = await _skillDataLayer.GetSkillAsync(accountId);
+            var skills = _skillDataLayer.GetSkillAsync(accountId);
 
-            var education = await _educationDataLayer.GetEducationAsync(accountId);
+            var education = _educationDataLayer.GetEducationAsync(accountId);
 
-            var experience = await _experienceDataLayer.GetExperienceAsync(accountId);
+            var experience = _experienceDataLayer.GetExperienceAsync(accountId);
+
+            await Task.WhenAll([account, emailAddress, skills, education, experience]);
 
             return new AccountDetails
             {
                 AccountId = accountId,
-                EmailAddress = emailAddress.EmailAddress,
-                PortfolioLink = account.PortfolioLink,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                ProfilePhotoLink = account.ProfilePhotoLink,
-                StateLocation = account.StateLocation,
-                Title = account.Title,
-                Skills = skills.Select(x => x.Description).ToList(),
-                Education = education.Select(x => new Education
+                EmailAddress = emailAddress.Result.EmailAddress,
+                PortfolioLink = account.Result.PortfolioLink,
+                FirstName = account.Result.FirstName,
+                LastName = account.Result.LastName,
+                ProfilePhotoLink = account.Result.ProfilePhotoLink,
+                StateLocation = account.Result.StateLocation,
+                Title = account.Result.Title,
+                Skills = skills.Result.Select(x => x.Description).ToList(),
+                Education = education.Result.Select(x => new Education
                 {
                     AccountId = x.AccountId,
                     Degree = x.Degree,
@@ -118,7 +120,7 @@ namespace ResumeRocketQuery.Services
                     Minor = x.Minor,
                     SchoolName = x.SchoolName   
                 }).ToList(),
-                Experience = experience.Select(x => new Experience
+                Experience = experience.Result.Select(x => new Experience
                 {
                     AccountId = x.AccountId,
                     Company = x.Company,
