@@ -112,7 +112,11 @@ namespace ResumeRocketQuery.Services
                 ProfilePhotoLink = account.Result.ProfilePhotoLink,
                 StateLocation = account.Result.StateLocation,
                 Title = account.Result.Title,
-                Skills = skills.Result.Select(x => x.Description).ToList(),
+                Skills = skills.Result.Select(x => new Skill
+                {
+                    Description = x.Description,
+                    SkillId = x.SkillId
+                }).ToList(),
                 Education = education.Result.Select(x => new Education
                 {
                     AccountId = x.AccountId,
@@ -139,6 +143,11 @@ namespace ResumeRocketQuery.Services
 
         public async Task UpdateAccount(int accountId, Dictionary<string, string> updates)
         {
+            if(!updates.Any())
+            {
+                throw new ValidationException("Must pass Parameters to update");
+            }
+
             var account = await _accountDataLayer.GetAccountAsync(accountId);
 
             var updatedAccount = new AccountStorage
@@ -149,11 +158,48 @@ namespace ResumeRocketQuery.Services
                 LastName = updates.ContainsKey("LastName") ? updates["LastName"] : account.LastName,
                 ProfilePhotoLink = updates.ContainsKey("ProfilePhotoLink") ? updates["ProfilePhotoLink"] : account.ProfilePhotoLink,
                 Title = updates.ContainsKey("Title") ? updates["Title"] : account.Title,
-                StateLocation = updates.ContainsKey("StateLocation") ? updates["StateLocation"] : account.StateLocation,
+                StateLocation = updates.ContainsKey("Location") ? updates["Location"] : account.StateLocation,
                 PortfolioLink = updates.ContainsKey("PortfolioLink") ? updates["PortfolioLink"] : account.PortfolioLink,
             };
 
+
             await _accountDataLayer.UpdateAccountStorageAsync(updatedAccount);
+        }
+
+        public async Task CreateExperience(Experience experience)
+        {
+            await _experienceDataLayer.InsertExperienceAsync(new ExperienceStorage
+            {
+                AccountId = experience.AccountId,
+                Company = experience.Company,
+                Description = experience.Description,
+                EndDate = experience.EndDate,
+                Position = experience.Position,
+                StartDate = experience.StartDate,
+            });
+        }
+
+        public async Task CreateEducation(Education education)
+        {
+            await _educationDataLayer.InsertEducationStorageAsync(new EducationStorage
+            {
+                AccountId = education.AccountId,
+                Degree = education.Degree,
+                EducationId = education.EducationId,
+                GraduationDate = education.GraduationDate,
+                Major = education.Major,
+                Minor = education.Minor,
+                SchoolName = education.SchoolName
+            });
+        }
+
+        public async Task CreateSkill(Skill education, int accountId)
+        {
+            await _skillDataLayer.InsertSkillAsync(new SkillStorage
+            {
+                AccountId = accountId,
+                Description = education.Description,
+            });
         }
     }
 }
