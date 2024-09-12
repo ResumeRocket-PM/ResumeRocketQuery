@@ -141,7 +141,7 @@ namespace ResumeRocketQuery.Services.Tests
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
-                    Position = "Software Engineer",
+                    Position = "Application Engineer",
                     ResumeID = resumeId,
                     Status = "Pending"
                 };
