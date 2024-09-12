@@ -107,7 +107,7 @@ namespace ResumeRocketQuery.Services
 
             var newPDF = await _pdfService.CreatePdfAsync(job.Resume["FileName"], html, css);
 
-            job.Resume["FileBytes"] = File.ReadAllBytes(newPDF.ToString()).ToString(); ;
+            job.Resume["FileBytes"] = Convert.ToBase64String(File.ReadAllBytes(newPDF));
             var resumeContent = job.Resume;
 
             resumeContent.Add("Recommendations", recommendations.ToString()); //replace key FileBytes with new Pdf bytes
