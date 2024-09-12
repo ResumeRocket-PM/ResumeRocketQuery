@@ -66,6 +66,11 @@ namespace ResumeRocketQuery.Services
         //Pass the Prompt that we've created, and the HTML into the External class.
         //Deserialize the result as our JobResult class.
 
+        /// <summary>
+        ///     Checks for and strips of markdown code block syntax in the event ChatGPT ignores the request to not include it
+        /// </summary>
+        /// <param name="json"> the returned JSON from ChatGPT </param>
+        /// <returns> The plain text version </returns>
         public static string FormatPreCheck(string json)
         {
             json = Regex.Replace(json, @"^```json", "");

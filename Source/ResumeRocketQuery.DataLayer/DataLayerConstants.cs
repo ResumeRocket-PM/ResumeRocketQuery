@@ -156,7 +156,8 @@ namespace ResumeRocketQuery.DataLayer
                     UPDATE Portfolio
                     SET Configuration = @Configuration,
                         UpdateDate = GetDate()
-                    WHERE PortfolioId = @PortfolioId;";
+                    WHERE PortfolioId = @PortfolioId
+                    ORDER BY PortfolioId DESC;";
 
 
                 // Select

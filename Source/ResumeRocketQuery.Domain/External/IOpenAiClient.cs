@@ -9,5 +9,6 @@ namespace ResumeRocketQuery.Domain.External
     public interface IOpenAiClient
     {
         Task<string> SendMessageAsync(string prompt, string message);
+        Task<string> SendMultiMessageAsync(List<string> prompts);
     }
 }

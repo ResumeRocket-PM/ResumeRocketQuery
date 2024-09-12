@@ -72,13 +72,12 @@ namespace ResumeRocketQuery.Services
                 These updates should not falsify any information, meaning no additional skills, education, or work experience 
                 should be added you are only allowed to reword items on the resume to better match the job posting.
 
-                Your output should be plain text JSON (no markdown code block syntax) with 4 keys. 
-                The first key is 'suggestions' which has a value of a JSON array listing the suggestions. 
+                Your output should be plain text JSON (no markdown code block syntax) with 3 keys. 
 
-                The second key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
+                The first key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
                 a new resume using the suggested changes.
 
-                The third key is 'css' which has a string value containing the CSS to format the HTML from the second key.
+                The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
 
                 The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
                 each item details the changes made to the original resume.
@@ -87,23 +86,29 @@ namespace ResumeRocketQuery.Services
 
             //Store this as part of the ResumeContent dictionary.
             string response = await _openAiClient.SendMessageAsync(prompt, pdfText);
-            var recommendations = "";
+            var recommendations = new List<Change>();
+            var html = "";
+            var css = "";
 
             try
             {
-                var jsonResult = JsonConvert.DeserializeObject<List<String>>(response);
-                recommendations = jsonResult[0];
+                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
+                html = jsonResult.html;
+                css = jsonResult.css;
+                recommendations = jsonResult.changes;
+
             }
             catch (Exception e) {
                 Debug.WriteLine("Error parsing returned JSON", e);
                 throw e;
             }
 
-            
+            var newPDF = _pdfService.CreatePdfAsync(job.Resume["FileName"], html, css);
 
+            job.Resume["FileBytes"] = File.ReadAllBytes(newPDF.ToString()).ToString(); ;
             var resumeContent = job.Resume;
 
-            resumeContent.Add("Recommendations", recommendations); //replace key FileBytes with new Pdf bytes
+            //resumeContent.Add("Recommendations", recommendations); //replace key FileBytes with new Pdf bytes
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
