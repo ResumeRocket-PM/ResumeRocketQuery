@@ -8,6 +8,7 @@ using iText;
 using System.IO;
 using System.Net.Http;
 using iText.Kernel.Pdf;
+using iText.Html2pdf;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Layout.Element;
@@ -63,6 +64,17 @@ namespace ResumeRocketQuery.Service
             var doc = new Document(pdf);
             doc.Add(new Paragraph(update));
             doc.Close();
+            return file.FullName;
+        }
+
+        public async Task<string> CreatePdfAsync(string filepath, string html, string css)
+        {
+            string name = filepath.Replace(".pdf", "");
+            FileInfo file = new FileInfo(name + "-" + DateTime.Now.ToString("yyyyMMddHHmmffff") + ".pdf");
+            if (!file.Exists)
+                file.Directory.Create();
+            var writer = new PdfWriter(file);
+            HtmlConverter.ConvertToPdf(html, writer);            
             return file.FullName;
         }
     }
