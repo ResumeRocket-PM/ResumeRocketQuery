@@ -10,5 +10,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task UpdateEducationStorageAsync(EducationStorage educationStorage);
         Task DeleteEducationStorageAsync(int educationId);
         Task<List<Education>> GetEducationAsync(int accountId);
+        Task DeleteEducationStorageByAccountAsync(int accountId);
     }
 }

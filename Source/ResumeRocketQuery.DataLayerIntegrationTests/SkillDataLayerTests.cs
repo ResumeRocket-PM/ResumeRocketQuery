@@ -118,5 +118,36 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             Assert.Empty(actual);
         }
+
+
+        [Theory]
+        [InlineData(typeof(SkillDataLayer))]
+        public async Task WHEN_DeleteSkillByAccountIdAsync_is_called_THEN_skill_is_deleted(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var skillId = await systemUnderTest.InsertSkillAsync(new SkillStorage
+            {
+                AccountId = accountId,
+                Description = "C# Programming"
+            });
+
+            await systemUnderTest.DeleteSkillByAccountIdAsync(accountId);
+
+            var actual = await systemUnderTest.GetSkillAsync(skillId);
+
+            Assert.Empty(actual);
+        }
     }
 }

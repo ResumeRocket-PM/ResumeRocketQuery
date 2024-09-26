@@ -201,5 +201,40 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             Assert.Empty(actual);
         }
+
+        [Theory]
+        [InlineData(typeof(ExperienceDataLayer))]
+        public async Task WHEN_DeleteExperienceByAccountIdAsync_is_called_THEN_experience_is_deleted(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var experienceId = await systemUnderTest.InsertExperienceAsync(new ExperienceStorage
+            {
+                AccountId = accountId,
+                Company = "Tech Corp",
+                Position = "Software Engineer",
+                Type = "Full-time",
+                Description = "Worked on building enterprise software.",
+                StartDate = DateTime.UtcNow.AddYears(-3),
+                EndDate = DateTime.UtcNow.AddYears(-1)
+            });
+
+            await systemUnderTest.DeleteExperienceByAccountIdAsync(accountId);
+
+            var actual = await systemUnderTest.GetExperienceAsync(experienceId);
+
+            Assert.Empty(actual);
+        }
     }
 }

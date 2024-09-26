@@ -200,5 +200,41 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             Assert.Empty(education);
         }
+
+        [Theory]
+        [InlineData(typeof(EducationDataLayer))]
+        public async Task WHEN_DeleteEducationStorageByAccountAsync_is_called_THEN_correct_education_is_deleted(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var expected = new EducationStorage
+            {
+                AccountId = accountId,
+                SchoolName = "Test School",
+                Degree = "Bachelor's",
+                Major = "Computer Science",
+                Minor = "Mathematics",
+                GraduationDate = DateTime.Now
+            };
+
+            var educationId = await systemUnderTest.InsertEducationStorageAsync(expected);
+
+            await systemUnderTest.DeleteEducationStorageByAccountAsync(accountId);
+
+            var education = await systemUnderTest.GetEducationAsync(expected.AccountId);
+
+            Assert.Empty(education);
+        }
     }
 }
