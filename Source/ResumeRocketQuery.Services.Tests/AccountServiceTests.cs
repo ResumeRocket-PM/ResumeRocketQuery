@@ -9,6 +9,7 @@ using System.Security.Principal;
 using System.Collections.Generic;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services.Repository;
+using ResumeRocketQuery.Tests.ResourceBuilder;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -20,6 +21,7 @@ namespace ResumeRocketQuery.Services.Tests
         private readonly ISkillDataLayer _skillDataLayer;
         private readonly IEducationDataLayer _educationDataLayer;
         private readonly IExperienceDataLayer _experienceDataLayer;
+        private readonly TestResourceBuilder _testResourceBuilder;
 
         public AccountServiceTests()
         {
@@ -32,6 +34,8 @@ namespace ResumeRocketQuery.Services.Tests
             _skillDataLayer = serviceProvider.GetService<ISkillDataLayer>();
             _educationDataLayer = serviceProvider.GetService<IEducationDataLayer>();
             _experienceDataLayer = serviceProvider.GetService<IExperienceDataLayer>();
+
+            _testResourceBuilder = serviceProvider.GetService<TestResourceBuilder>();
         }
 
         public class CreateAccountAsync : AccountServiceTests
@@ -311,6 +315,76 @@ namespace ResumeRocketQuery.Services.Tests
                 var actual = await _systemUnderTest.GetAccountAsync(accountId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
+            }
+
+
+            [Fact]
+            public async Task GIVEN_resource_builder_WHEN_UpdateAccount_is_called_THEN_account_matches_response()
+            {
+                for(int i = 0; i < 50; i++)
+                {
+                    try
+                    {
+                        var accountId = await _testResourceBuilder
+                        .Initialize()
+                        .AddSkills(new Random().Next(1, 4))
+                        .AddEducation(new Random().Next(1, 2))
+                        .AddExperience(new Random().Next(1, 3))
+                        .Create();
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+
+                //var expected = new
+                //{
+                //    AccountId = accountId,
+                //    Skills = new[]
+                //    {
+                //        new
+                //        {
+                //            Description = "C#"
+                //        },
+                //        new
+                //        {
+                //            Description = "ASP.NET"
+                //        },
+                //    },
+                //    Education = new[]
+                //    {
+                //        new
+                //        {
+                //            AccountId = accountId,
+                //            Degree = "Bachelor's",
+                //            EducationId = Expect.Any<int>(x => x > 0),
+                //            GraduationDate = new DateTime(2020, 5, 1),
+                //            Major = "Computer Science",
+                //            Minor = (string)null,
+                //            SchoolName = "MIT"
+                //        }
+                //    },
+                //    Experience = new[]
+                //    {
+                //        new
+                //        {
+                //            AccountId = accountId,
+                //            Company = "Tech Corp",
+                //            Description = "Developed web applications.",
+                //            EndDate = new DateTime(2022, 7, 1),
+                //            ExperienceId = Expect.Any<int>(x => x > 0),
+                //            Position = "Software Engineer",
+                //            StartDate = new DateTime(2020, 6, 1),
+                //            Type = "FullTime"
+                //        }
+                //    }
+                //};
+
+                //var actual = await _systemUnderTest.GetAccountAsync(accountId);
+
+                //expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
     }

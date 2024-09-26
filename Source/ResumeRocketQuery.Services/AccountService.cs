@@ -195,7 +195,7 @@ namespace ResumeRocketQuery.Services
             {
                 await _experienceDataLayer.InsertExperienceAsync(new ExperienceStorage
                 {
-                    AccountId = experience.AccountId,
+                    AccountId = accountId,
                     Company = experience.Company,
                     Description = experience.Description,
                     EndDate = experience.EndDate,
@@ -213,7 +213,7 @@ namespace ResumeRocketQuery.Services
             {
                 await _educationDataLayer.InsertEducationStorageAsync(new EducationStorage
                 {
-                    AccountId = education.AccountId,
+                    AccountId = accountId,
                     Degree = education.Degree,
                     EducationId = education.EducationId,
                     GraduationDate = education.GraduationDate,

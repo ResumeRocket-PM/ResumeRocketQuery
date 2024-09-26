@@ -5,6 +5,7 @@ using ResumeRocketQuery.Domain.DataLayer;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Microsoft.Extensions.Configuration;
+using ResumeRocketQuery.Tests.ResourceBuilder;
 
 namespace ResumeRocketQuery.Tests.Helpers
 {
@@ -25,6 +26,8 @@ namespace ResumeRocketQuery.Tests.Helpers
         private void RegisterAll(IServiceCollection serviceCollection)
         {
             RegisterMemoryFake(serviceCollection);
+
+            serviceCollection.AddSingleton<TestResourceBuilder>();
         }
 
         private void RegisterMemoryFake(IServiceCollection serviceCollection)
