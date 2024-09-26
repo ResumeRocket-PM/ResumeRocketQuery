@@ -201,6 +201,117 @@ namespace ResumeRocketQuery.Services.Tests
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
+
+            [Fact]
+            public async Task WHEN_UpdateAccount_is_called_THEN_account_matches_response()
+            {
+                var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+                {
+                    FirstName = "John",
+                    LastName = "Doe",
+                    PortfolioLink = "https://portfolio.com/johndoe",
+                    ProfilePhotoLink = "https://profilephoto.com/johndoe",
+                    StateLocation = "CA",
+                    Title = "Software Engineer",
+                    AccountAlias = Guid.NewGuid().ToString()
+                });
+
+                var emailAddress = $"{Guid.NewGuid().ToString()}@gmail.com";
+
+                await _emailAddressDataLayer.InsertEmailAddressStorageAsync(new EmailAddressStorage
+                {
+                    AccountId = accountId,
+                    EmailAddress = emailAddress
+                });
+
+                await _skillDataLayer.InsertSkillAsync(new SkillStorage { AccountId = accountId, Description = "C#" });
+                await _skillDataLayer.InsertSkillAsync(new SkillStorage { AccountId = accountId, Description = "ASP.NET" });
+
+                await _educationDataLayer.InsertEducationStorageAsync(new EducationStorage
+                {
+                    AccountId = accountId,
+                    Degree = "Bachelor's",
+                    SchoolName = "MIT",
+                    Major = "Computer Science",
+                    GraduationDate = new DateTime(2020, 5, 1)
+                });
+
+                await _experienceDataLayer.InsertExperienceAsync(new ExperienceStorage
+                {
+                    AccountId = accountId,
+                    Company = "Tech Corp",
+                    Position = "Software Engineer",
+                    StartDate = new DateTime(2020, 6, 1),
+                    EndDate = new DateTime(2022, 7, 1),
+                    Description = "Developed web applications.",
+                    Type = "FullTime"
+                });
+
+                var parameters = new Dictionary<string, string>
+                {
+                    { "FirstName", "test_firstname" },
+                    { "LastName", "test_lastName" },
+                    { "Title", "test_Title" },
+                    { "ProfilePhotoLink", "this is a link" },
+                    { "Location", "test_NewState" },
+                };
+
+                await _systemUnderTest.UpdateAccount(accountId, parameters);
+
+                var expected = new
+                {
+                    AccountId = accountId,
+                    EmailAddress = emailAddress,
+                    PortfolioLink = "https://portfolio.com/johndoe",
+                    FirstName = parameters["FirstName"],
+                    LastName = parameters["LastName"],
+                    ProfilePhotoLink = parameters["ProfilePhotoLink"],
+                    StateLocation = parameters["Location"],
+                    Title = parameters["Title"],
+                    Skills = new[]
+                    {
+                        new
+                        {
+                            Description = "C#"
+                        },
+                        new
+                        {
+                            Description = "ASP.NET"
+                        },
+                    },
+                    Education = new[]
+                    {
+                        new
+                        {
+                            AccountId = accountId,
+                            Degree = "Bachelor's",
+                            EducationId = Expect.Any<int>(x => x > 0),
+                            GraduationDate = new DateTime(2020, 5, 1),
+                            Major = "Computer Science",
+                            Minor = (string)null,
+                            SchoolName = "MIT"
+                        }
+                    },
+                    Experience = new[]
+                    {
+                        new
+                        {
+                            AccountId = accountId,
+                            Company = "Tech Corp",
+                            Description = "Developed web applications.",
+                            EndDate = new DateTime(2022, 7, 1),
+                            ExperienceId = Expect.Any<int>(x => x > 0),
+                            Position = "Software Engineer",
+                            StartDate = new DateTime(2020, 6, 1),
+                            Type = "FullTime"
+                        }
+                    }
+                };
+
+                var actual = await _systemUnderTest.GetAccountAsync(accountId);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
+            }
         }
     }
 }
