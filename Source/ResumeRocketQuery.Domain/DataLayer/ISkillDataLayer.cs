@@ -9,5 +9,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<int> InsertSkillAsync(SkillStorage skill);
         Task<List<SkillStorage>> GetSkillAsync(int accountId);
         Task DeleteSkillAsync(int skillId);
+        Task DeleteSkillByAccountIdAsync(int accountId);
     }
 }

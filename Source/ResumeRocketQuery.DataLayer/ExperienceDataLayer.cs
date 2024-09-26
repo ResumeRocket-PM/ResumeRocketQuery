@@ -83,5 +83,19 @@ namespace ResumeRocketQuery.DataLayer
                     commandType: CommandType.Text);
             }
         }
+
+        public async Task DeleteExperienceByAccountIdAsync(int accountId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Experience.DeleteExperienceByAccountId,
+                    new
+                    {
+                        AccountId = accountId,
+                    },
+                    commandType: CommandType.Text);
+            }
+        }
     }
 }

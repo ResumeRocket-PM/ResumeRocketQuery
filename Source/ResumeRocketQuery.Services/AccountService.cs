@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
@@ -162,44 +163,79 @@ namespace ResumeRocketQuery.Services
                 PortfolioLink = updates.ContainsKey("PortfolioLink") ? updates["PortfolioLink"] : account.PortfolioLink,
             };
 
-
             await _accountDataLayer.UpdateAccountStorageAsync(updatedAccount);
+
+            if(updates.ContainsKey("Education"))
+            {
+                var educations = JsonConvert.DeserializeObject<List<Education>>(updates["Education"]);
+
+                await CreateEducationsAsync(accountId, educations);
+            }
+
+            if (updates.ContainsKey("Experience"))
+            {
+                var educations = JsonConvert.DeserializeObject<List<Experience>>(updates["Experience"]);
+
+                await CreateExperiencesAsync(accountId, educations);
+            }
+
+            if (updates.ContainsKey("Skill"))
+            {
+                var educations = JsonConvert.DeserializeObject<List<Skill>>(updates["Skill"]);
+
+                await CreateSkillsAsync(accountId, educations);
+            }
         }
 
-        public async Task CreateExperience(Experience experience)
+        public async Task CreateExperiencesAsync(int accountId, List<Experience> experiences)
         {
-            await _experienceDataLayer.InsertExperienceAsync(new ExperienceStorage
+            await _experienceDataLayer.DeleteExperienceByAccountIdAsync(accountId);
+
+            foreach (var experience in experiences)
             {
-                AccountId = experience.AccountId,
-                Company = experience.Company,
-                Description = experience.Description,
-                EndDate = experience.EndDate,
-                Position = experience.Position,
-                StartDate = experience.StartDate,
-            });
+                await _experienceDataLayer.InsertExperienceAsync(new ExperienceStorage
+                {
+                    AccountId = experience.AccountId,
+                    Company = experience.Company,
+                    Description = experience.Description,
+                    EndDate = experience.EndDate,
+                    Position = experience.Position,
+                    StartDate = experience.StartDate,
+                });
+            }
         }
 
-        public async Task CreateEducation(Education education)
+        public async Task CreateEducationsAsync(int accountId, List<Education> educations)
         {
-            await _educationDataLayer.InsertEducationStorageAsync(new EducationStorage
+            await _educationDataLayer.DeleteEducationStorageAsync(accountId);
+
+            foreach(var education in educations)
             {
-                AccountId = education.AccountId,
-                Degree = education.Degree,
-                EducationId = education.EducationId,
-                GraduationDate = education.GraduationDate,
-                Major = education.Major,
-                Minor = education.Minor,
-                SchoolName = education.SchoolName
-            });
+                await _educationDataLayer.InsertEducationStorageAsync(new EducationStorage
+                {
+                    AccountId = education.AccountId,
+                    Degree = education.Degree,
+                    EducationId = education.EducationId,
+                    GraduationDate = education.GraduationDate,
+                    Major = education.Major,
+                    Minor = education.Minor,
+                    SchoolName = education.SchoolName
+                });
+            }
         }
 
-        public async Task CreateSkill(Skill education, int accountId)
+        public async Task CreateSkillsAsync(int accountId, List<Skill> skills)
         {
-            await _skillDataLayer.InsertSkillAsync(new SkillStorage
+            await _skillDataLayer.DeleteSkillByAccountIdAsync(accountId);
+
+            foreach (var skill in skills)
             {
-                AccountId = accountId,
-                Description = education.Description,
-            });
+                await _skillDataLayer.InsertSkillAsync(new SkillStorage
+                {
+                    AccountId = accountId,
+                    Description = skill.Description,
+                });
+            }
         }
     }
 }

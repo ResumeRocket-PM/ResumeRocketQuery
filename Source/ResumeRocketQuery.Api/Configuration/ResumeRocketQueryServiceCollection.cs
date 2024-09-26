@@ -13,17 +13,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Options;
 using System.IO;
 using System.Reflection;
 using System;
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.External;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Http.Features;
 using ResumeRocketQuery.Service;
-using ResumeRocketQuery.Domain.Services.Repository;
 using ResumeRocketQuery.DataLayer;
 
 namespace ResumeRocketQuery.Api.Configuration

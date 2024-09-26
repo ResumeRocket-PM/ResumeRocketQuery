@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services.Repository;
@@ -66,6 +67,21 @@ namespace ResumeRocketQuery.DataLayer
                     new
                     {
                         EducationId = educationId
+                    },
+                    commandType: CommandType.Text);
+            }
+        }
+
+
+        public async Task DeleteEducationStorageByAccountAsync(int accountId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Education.DeleteEducationByAccount,
+                    new
+                    {
+                        AccountId = accountId
                     },
                     commandType: CommandType.Text);
             }

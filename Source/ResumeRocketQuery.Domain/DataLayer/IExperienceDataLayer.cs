@@ -10,5 +10,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task UpdateExperienceAsync(ExperienceStorage experience);
         Task<List<Experience>> GetExperienceAsync(int accountId);
         Task DeleteExperienceAsync(int experienceId);
+        Task DeleteExperienceByAccountIdAsync(int accountId);
     }
 }

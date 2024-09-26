@@ -142,6 +142,11 @@ namespace ResumeRocketQuery.DataLayer
                 public const string DeleteEducation = @"
                     DELETE FROM Educations
                     WHERE EducationId = @EducationId;";
+
+
+                public const string DeleteEducationByAccount = @"
+                    DELETE FROM Educations
+                    WHERE AccountId = @AccountId;";
             }
 
             public class Portfolio
@@ -220,6 +225,10 @@ namespace ResumeRocketQuery.DataLayer
                 public const string DeleteExperience = @"
                     DELETE FROM Experience
                     WHERE ExperienceId = @ExperienceId;";
+
+                public const string DeleteExperienceByAccountId = @"
+                    DELETE FROM Experience
+                    WHERE AccountId = @AccountId;";
             }
 
             public class Skills
@@ -237,6 +246,10 @@ namespace ResumeRocketQuery.DataLayer
                 public const string DeleteSkill = @"
                     DELETE FROM Skills
                     WHERE SkillId = @SkillId;";
+
+                public const string DeleteSkillByAccountId = @"
+                    DELETE FROM Skills
+                    WHERE AccountId = @AccountId;";
             }
         }
     }

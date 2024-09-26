@@ -58,5 +58,16 @@ namespace ResumeRocketQuery.DataLayer
                     commandType: CommandType.Text);
             }
         }
+
+        public async Task DeleteSkillByAccountIdAsync(int accountId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Skills.DeleteSkillByAccountId,
+                    new { AccountId = accountId },
+                    commandType: CommandType.Text);
+            }
+        }
     }
 }

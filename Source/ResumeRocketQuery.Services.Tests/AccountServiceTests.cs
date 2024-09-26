@@ -6,7 +6,6 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Security.Principal;
-using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 using System.Collections.Generic;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services.Repository;

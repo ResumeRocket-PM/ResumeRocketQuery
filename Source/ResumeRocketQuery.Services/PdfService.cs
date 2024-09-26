@@ -1,23 +1,14 @@
 ﻿using ResumeRocketQuery.Domain.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using iText;
 using System.IO;
-using System.Net.Http;
 using iText.Kernel.Pdf;
 using iText.Html2pdf;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Layout.Element;
 using iText.Layout;
-using iText.IO.Font;
-using iText.IO.Image;
-using iText.Kernel.Font;
-using iText.Kernel.Geom;
-using Org.BouncyCastle.Utilities;
 
 namespace ResumeRocketQuery.Service
 {

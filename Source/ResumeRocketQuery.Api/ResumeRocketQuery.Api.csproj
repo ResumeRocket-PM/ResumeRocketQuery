@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ResumeRocketQuery.DataLayer\ResumeRocketQuery.DataLayer.csproj" />
+    <ProjectReference Include="..\ResumeRocketQuery.Domain\ResumeRocketQuery.Domain.csproj" />
     <ProjectReference Include="..\ResumeRocketQuery.External\ResumeRocketQuery.External.csproj" />
     <ProjectReference Include="..\ResumeRocketQuery.Services\ResumeRocketQuery.Services.csproj" />
   </ItemGroup>
