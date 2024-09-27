@@ -33,8 +33,8 @@ namespace ResumeRocketQuery.Api.Controllers
             _openAi = openAiClient;
         }
 
-        // TODO: now sure if need provide the route
         
+        // TODO: now sure if need provide the route
         /// <summary>
         /// Use scrape method to scrape the expected content of web page given by the url and the token domain
         /// 
@@ -76,29 +76,8 @@ namespace ResumeRocketQuery.Api.Controllers
 
             }
             Dictionary<string, string> test = new Dictionary<string, string>();
-            //if test.ContainsKey
 
-
-            // name
-            // email
-            // school name
-            // major
-            // minor
-            // degree
-            // 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
-        }
-
-        private Dictionary<string, string> findFillingValue(List<string> FillNameList)
-        {
-            Dictionary<string, string> result = new();
-
-            for (int i = 0; i < FillNameList.Count; i++)
-            {
-
-            }
-
-            return result;
         }
 
         [HttpPost]

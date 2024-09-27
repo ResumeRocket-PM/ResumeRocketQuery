@@ -133,6 +133,12 @@ namespace ResumeRocketQuery.External
             }
         }
 
+        //public async Task<Dictionary<string, string>> FindInputValue(List<string> filedNames, int accountID)
+        //{
+
+        //}
+
+        
         /// <summary>
         /// auto filled all the value into related value part of the input field of the html and submit that request
         /// 
