@@ -58,14 +58,16 @@ namespace ResumeRocketQuery.Service
             return file.FullName;
         }
 
-        public async Task<string> CreatePdfAsync(string filepath, string html, string css)
+        public async Task<string> CreatePdfAsync(string filepath, string html)
         {
             string name = filepath.Replace(".pdf", "");
             FileInfo file = new FileInfo(name + "-" + DateTime.Now.ToString("yyyyMMddHHmmffff") + ".pdf");
             if (!file.Exists)
                 file.Directory.Create();
             var writer = new PdfWriter(file);
-            HtmlConverter.ConvertToPdf(html, writer);            
+            ConverterProperties converterProperties = new ConverterProperties();
+            converterProperties.SetBaseUri(filepath);
+            HtmlConverter.ConvertToPdf(html, writer, converterProperties);            
             return file.FullName;
         }
     }

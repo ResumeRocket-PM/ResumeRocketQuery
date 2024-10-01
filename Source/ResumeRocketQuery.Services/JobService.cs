@@ -13,6 +13,7 @@ using ResumeRocketQuery.Domain.Services.Repository;
 using ResumeRocketQuery.Service;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using iText.Layout.Properties.Grid;
 
 namespace ResumeRocketQuery.Services
 {
@@ -41,50 +42,41 @@ namespace ResumeRocketQuery.Services
         {
             JobResult jobResult = await _languageService.CaptureJobPostingAsync(job.JobUrl);
 
-            //Nate Put logic here.
             //Parse the Pdf bytes from the Job Object.
             var pdfBytes = Convert.FromBase64String(job.Resume["FileBytes"]);
             var pdf = new MemoryStream(pdfBytes);
-            System.IO.File.WriteAllBytes("hello.pdf", pdfBytes);
-            //Take the Text of the Resume
+            
+            // Take the Text of the Resume
             var pdfText = await _pdfService.ReadPdfAsync(pdf);
+
             //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
+            var prompt = 
+                    $@"Using this input resume content, along with this job description:
 
-            //var prompt = $"Based on this job description: \r\n\r\n<DESCRIPTION BEGINS>{jobResult.Description}<DESCRIPTION ENDS>\r\n\r\n " +
-            //             $"and these 10 keywords selected from the job posting\n\n<DESCRIPTION BEGINS>{jobResult.Keywords}<DESCRIPTION ENDS>\n\n " +
-            //             "Provide a list of suggestions, separated by the new line character: '\n', on what needs to be changed for the following resume content\n\n{{$input}}";
+                    {jobResult.Description}
 
-            /// TODO - Using the attached resume as a reference along with the 5 suggestions you made from that job posting, given the content in the resume apply the 5 suggestions for updates to the resume.
+                    and these 10 keywords:
 
+                    {jobResult.Keywords}
 
+                    produce 5 suggestiobs for changes that should be made to the resume, and apply them to the resume.
 
-        var prompt = 
-                $@"Using this input resume content, along with this job description:
+                    These updates should not falsify any information, meaning no additional skills, education, or work experience 
+                    should be added you are only allowed to reword items on the resume to better match the job posting.
 
-                {jobResult.Description}
+                    Your output should be plain text JSON (no markdown code block syntax) with 3 keys. 
 
-                and these 10 keywords:
+                    The first key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
+                    a new resume using the suggested changes. The name of the stylesheet in the link to the css style sheet is style.css.
 
-                {jobResult.Keywords}
+                    The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
 
-                produce 5 suggestiobs for changes that should be made to the resume, and apply them to the resume.
+                    The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
+                    each item will have the following JSON array item structure: a key for ""section"" with string value specifying the section
+                    the original resume that is being addressed, a key of ""original"" with string value that is the original content that was on
+                    the resume, and a key for ""modified"" with string value of the suggested change to the ""original"" text.
 
-                These updates should not falsify any information, meaning no additional skills, education, or work experience 
-                should be added you are only allowed to reword items on the resume to better match the job posting.
-
-                Your output should be plain text JSON (no markdown code block syntax) with 3 keys. 
-
-                The first key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
-                a new resume using the suggested changes.
-
-                The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
-
-                The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
-                each item will have the following JSON array item structure: a key for ""section"" with string value specifying the section
-                the original resume that is being addressed, a key of ""original"" with string value that is the original content that was on
-                the resume, and a key for ""modified"" with string value of the suggested change to the ""original"" text.
-
-                {{$input}}";
+                    {{$input}}";
 
             //Store this as part of the ResumeContent dictionary.
             string response = await _openAiClient.SendMessageAsync(prompt, pdfText);
@@ -102,15 +94,21 @@ namespace ResumeRocketQuery.Services
             }
             catch (Exception e) {
                 Debug.WriteLine("Error parsing returned JSON", e);
-                throw e;
+                throw;
             }
 
-            var newPDF = await _pdfService.CreatePdfAsync(job.Resume["FileName"], html, css);
+            // Store css in filepath for use by PDF library then delete
+            FileInfo file = new FileInfo("style.css");
+            if (!file.Exists)
+                file.Directory.Create();
+            var newPDF = await _pdfService.CreatePdfAsync(job.Resume["FileName"], html);
+            file.Delete();
 
             job.Resume["FileBytes"] = Convert.ToBase64String(File.ReadAllBytes(newPDF));
+            File.Delete(newPDF);
             var resumeContent = job.Resume;
 
-            resumeContent.Add("Recommendations", recommendations.ToString()); //replace key FileBytes with new Pdf bytes
+            resumeContent.Add("Recommendations", recommendations.ToString());
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 

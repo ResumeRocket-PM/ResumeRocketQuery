@@ -13,6 +13,6 @@ namespace ResumeRocketQuery.Domain.Services
         Task<string> ReadPdfAsync(MemoryStream bytes);
         Task<string> UpdatePdfAsync(string filepath, string update);
 
-        Task<string> CreatePdfAsync(string filepath, string html, string css);
+        Task<string> CreatePdfAsync(string filename, string html);
     }
 }
