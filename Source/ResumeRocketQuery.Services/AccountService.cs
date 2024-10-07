@@ -201,13 +201,14 @@ namespace ResumeRocketQuery.Services
                     EndDate = experience.EndDate,
                     Position = experience.Position,
                     StartDate = experience.StartDate,
+                    Type = experience.Type,
                 });
             }
         }
 
         public async Task CreateEducationsAsync(int accountId, List<Education> educations)
         {
-            await _educationDataLayer.DeleteEducationStorageAsync(accountId);
+            await _educationDataLayer.DeleteEducationStorageByAccountAsync(accountId);
 
             foreach(var education in educations)
             {
