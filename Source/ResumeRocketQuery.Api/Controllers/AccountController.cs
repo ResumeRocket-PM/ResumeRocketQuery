@@ -1,10 +1,13 @@
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ResumeRocketQuery.Domain.Api;
 using ResumeRocketQuery.Domain.Api.Request;
 using ResumeRocketQuery.Domain.Api.Response;
+using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -21,14 +24,17 @@ namespace ResumeRocketQuery.Api.Controllers
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
         private readonly IAccountService _accountService;
+        private readonly ISearchService _searchService;
 
         public AccountController(IServiceResponseBuilder serviceResponseBuilder,
             IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder,
-            IAccountService accountService)
+            IAccountService accountService, 
+            ISearchService searchService)
         {
             _serviceResponseBuilder = serviceResponseBuilder;
             _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
             _accountService = accountService;
+            _searchService = searchService;
         }
 
         /// <summary>
@@ -85,6 +91,15 @@ namespace ResumeRocketQuery.Api.Controllers
             await _accountService.UpdateAccount(user.AccountId, accountDetailsRequest.Parameters );
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Route("search")]
+        public async Task<ServiceResponseGeneric<List<SearchResult>>> SearchAccountsAsync([FromBody] SearchAccountRequest searchAccountRequest)
+        {
+            var result = await _searchService.SearchAsync(searchAccountRequest.SearchTerm, searchAccountRequest.ResultCount);
+
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
     }
 }

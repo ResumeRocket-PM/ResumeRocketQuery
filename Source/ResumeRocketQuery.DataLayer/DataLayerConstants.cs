@@ -251,6 +251,33 @@ namespace ResumeRocketQuery.DataLayer
                     DELETE FROM Skills
                     WHERE AccountId = @AccountId;";
             }
+
+            public class Search
+            {
+                public const string SearchFullTextIndex = @"
+                    Select Top(@ResultCount) FullTextScore + SoundexScore as Score, * from (
+
+	                    SELECT *,
+		                       CASE
+			                       WHEN FREETEXT((FirstName, LastName, StateLocation, Title), @SearchTerm) THEN 1
+			                       ELSE 0
+		                       END AS FullTextScore,
+		                       CASE
+			                       WHEN SOUNDEX(FirstName) = SOUNDEX(@SearchTerm) 
+					                    OR SOUNDEX(LastName) = SOUNDEX(@SearchTerm) THEN 1
+			                       ELSE 0
+		                       END AS SoundexScore
+	                    FROM dbo.Accounts
+	                    WHERE FREETEXT((FirstName, LastName, StateLocation, Title), @SearchTerm)
+	                       OR SOUNDEX(FirstName) = SOUNDEX(@SearchTerm)
+	                       OR SOUNDEX(LastName) = SOUNDEX(@SearchTerm)
+                    ) as s 
+
+                    ORDER BY 1 DESC, 
+	                    CASE WHEN ProfilePhotoLink IS NULL THEN 1 ELSE 0 END,
+	                    CASE WHEN FirstName IS NULL OR LastName is null THEN 1 ELSE 0 END";
+
+            }
         }
     }
 }
