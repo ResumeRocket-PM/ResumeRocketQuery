@@ -101,5 +101,44 @@ namespace ResumeRocketQuery.Api.Controllers
 
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
+
+        [HttpGet]
+        [Route("{AccountId}")]
+        public async Task<ServiceResponseGeneric<AccountResponseBody>> GetAccountsAsync(int accountId)
+        {
+            var accountResponse = await _accountService.GetAccountAsync(accountId);
+
+            var response = new AccountResponseBody
+            {
+                FirstName = accountResponse.FirstName,
+                LastName = accountResponse.LastName,
+                ProfilePhotoLink = accountResponse.ProfilePhotoLink,
+                Title = accountResponse.Title,
+                Email = accountResponse.EmailAddress,
+                Location = accountResponse.StateLocation,
+                PortfolioLink = accountResponse.PortfolioLink,
+                Resume = null,
+                Skills = accountResponse.Skills,
+                Experience = accountResponse.Experience.Select(e => new Domain.Api.Response.Experience
+                {
+                    Company = e.Company,
+                    Description = e.Description,
+                    EndDate = e.EndDate,
+                    Position = e.Position,
+                    StartDate = e.StartDate,
+                    Type = e.Type
+                }).ToList(),
+                Education = accountResponse.Education.Select(edu => new Domain.Api.Response.Education
+                {
+                    Degree = edu.Degree,
+                    GraduationDate = edu.GraduationDate,
+                    Major = edu.Major,
+                    Minor = edu.Minor,
+                    SchoolName = edu.SchoolName
+                }).ToList()
+            };
+
+            return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+        }
     }
 }
