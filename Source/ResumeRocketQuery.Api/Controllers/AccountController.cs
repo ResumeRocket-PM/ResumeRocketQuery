@@ -103,8 +103,8 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{AccountId}")]
-        public async Task<ServiceResponseGeneric<AccountResponseBody>> GetAccountsAsync(int accountId)
+        [Route("{accountId}")]
+        public async Task<ServiceResponseGeneric<AccountResponseBody>> GetAccountsAsync([FromRoute] int accountId)
         {
             var accountResponse = await _accountService.GetAccountAsync(accountId);
 
