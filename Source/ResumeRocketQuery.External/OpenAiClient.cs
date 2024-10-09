@@ -23,13 +23,22 @@ namespace ResumeRocketQuery.External
         public async Task<string> SendMessageAsync(string prompt, string message)
         {
             var builder = Kernel.CreateBuilder();
-            builder.AddOpenAIChatCompletion(
-                "gpt-4o-mini", // OpenAI Model name
-                "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"); // OpenAI API Key
-            var kernel = builder.Build();
-            var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message});            
-
-            return result.ToString();
+            //var models = new List<string>{"gpt-4o", "gpt-4-turbo", "o1-preview", "gpt-4", "gpt-4o-mini", "gpt-3.5-turbo" };
+            var models = new List<string>{ "gpt-4o-mini" };
+            foreach (var model in models)
+            {
+                try
+                {
+                    builder.AddOpenAIChatCompletion(
+                        model, // OpenAI Model name
+                        "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"); // OpenAI API Key
+                    var kernel = builder.Build();
+                    var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message });
+                    return result.ToString();
+                }
+                catch (Exception e) { Console.WriteLine(e); }
+            }
+            return "";
         }
 
         public async Task<string> SendMultiMessageAsync(List<string> prompts)
