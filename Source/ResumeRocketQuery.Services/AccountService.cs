@@ -106,7 +106,7 @@ namespace ResumeRocketQuery.Services
             return new AccountDetails
             {
                 AccountId = accountId,
-                EmailAddress = emailAddress.Result.EmailAddress,
+                EmailAddress = emailAddress.Result?.EmailAddress,
                 PortfolioLink = account.Result.PortfolioLink,
                 FirstName = account.Result.FirstName,
                 LastName = account.Result.LastName,
