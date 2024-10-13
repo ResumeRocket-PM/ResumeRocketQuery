@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
-using ResumeRocketQuery.Service;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using iText.Layout.Properties.Grid;
 
 namespace ResumeRocketQuery.Services
 {
@@ -90,7 +85,6 @@ namespace ResumeRocketQuery.Services
                 html = jsonResult.html;
                 css = jsonResult.css;
                 recommendations = jsonResult.changes;
-
             }
             catch (Exception e) {
                 Debug.WriteLine("Error parsing returned JSON", e);
@@ -106,16 +100,18 @@ namespace ResumeRocketQuery.Services
 
             job.Resume["FileBytes"] = Convert.ToBase64String(File.ReadAllBytes(newPDF));
             File.Delete(newPDF);
-            var resumeContent = job.Resume;
 
-            resumeContent.Add("Recommendations", recommendations.ToString());
+            job.Resume.Add("Recommendations", recommendations.ToString());
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
             var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
-                Resume = JsonConvert.SerializeObject(resumeContent),
                 AccountId = job.AccountId,
+                Resume = JsonConvert.SerializeObject(job.Resume),
+                OriginalResumeID = 0,
+                OriginalResume = true,
+                Version = 1
             });
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
@@ -150,6 +146,15 @@ namespace ResumeRocketQuery.Services
         }
 
         public async Task<ApplicationResult> GetResume(int resumeId)
+        {
+            var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
+
+            var result = await ConvertApplication(application);
+
+            return result;
+        }
+
+        public async Task<ApplicationResult> GetResumeHistory(int resumeId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
 

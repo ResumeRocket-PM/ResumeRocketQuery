@@ -21,10 +21,12 @@ namespace ResumeRocketQuery.Api.Controllers
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
         private readonly IJobScraper jobScraper;
+        private readonly IJobService jobService;
         public ResumeController(IServiceResponseBuilder serviceResponseBuilder, IJobScraper jobScraper)
         {
             this._serviceResponseBuilder = serviceResponseBuilder;
             this.jobScraper = jobScraper;
+            this.jobService = jobService;
         }
 
         /// <summary>
@@ -42,11 +44,23 @@ namespace ResumeRocketQuery.Api.Controllers
         ///     This retrieves the PDF content
         /// </summary>
         /// <returns>A PDF Object</returns>
+        [HttpGet]
+        [Route("history")]
+        public async Task<ServiceResponse> History(int originalResumeId)
+        {
+            await jobService.GetResumeHistory(originalResumeId);
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        ///     This updates the PDF content
+        /// </summary>
+        /// <returns>A PDF Object</returns>
         [HttpPost]
         [Route("post")]
         public async Task<ServiceResponse> Post([FromBody] string resume, string jobUrl)
         {
-            var result = await jobScraper.ScrapeJobPosting(jobUrl);
+            await jobScraper.ScrapeJobPosting(jobUrl);
             // Call to Arthur's class to save to table
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
