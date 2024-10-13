@@ -4,11 +4,11 @@ FROM ubuntu:trusty
 RUN apt-get update && apt-get install -y build-essential checkinstall git cmake \
     wget curl libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
     libffi-dev liblzma-dev libgdbm-dev ca-certificates openssl \
-    libncurses5-dev libncursesw5-dev xz-utils tk-dev
+    libncurses5-dev libncursesw5-dev xz-utils tk-dev wget
 
 # Download and install OpenSSL (newer version)
 RUN cd /usr/src && \
-    wget https://www.openssl.org/source/openssl-1.1.1q.tar.gz && \
+    wget --no-check-certificate https://www.openssl.org/source/openssl-1.1.1q.tar.gz && \
     tar xzf openssl-1.1.1q.tar.gz && \
     cd openssl-1.1.1q && \
     ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib && \
@@ -20,7 +20,7 @@ ENV PATH="/usr/local/ssl/bin:$PATH"
 
 # Download and install Python 3.8 from source with SSL support
 RUN cd /usr/src && \
-    wget https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz && \
+    wget --no-check-certificate https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz && \
     tar xzf Python-3.8.13.tgz && \
     cd Python-3.8.13 && \
     ./configure --enable-optimizations --with-openssl=/usr/local/ssl && \
