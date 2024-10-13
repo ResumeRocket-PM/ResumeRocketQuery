@@ -74,6 +74,6 @@ WORKDIR /pdf
 
 COPY app.py .
 
-EXPOSE 5000
+EXPOSE 5010
 
 CMD ["python3.8", "app.py"]

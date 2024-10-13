@@ -8,7 +8,7 @@ namespace ResumeRocketQuery.External
 {
     public class PdfToHtmlClient : IPdfToHtmlClient
     {
-        private string _apiUrl = "http://localhost:5000/convert";
+        private string _apiUrl = "http://localhost:5010/convert";
 
         public async Task<Stream> ConvertPdf(MemoryStream stream)
         {

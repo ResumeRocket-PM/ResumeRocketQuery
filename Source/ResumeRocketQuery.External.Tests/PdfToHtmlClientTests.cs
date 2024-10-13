@@ -38,15 +38,17 @@ namespace ResumeRocketQuery.Repository.Tests
                 // Act
                 var resultStream = await _systemUnderTest.ConvertPdf(memoryStream);
 
+                var fileName = $"{Guid.NewGuid().ToString()}.html";
+
                 // Write the output to a file
-                using (var fileStream = new FileStream("output.html", FileMode.Create, FileAccess.Write))
+                using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
                     resultStream.Position = 0; // Reset position before writing
                     await resultStream.CopyToAsync(fileStream);
                 }
 
                 // Assert
-                Assert.True(File.Exists("output.html"), "The output HTML file was not created.");
+                Assert.True(File.Exists(fileName), "The output HTML file was not created.");
             }
         }
     }
