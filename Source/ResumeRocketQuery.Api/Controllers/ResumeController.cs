@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using ResumeRocketQuery.Services;
 using System.Collections.Generic;
 using ResumeRocketQuery.Domain.External;
+using ResumeRocketQuery.Domain.DataLayer;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -20,48 +21,46 @@ namespace ResumeRocketQuery.Api.Controllers
     public class ResumeController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
-        private readonly IJobScraper jobScraper;
-        private readonly IJobService jobService;
-        public ResumeController(IServiceResponseBuilder serviceResponseBuilder, IJobScraper jobScraper)
+        private readonly IResumeService resumeService;
+        public ResumeController(IServiceResponseBuilder serviceResponseBuilder, IResumeService resumeService)
         {
             this._serviceResponseBuilder = serviceResponseBuilder;
-            this.jobScraper = jobScraper;
-            this.jobService = jobService;
+            this.resumeService = resumeService;
         }
 
         /// <summary>
-        ///     This retrieves the PDF content
+        ///     This retrieves a 
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpGet]
-        [Route("get")]
-        public async Task<ServiceResponse> Get(string request)
+        [Route("get/{resumeId}")]
+        public async Task<ServiceResponse> Get(int resumeId)
         {
+            await resumeService.GetResume(resumeId);
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
-        ///     This retrieves the PDF content
+        ///     This retrieves the version history of a Resume
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpGet]
         [Route("history")]
         public async Task<ServiceResponse> History(int originalResumeId)
         {
-            await jobService.GetResumeHistory(originalResumeId);
+            await resumeService.GetResumeHistory(originalResumeId);
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
-        ///     This updates the PDF content
+        ///     This updates the Resume content
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpPost]
-        [Route("post")]
-        public async Task<ServiceResponse> Post([FromBody] string resume, string jobUrl)
+        [Route("post/{resumeId}")]
+        public async Task<ServiceResponse> Post(ResumeStorage resumeObject)
         {
-            await jobScraper.ScrapeJobPosting(jobUrl);
-            // Call to Arthur's class to save to table
+            await resumeService.UpdateResume(resumeObject);
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
     }

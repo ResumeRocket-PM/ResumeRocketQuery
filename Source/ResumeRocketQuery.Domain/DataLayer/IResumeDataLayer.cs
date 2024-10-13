@@ -11,5 +11,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task DeleteResumeAsync(int resumeId);
         Task<List<ResumeResult>> GetResumesAsync(int accountId);
         Task<ResumeResult> GetResumeAsync(int resumeId);
+        Task<List<ResumeResult>> GetResumeHistoryAsync(int originalResumeId);
     }
 }
