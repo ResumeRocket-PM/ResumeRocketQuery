@@ -26,28 +26,133 @@ namespace ResumeRocketQuery.DataLayer
         /// search the university name by the given name
         /// </summary>
         /// <returns></returns>
-        public async Task<List<SearchResult>> SearchStateNameAsync(string sName, bool isAsc = true) 
+        public async Task<List<ProfileResult>> SearchStateNameAsync(string sName, bool isAsc = true) 
         {
-            string oType = "ASC";
-            if (!isAsc)
-            {
-                oType = "DESC";
-            }
-
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryAsync<SearchResult>(
-                    DataLayerConstants.StoredProcedures.Profile.SearchStatesName,
-                    new
-                    {
-                        stateNames = sName,
-                        orderType = oType
-                    },
-                    commandType: CommandType.Text);
+                if (isAsc)
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchStatesNameASC,
+                                new
+                                {
+                                    stateName = $"%{sName}%"
+                                    //orderType = oType
+                                },
+                                commandType: CommandType.Text);
 
-                return result.ToList();
+                    return result.ToList(); 
+                }
+                else
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchStatesNameDESC,
+                                new
+                                {
+                                    stateName = $"%{sName}%"
+                                    //orderType = oType
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
             }
         }
+
+        public async Task<List<ProfileResult>> SearchUniversityNameAsync(string univName, bool isAsc)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                if (isAsc)
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchUniversityNameASC,
+                                new
+                                {
+                                    uName = $"%{univName}%"
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+                else
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchUniversityNameDESC,
+                                new
+                                {
+                                    uName = $"%{univName}%"
+                                    //orderType = oType
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+            }
+        }
+
+        public async Task<List<ProfileResult>> SearchCareerNameAsync(string careerName, bool isAsc)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                if (isAsc)
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchCareerNameASC,
+                                new
+                                {
+                                    cName = $"%{careerName}%"
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+                else
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchCareerNameDESC,
+                                new
+                                {
+                                    cName = $"%{careerName}%"
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+            }
+        }
+
+        public async Task<List<ProfileResult>> SearchMajorNameAsync(string majorName, bool isAsc)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                if (isAsc)
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchMajorNameASC,
+                                new
+                                {
+                                    mName = $"%{majorName}%"
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+                else
+                {
+                    var result = await connection.QueryAsync<ProfileResult>(
+                                DataLayerConstants.StoredProcedures.Profile.SearchMajorNameDESC,
+                                new
+                                {
+                                    mName = $"%{majorName}%"
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+            }
+        }
+
         // show states
 
         // show career

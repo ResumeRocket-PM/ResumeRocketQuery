@@ -288,41 +288,64 @@ namespace ResumeRocketQuery.DataLayer
             }
             public class Profile
             {
-                //TODO: maybe dbo.States should be States 
-                public const string SearchStatesName = @"
-                SELECT StatesName
-                FROM dbo.States
-                WHERE StatesName LIKE '%@stateName%'
-                ORDER BY StatesName @orderType;
+                //search State query
+                public const string SearchStatesNameASC = @"
+                SELECT *
+                FROM States
+                WHERE StatesName LIKE @stateName
+                ORDER BY StatesName ASC;
                 ";
 
-                public const string listAllStateName = @"
-                SELECT StatesName
-                FROM dbo.States
-                ORDER BY StatesName @orderType;
+                public const string SearchStatesNameDESC = @"
+                SELECT *
+                FROM States
+                WHERE StatesName LIKE @stateName
+                ORDER BY StatesName DESC;
                 ";
-                //public const string listAllStateNameDesc = @"
-                //SELECT StatesName
-                //FROM dbo.States
-                //ORDER BY StatesName DESC;
-                //";
 
-                public const string SearchUniversityName = @"SELECT UniversityName
+                //seach University query
+                public const string SearchUniversityNameASC = @"
+                SELECT *
+                FROM University
+                WHERE UniversityName LIKE @uName
+                ORDER BY UniversityName ASC;
+                ";
+
+                public const string SearchUniversityNameDESC = @"
+                SELECT *
                 FROM dbo.University
-                WHERE UniversityName LIKE '%@uName%'
-                ORDER BY UniversityName @orderType;
+                WHERE UniversityName LIKE @uName
+                ORDER BY UniversityName DESC;
                 ";
 
-                //public const string SearchUniversityNameDesc = @"SELECT UniversityName
-                //FROM dbo.University
-                //WHERE UniversityName LIKE '%@uName%'
-                //ORDER BY UniversityName DESC;
-                //";
-
-                public const string ListUniversityName = @"SELECT UniversityName
-                FROM dbo.University
-                ORDER BY UniversityName @orderType;
+                //search career query
+                public const string SearchCareerNameASC = @"
+                SELECT *
+                FROM Career
+                WHERE CareerName LIKE @cName
+                ORDER BY CareerName ASC
                 ";
+
+                public const string SearchCareerNameDESC = @"
+                SELECT *
+                FROM Career
+                WHERE CareerName LIKE @cName
+                ORDER BY CareerName DESC
+                ";
+
+                //search career query
+                public const string SearchMajorNameASC = @" 
+                SELECT *
+                FROM Major
+                WHERE MajorName LIKE @mName
+                ORDER BY MajorName ASC";
+
+                public const string SearchMajorNameDESC = @" 
+                SELECT *
+                FROM Major
+                WHERE MajorName LIKE @mName
+                ORDER BY MajorName DESC";
+
 
             }
         }
