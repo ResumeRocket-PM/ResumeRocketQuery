@@ -59,7 +59,7 @@ namespace ResumeRocketQuery.Api.Controllers
                 Email = x.EmailAddress,
                 Location = x.StateLocation,
                 PortfolioLink = x.PortfolioLink,
-                Resume = null,
+                PrimaryResumeId = x.PrimaryResumeId,
                 Skills = x.Skills,
                 Experience = x.Experience.Select(e => new Experience
                 {

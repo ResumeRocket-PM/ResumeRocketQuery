@@ -15,5 +15,6 @@ namespace ResumeRocketQuery.Domain.Services.Repository
         public List<Skill> Skills { get; set; }
         public List<Experience> Experience { get; set; }
         public List<Education> Education { get; set; }
+        public int? PrimaryResumeId { get; set; }
     }
 }

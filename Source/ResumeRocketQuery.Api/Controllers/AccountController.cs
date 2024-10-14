@@ -58,7 +58,7 @@ namespace ResumeRocketQuery.Api.Controllers
                 Email = accountResponse.EmailAddress,
                 Location = accountResponse.StateLocation,
                 PortfolioLink = accountResponse.PortfolioLink,
-                Resume = null,
+                PrimaryResumeId = accountResponse.PrimaryResumeId,
                 Skills = accountResponse.Skills,
                 Experience = accountResponse.Experience.Select(e => new Domain.Api.Response.Experience
                 {
@@ -117,7 +117,7 @@ namespace ResumeRocketQuery.Api.Controllers
                 Email = accountResponse.EmailAddress,
                 Location = accountResponse.StateLocation,
                 PortfolioLink = accountResponse.PortfolioLink,
-                Resume = null,
+                PrimaryResumeId = accountResponse.PrimaryResumeId,
                 Skills = accountResponse.Skills,
                 Experience = accountResponse.Experience.Select(e => new Domain.Api.Response.Experience
                 {

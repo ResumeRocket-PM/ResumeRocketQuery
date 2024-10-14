@@ -11,11 +11,17 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
     [Rollback]
     public class AccountDataLayerTests
     {
+        private IServiceProvider _serviceProvider;
+
+        public AccountDataLayerTests()
+        {
+            _serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+
+        }
+
         private IAccountDataLayer GetSystemUnderTest(Type storageType)
         {
-            var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
-
-            return serviceProvider.GetService<IAccountDataLayer>();
+            return _serviceProvider.GetService<IAccountDataLayer>();
         }
 
         public class InsertAccountStorageAsync : AccountDataLayerTests
@@ -123,6 +129,51 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
                     Title = "UpdatedTitle",
                     StateLocation = "UpdatedStateLocation",
                     PortfolioLink = "UpdatedPortfolioLink",
+                };
+
+                await systemUnderTest.UpdateAccountStorageAsync(updatedAccount);
+
+                var actual = await systemUnderTest.GetAccountAsync(accountId);
+
+                updatedAccount.ToExpectedObject().ShouldMatch(actual);
+            }
+
+            [Theory]
+            [InlineData(typeof(AccountDataLayer))]
+            public async Task GIVEN_resume_id_WHEN_UpdateAccountStorageAsync_is_called_THEN_account_is_updated(Type storageType)
+            {
+                var systemUnderTest = GetSystemUnderTest(storageType);
+
+                var accountId = await systemUnderTest.InsertAccountStorageAsync(new AccountStorage
+                {
+                    AccountAlias = Guid.NewGuid().ToString(),
+                    FirstName = Guid.NewGuid().ToString(),
+                    LastName = Guid.NewGuid().ToString(),
+                    ProfilePhotoLink = Guid.NewGuid().ToString(),
+                    Title = Guid.NewGuid().ToString(),
+                    StateLocation = Guid.NewGuid().ToString(),
+                    PortfolioLink = Guid.NewGuid().ToString(),
+                });
+
+                var resumeService = _serviceProvider.GetService<IResumeDataLayer>();
+
+                var resumeId = await resumeService.InsertResumeAsync(new ResumeStorage
+                {
+                    AccountId = accountId,
+                    Resume = "Sample Resume Text"
+                });
+
+                var updatedAccount = new AccountStorage
+                {
+                    AccountId = accountId,
+                    AccountAlias = "UpdatedAlias",
+                    FirstName = "UpdatedFirstName",
+                    LastName = "UpdatedLastName",
+                    ProfilePhotoLink = "UpdatedPhotoLink",
+                    Title = "UpdatedTitle",
+                    StateLocation = "UpdatedStateLocation",
+                    PortfolioLink = "UpdatedPortfolioLink",
+                    PrimaryResumeId = resumeId
                 };
 
                 await systemUnderTest.UpdateAccountStorageAsync(updatedAccount);

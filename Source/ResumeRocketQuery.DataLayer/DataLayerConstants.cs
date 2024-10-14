@@ -9,12 +9,12 @@ namespace ResumeRocketQuery.DataLayer
             public static class Account
             {
                 public const string InsertAccount = @"
-                    INSERT INTO Accounts (AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink)
-                    VALUES (@accountAlias, @firstName, @lastName, @profilePhotoLink, @title, @stateLocation, @portfolioLink);
+                    INSERT INTO Accounts (AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId)
+                    VALUES (@accountAlias, @firstName, @lastName, @profilePhotoLink, @title, @stateLocation, @portfolioLink, @primaryResumeId);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string SelectAccount = @"
-                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink
+                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId
                     FROM Accounts
                     WHERE AccountId = @accountID;";
 
@@ -30,7 +30,8 @@ namespace ResumeRocketQuery.DataLayer
                         Title = @title,
                         StateLocation = @stateLocation,
                         PortfolioLink = @portfolioLink,
-                        UpdateDate = GetDate()
+                        UpdateDate = GetDate(),
+                        PrimaryResumeId = @primaryResumeId
                     WHERE AccountId = @accountId;";
             }
 
@@ -49,12 +50,19 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateApplication = @"
-
                     DECLARE @StatusID int;
 
                     SELECT @StatusID = StatusId
                     FROM ApplicationStatus
                     WHERE Status = @Status;
+
+                    IF @StatusID IS NULL
+                    BEGIN
+                        INSERT INTO ApplicationStatus (Status)
+                        VALUES (@Status);
+
+                        SET @StatusID = SCOPE_IDENTITY();
+                    END
 
                     UPDATE Applications
                     SET StatusId = @StatusID,
