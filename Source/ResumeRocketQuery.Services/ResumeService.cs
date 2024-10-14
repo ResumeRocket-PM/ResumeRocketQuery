@@ -35,7 +35,11 @@ namespace ResumeRocketQuery.Services
                 Debug.WriteLine(e.Message);
                 return false;
             }
+        }
 
+        public async Task<ResumeResult> CreateResume(ResumeStorage resume) {
+            var result = await _resumeDataLayer.InsertResumeAsync(resume);
+            return result;
         }
     }
 }

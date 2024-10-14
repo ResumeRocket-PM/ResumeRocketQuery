@@ -9,4 +9,5 @@ public interface IResumeService
     Task<List<ResumeResult>> GetResumeHistory(int originalResumeId);
     Task<ResumeResult> GetResume(int resumeId);
     Task<bool> UpdateResume(ResumeStorage resume);
+    Task<ResumeResult> CreateResume(ResumeStorage resume);
 }
