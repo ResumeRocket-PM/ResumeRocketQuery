@@ -278,6 +278,45 @@ namespace ResumeRocketQuery.DataLayer
 	                    CASE WHEN FirstName IS NULL OR LastName is null THEN 1 ELSE 0 END";
 
             }
+            public class Profile
+            {
+                //TODO: maybe dbo.States should be States 
+                public const string SearchStatesName = @"
+                SELECT StatesName
+                FROM dbo.States
+                WHERE StatesName LIKE '%@stateName%'
+                ORDER BY StatesName @orderType;
+                ";
+
+                public const string listAllStateName = @"
+                SELECT StatesName
+                FROM dbo.States
+                ORDER BY StatesName @orderType;
+                ";
+                //public const string listAllStateNameDesc = @"
+                //SELECT StatesName
+                //FROM dbo.States
+                //ORDER BY StatesName DESC;
+                //";
+
+                public const string SearchUniversityName = @"SELECT UniversityName
+                FROM dbo.University
+                WHERE UniversityName LIKE '%@uName%'
+                ORDER BY UniversityName @orderType;
+                ";
+
+                //public const string SearchUniversityNameDesc = @"SELECT UniversityName
+                //FROM dbo.University
+                //WHERE UniversityName LIKE '%@uName%'
+                //ORDER BY UniversityName DESC;
+                //";
+
+                public const string ListUniversityName = @"SELECT UniversityName
+                FROM dbo.University
+                ORDER BY UniversityName @orderType;
+                ";
+
+            }
         }
     }
 }
