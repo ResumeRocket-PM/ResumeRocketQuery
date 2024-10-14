@@ -19,6 +19,7 @@ namespace ResumeRocketQuery.Services
         private readonly ISkillDataLayer _skillDataLayer;
         private readonly IEducationDataLayer _educationDataLayer;
         private readonly IExperienceDataLayer _experienceDataLayer;
+        private readonly IResumeService resumeService;
         private readonly IAuthenticationHelper _authenticationHelper;
 
         public AccountService(IAuthenticationHelper authenticationHelper,
@@ -28,7 +29,8 @@ namespace ResumeRocketQuery.Services
             IAuthenticationService authenticationService,
             ISkillDataLayer skillDataLayer,
             IEducationDataLayer educationDataLayer,
-            IExperienceDataLayer experienceDataLayer
+            IExperienceDataLayer experienceDataLayer,
+            IResumeService resumeService
             )
         {
             _authenticationHelper = authenticationHelper;
@@ -39,6 +41,7 @@ namespace ResumeRocketQuery.Services
             _skillDataLayer = skillDataLayer;
             _educationDataLayer = educationDataLayer;
             _experienceDataLayer = experienceDataLayer;
+            this.resumeService = resumeService;
         }
 
         public async Task<CreateAccountResponse> CreateAccountAsync(CreateAccountRequest createAccountRequest)

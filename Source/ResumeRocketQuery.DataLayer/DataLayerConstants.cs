@@ -14,7 +14,7 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT SCOPE_IDENTITY();";
 
                 public const string SelectAccount = @"
-                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink
+                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId
                     FROM Accounts
                     WHERE AccountId = @accountID;";
 
@@ -30,7 +30,8 @@ namespace ResumeRocketQuery.DataLayer
                         Title = @title,
                         StateLocation = @stateLocation,
                         PortfolioLink = @portfolioLink,
-                        UpdateDate = GetDate()
+                        UpdateDate = GetDate(),
+                        PrimaryResumeId = @primaryResumeId
                     WHERE AccountId = @accountId;";
             }
 
