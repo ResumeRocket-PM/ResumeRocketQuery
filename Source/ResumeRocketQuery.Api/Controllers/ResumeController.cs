@@ -9,46 +9,77 @@ using Microsoft.AspNetCore.Mvc;
 using ResumeRocketQuery.Services;
 using System.Collections.Generic;
 using ResumeRocketQuery.Domain.External;
+using ResumeRocketQuery.Api.Builder;
+using System.IO;
+using System;
+using Microsoft.AspNetCore.Http;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
-    /// <summary>
-    ///     This is a controller that handles the retrieval and modification of PDFs.
-    /// </summary>
     [Authorize]
     [Route("api/resume")]
     public class ResumeController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
-        private readonly IJobScraper jobScraper;
-        public ResumeController(IServiceResponseBuilder serviceResponseBuilder, IJobScraper jobScraper)
+        private readonly IResumeService _resumeService;
+        private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
+        public ResumeController(IServiceResponseBuilder serviceResponseBuilder, 
+            IResumeService resumeService,
+            IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
         {
-            this._serviceResponseBuilder = serviceResponseBuilder;
-            this.jobScraper = jobScraper;
+            _serviceResponseBuilder = serviceResponseBuilder;
+            _resumeService = resumeService;
+            _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
         }
 
-        /// <summary>
-        ///     This retrieves the PDF content
-        /// </summary>
-        /// <returns>A PDF Object</returns>
-        [HttpGet]
-        [Route("get")]
-        public async Task<ServiceResponse> Get(string request)
-        {
-            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
-        }
-
-        /// <summary>
-        ///     This retrieves the PDF content
-        /// </summary>
-        /// <returns>A PDF Object</returns>
         [HttpPost]
-        [Route("post")]
-        public async Task<ServiceResponse> Post([FromBody] string resume, string jobUrl)
+        [Route("primary")]
+        public async Task<ServiceResponse> CreatePrimary([FromForm] IFormFile file)
         {
-            var result = await jobScraper.ScrapeJobPosting(jobUrl);
-            // Call to Arthur's class to save to table
-            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var resultResume = new Dictionary<string, string>();
+
+            using (var ms = new MemoryStream())
+            {
+                file.CopyTo(ms);
+                var fileByteArray = ms.ToArray();
+                string fileBytes = Convert.ToBase64String(fileByteArray);
+
+                resultResume.Add("FileName", file.FileName);
+                resultResume.Add("FileBytes", fileBytes);
+            }
+
+            await _resumeService.CreatePrimaryResume(new ResumeRequest
+            {
+                AccountId = user.AccountId,
+                Pdf = resultResume
+            });
+
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);
+        }
+
+        [HttpGet]
+        [Route("primary/pdf")]
+        public async Task<IActionResult> Get()
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var result = await _resumeService.GetPrimaryResumePdf(user.AccountId);
+
+            return File(result, "application/pdf", "resume.pdf");
+        }
+
+
+        [HttpGet]
+        [Route("primary")]
+        public async Task<ServiceResponseGeneric<string>> GetPrimaryPdf([FromBody] string resume, string jobUrl)
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var result = await _resumeService.GetPrimaryResume(user.AccountId);
+
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
     }
 }

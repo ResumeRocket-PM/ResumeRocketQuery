@@ -9,8 +9,8 @@ namespace ResumeRocketQuery.DataLayer
             public static class Account
             {
                 public const string InsertAccount = @"
-                    INSERT INTO Accounts (AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink)
-                    VALUES (@accountAlias, @firstName, @lastName, @profilePhotoLink, @title, @stateLocation, @portfolioLink);
+                    INSERT INTO Accounts (AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId)
+                    VALUES (@accountAlias, @firstName, @lastName, @profilePhotoLink, @title, @stateLocation, @portfolioLink, @primaryResumeId);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string SelectAccount = @"

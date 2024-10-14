@@ -6,6 +6,7 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Collections.Generic;
+using Sprache;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -22,10 +23,136 @@ namespace ResumeRocketQuery.Services.Tests
             _accountService = serviceProvider.GetService<IAccountService>();
         }
 
-        public class CreateAccountAsync : ResumeServiceTests
+        public class CreatePrimaryResume : ResumeServiceTests
         {
             [Fact]
-            public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_created()
+            public async Task WHEN_CreatePrimaryResume_is_called_THEN_resuume_stored_on_account()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                await _systemUnderTest.CreatePrimaryResume(new ResumeRequest
+                {
+                    AccountId = account.AccountId,
+                    Pdf = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
+                });
+
+                var accountDetails = await _accountService.GetAccountAsync(account.AccountId);
+
+                Assert.True(accountDetails.PrimaryResumeId.HasValue);
+                Assert.True(accountDetails.PrimaryResumeId.Value > 0);
+            }
+
+            [Fact]
+            public async Task GIVEN_resume_exists_WHEN_GetPrimaryResume_THEN_result_is_not_null()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                await _systemUnderTest.CreatePrimaryResume(new ResumeRequest
+                {
+                    AccountId = account.AccountId,
+                    Pdf = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
+                });
+
+                var actual = await _systemUnderTest.GetPrimaryResume(account.AccountId);
+
+                Assert.NotNull(actual);
+
+                var accountDetails = await _accountService.GetAccountAsync(account.AccountId);
+
+                Assert.True(accountDetails.PrimaryResumeId.HasValue);
+                Assert.True(accountDetails.PrimaryResumeId.Value > 0);
+            }
+
+            [Fact]
+            public async Task WHEN_GetPrimaryResume_THEN_result_is_null()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var actual = await _systemUnderTest.GetPrimaryResume(account.AccountId);
+
+                Assert.Null(actual);
+
+                var accountDetails = await _accountService.GetAccountAsync(account.AccountId);
+
+                Assert.False(accountDetails.PrimaryResumeId.HasValue);
+                Assert.Null(accountDetails.PrimaryResumeId);
+            }
+
+
+            [Fact]
+            public async Task WHEN_GetPrimaryResumePdf_THEN_result_is_null()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var actual = await _systemUnderTest.GetPrimaryResumePdf(account.AccountId);
+
+                Assert.Empty(actual);
+            }
+
+            [Fact]
+            public async Task GIVEN_resume_exists_WHEN_GetPrimaryResumePdf_THEN_result_is_not_null()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                await _systemUnderTest.CreatePrimaryResume(new ResumeRequest
+                {
+                    AccountId = account.AccountId,
+                    Pdf = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
+                });
+
+                var actual = await _systemUnderTest.GetPrimaryResumePdf(account.AccountId);
+
+                Assert.NotEmpty(actual);
+            }
+        }
+
+        public class GetResumePdf : ResumeServiceTests
+        {
+            [Fact]
+            public async Task GIVEN_resume_exists_WHEN_GetPrimaryResumePdf_THEN_result_is_not_null()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var result = await _systemUnderTest.CreateResumeFromPdf(new ResumeRequest
+                {
+                    AccountId = account.AccountId,
+                    Pdf = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
+                });
+
+                var actual = await _systemUnderTest.GetResumePdf(result.ResumeId);
+
+                Assert.NotEmpty(actual);
+            }
+        }
+
+        public class CreateResumeFromPdf : ResumeServiceTests
+        {
+            [Fact]
+            public async Task WHEN_CreateResumeFromPdf_is_called_THEN_resuume_stored_on_account()
             {
                 var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
                 {
@@ -43,7 +170,6 @@ namespace ResumeRocketQuery.Services.Tests
 
                 Assert.NotNull(result.Html);
             }
-
         }
 
         private string GetResumeBytes()

@@ -12,6 +12,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
         public string Title { get; set; }
         public string StateLocation { get; set; }
         public string PortfolioLink { get; set; }
-        public int PrimaryResumeId { get; set; }
+        public int? PrimaryResumeId { get; set; }
     }
 }

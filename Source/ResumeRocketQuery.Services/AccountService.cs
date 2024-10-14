@@ -19,7 +19,6 @@ namespace ResumeRocketQuery.Services
         private readonly ISkillDataLayer _skillDataLayer;
         private readonly IEducationDataLayer _educationDataLayer;
         private readonly IExperienceDataLayer _experienceDataLayer;
-        private readonly IResumeService resumeService;
         private readonly IAuthenticationHelper _authenticationHelper;
 
         public AccountService(IAuthenticationHelper authenticationHelper,
@@ -29,8 +28,7 @@ namespace ResumeRocketQuery.Services
             IAuthenticationService authenticationService,
             ISkillDataLayer skillDataLayer,
             IEducationDataLayer educationDataLayer,
-            IExperienceDataLayer experienceDataLayer,
-            IResumeService resumeService
+            IExperienceDataLayer experienceDataLayer
             )
         {
             _authenticationHelper = authenticationHelper;
@@ -41,7 +39,6 @@ namespace ResumeRocketQuery.Services
             _skillDataLayer = skillDataLayer;
             _educationDataLayer = educationDataLayer;
             _experienceDataLayer = experienceDataLayer;
-            this.resumeService = resumeService;
         }
 
         public async Task<CreateAccountResponse> CreateAccountAsync(CreateAccountRequest createAccountRequest)
@@ -142,6 +139,7 @@ namespace ResumeRocketQuery.Services
                     StartDate = x.StartDate,
                     Type = x.Type   
                 }).ToList(),
+                PrimaryResumeId = account.Result.PrimaryResumeId
             };
         }
 
@@ -164,6 +162,7 @@ namespace ResumeRocketQuery.Services
                 Title = updates.ContainsKey("Title") ? updates["Title"] : account.Title,
                 StateLocation = updates.ContainsKey("Location") ? updates["Location"] : account.StateLocation,
                 PortfolioLink = updates.ContainsKey("PortfolioLink") ? updates["PortfolioLink"] : account.PortfolioLink,
+                PrimaryResumeId = updates.ContainsKey("PrimaryResumeId") ? int.Parse(updates["PrimaryResumeId"]) : account.PrimaryResumeId
             };
 
             await _accountDataLayer.UpdateAccountStorageAsync(updatedAccount);
