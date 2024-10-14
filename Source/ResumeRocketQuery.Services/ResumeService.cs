@@ -56,6 +56,15 @@ namespace ResumeRocketQuery.Services
                 });
         }
 
+        public async Task<string> GetResume(int resumeId)
+        {
+            var resume = await _resumeDataLayer.GetResumeAsync(resumeId);
+
+            string result = resume.Resume;
+
+            return result;
+        }
+
         public async Task<byte[]> GetResumePdf(int resumeId)
         {
             var resume = await _resumeDataLayer.GetResumeAsync(resumeId);

@@ -61,7 +61,7 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpGet]
         [Route("primary/pdf")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetPrimaryPdf()
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
@@ -72,14 +72,21 @@ namespace ResumeRocketQuery.Api.Controllers
 
 
         [HttpGet]
-        [Route("primary")]
-        public async Task<ServiceResponseGeneric<string>> GetPrimaryPdf([FromBody] string resume, string jobUrl)
+        [Route("{resumeId}")]
+        public async Task<ServiceResponseGeneric<string>> Get([FromRoute] int resumeId)
         {
-            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
-
-            var result = await _resumeService.GetPrimaryResume(user.AccountId);
+            var result = await _resumeService.GetResume(resumeId);
 
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpGet]
+        [Route("{resumeId}/pdf")]
+        public async Task<IActionResult> GetPdf([FromRoute] int resumeId)
+        {
+            var result = await _resumeService.GetResumePdf(resumeId);
+
+            return File(result, "application/pdf", "resume.pdf");
         }
     }
 }
