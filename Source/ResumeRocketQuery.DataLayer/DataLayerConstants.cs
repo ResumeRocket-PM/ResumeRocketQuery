@@ -49,12 +49,19 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateApplication = @"
-
                     DECLARE @StatusID int;
 
                     SELECT @StatusID = StatusId
                     FROM ApplicationStatus
                     WHERE Status = @Status;
+
+                    IF @StatusID IS NULL
+                    BEGIN
+                        INSERT INTO ApplicationStatus (Status)
+                        VALUES (@Status);
+
+                        SET @StatusID = SCOPE_IDENTITY();
+                    END
 
                     UPDATE Applications
                     SET StatusId = @StatusID,
