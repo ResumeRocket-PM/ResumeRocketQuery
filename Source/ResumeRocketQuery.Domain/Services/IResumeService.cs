@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿﻿using System.Threading.Tasks;
+using System.Collections.Generic;
+using ResumeRocketQuery.Domain.DataLayer;
 
 namespace ResumeRocketQuery.Domain.Services
 {
@@ -10,5 +12,7 @@ namespace ResumeRocketQuery.Domain.Services
         Task<byte[]> GetPrimaryResumePdf(int accountId);
         Task<string> GetResume(int resumeId);
         Task<byte[]> GetResumePdf(int resumeId);
+        Task<List<ResumeResult>> GetResumeHistory(int originalResumeId);
+        Task<bool> UpdateResume(ResumeStorage resume);
     }
 }

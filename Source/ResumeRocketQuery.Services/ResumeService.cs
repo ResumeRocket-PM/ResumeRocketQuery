@@ -1,11 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services;
+using System.Diagnostics;
 ﻿using iText.Html2pdf;
 using iText.Kernel.Pdf;
-using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.External;
-using ResumeRocketQuery.Domain.Services;
-using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Services
 {
@@ -116,6 +118,22 @@ namespace ResumeRocketQuery.Services
                 };
 
                 return result;
+            }
+        }
+
+        public async Task<List<ResumeResult>> GetResumeHistory(int originalResumeId) {
+            var result = await _resumeDataLayer.GetResumeHistoryAsync(originalResumeId);
+            return result;
+        }
+        
+        public async Task<bool> UpdateResume(ResumeStorage resume) {
+            try {
+                await _resumeDataLayer.UpdateResumeAsync(resume);
+                return true;
+            }
+            catch (Exception e) {
+                Debug.WriteLine(e.Message);
+                return false;
             }
         }
     }

@@ -202,6 +202,12 @@ namespace ResumeRocketQuery.DataLayer
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 
+                public const string SelectResumeByOriginal = @"
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume
+                    FROM Resumes
+                    WHERE OgirinalResumeId = @OgirinalResumeId
+                    ORDER BY Version;";
+
                 public const string DeleteResume = @"
                     DELETE FROM Resumes
                     WHERE ResumeId = @ResumeId;";
