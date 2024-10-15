@@ -42,7 +42,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("get/{resumeId}")]
         public async Task<ServiceResponse> Get(int resumeId)
         {
-            await resumeService.GetResume(resumeId);
+            await _resumeService.GetResume(resumeId);
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
@@ -54,7 +54,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("history")]
         public async Task<ServiceResponse> History(int originalResumeId)
         {
-            await resumeService.GetResumeHistory(originalResumeId);
+            await _resumeService.GetResumeHistory(originalResumeId);
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
@@ -66,7 +66,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("post/{resumeId}")]
         public async Task<ServiceResponse> Post(ResumeStorage resumeObject)
         {
-            await resumeService.UpdateResume(resumeObject);
+            await _resumeService.UpdateResume(resumeObject);
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
@@ -106,16 +106,6 @@ namespace ResumeRocketQuery.Api.Controllers
             var result = await _resumeService.GetPrimaryResumePdf(user.AccountId);
 
             return File(result, "application/pdf", "resume.pdf");
-        }
-
-
-        [HttpGet]
-        [Route("{resumeId}")]
-        public async Task<ServiceResponseGeneric<string>> Get([FromRoute] int resumeId)
-        {
-            var result = await _resumeService.GetResume(resumeId);
-
-            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
         [HttpGet]
