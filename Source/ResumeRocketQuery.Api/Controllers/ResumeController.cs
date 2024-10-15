@@ -39,7 +39,7 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpGet]
-        [Route("get/{resumeId}")]
+        [Route("{resumeId}")]
         public async Task<ServiceResponse> Get(int resumeId)
         {
             await _resumeService.GetResume(resumeId);
@@ -63,7 +63,7 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpPost]
-        [Route("post/{resumeId}")]
+        [Route("{resumeId}")]
         public async Task<ServiceResponse> Post(ResumeStorage resumeObject)
         {
             await _resumeService.UpdateResume(resumeObject);
