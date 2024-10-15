@@ -1,15 +1,12 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.Api;
-using ResumeRocketQuery.Domain.Api.Request;
 using ResumeRocketQuery.Domain.Api.Response;
 using ResumeRocketQuery.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ResumeRocketQuery.Services;
 using System.Collections.Generic;
 using System.Linq;
-using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System;
@@ -40,10 +37,10 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <returns>A User Object.</returns>
         [HttpGet]
-        [Route("postings/{resumeId}")]
-        public async Task<ServiceResponseGeneric<JobPostingResponse>> GetById(int resumeId)
+        [Route("postings/{applicationId}")]
+        public async Task<ServiceResponseGeneric<JobPostingResponse>> GetById(int applicationId)
         {
-            var resumeResult = await _jobService.GetResume(resumeId);
+            var resumeResult = await _jobService.GetApplication(applicationId);
 
             if (resumeResult != null)
             {
@@ -92,7 +89,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("postings/{resumeId}")]
         public async Task<ServiceResponse> UpdateStaus(int resumeId, string status)
         {
-            await _jobService.UpdateResume(resumeId, status);
+            await _jobService.UpdateApplication(resumeId, status);
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }

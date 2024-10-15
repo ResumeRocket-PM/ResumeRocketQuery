@@ -7,8 +7,8 @@ public interface IJobService
 {
     Task<int> CreateJobResumeAsync(Job job);
     Task<List<ApplicationResult>> GetJobPostings(int accountId);
-    Task<ApplicationResult> GetResume(int resumeId);
+    Task<ApplicationResult> GetApplication(int applicationId);
     
-    Task UpdateResume(int resumeId, string status);
+    Task UpdateApplication(int applicationId, string status);
 
 }

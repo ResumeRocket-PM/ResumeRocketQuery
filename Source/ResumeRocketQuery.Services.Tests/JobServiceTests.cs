@@ -53,7 +53,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Status = "Pending"
                 };
 
-                var actual = await _systemUnderTest.GetResume(resumeId);
+                var actual = await _systemUnderTest.GetApplication(resumeId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
@@ -87,11 +87,9 @@ namespace ResumeRocketQuery.Services.Tests
                     Status = "Pending"
                 };
 
-                var actual = await _systemUnderTest.GetResume(resumeId);
+                var actual = await _systemUnderTest.GetApplication(resumeId);
 
-                Assert.True(actual.ResumeContent.ContainsKey("FileBytes"));
-                Assert.True(actual.ResumeContent.ContainsKey("FileName"));
-                Assert.True(actual.ResumeContent.ContainsKey("Recommendations"));
+                Assert.IsType<string>(actual.ResumeContent);
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
 
@@ -146,11 +144,9 @@ namespace ResumeRocketQuery.Services.Tests
                     Status = "Pending"
                 };
 
-                var actual = await _systemUnderTest.GetResume(resumeId);
+                var actual = await _systemUnderTest.GetApplication(resumeId);
 
-                Assert.True(actual.ResumeContent.ContainsKey("FileBytes"));
-                Assert.True(actual.ResumeContent.ContainsKey("FileName"));
-                Assert.True(actual.ResumeContent.ContainsKey("Recommendations"));
+                Assert.IsType<string>(actual.ResumeContent);
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
@@ -238,12 +234,12 @@ namespace ResumeRocketQuery.Services.Tests
 
                 
 
-                var actualOld = await _systemUnderTest.GetResume(resumeId1);
+                var actualOld = await _systemUnderTest.GetApplication(resumeId1);
                 string updateStatus = "Accepted";
                 Assert.NotEqual(updateStatus, actualOld.Status);
 
-                await _systemUnderTest.UpdateResume(resumeId1, updateStatus);
-                var actualnew = await _systemUnderTest.GetResume(resumeId1);
+                await _systemUnderTest.UpdateApplication(resumeId1, updateStatus);
+                var actualnew = await _systemUnderTest.GetApplication(resumeId1);
                 Assert.Equal(updateStatus, actualnew.Status);
 
 
