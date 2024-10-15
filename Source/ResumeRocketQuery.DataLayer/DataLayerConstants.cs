@@ -9,12 +9,12 @@ namespace ResumeRocketQuery.DataLayer
             public static class Account
             {
                 public const string InsertAccount = @"
-                    INSERT INTO Accounts (AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink)
-                    VALUES (@accountAlias, @firstName, @lastName, @profilePhotoLink, @title, @stateLocation, @portfolioLink);
+                    INSERT INTO Accounts (AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId)
+                    VALUES (@accountAlias, @firstName, @lastName, @profilePhotoLink, @title, @stateLocation, @portfolioLink, @primaryResumeId);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string SelectAccount = @"
-                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink
+                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId
                     FROM Accounts
                     WHERE AccountId = @accountID;";
 
@@ -30,7 +30,8 @@ namespace ResumeRocketQuery.DataLayer
                         Title = @title,
                         StateLocation = @stateLocation,
                         PortfolioLink = @portfolioLink,
-                        UpdateDate = GetDate()
+                        UpdateDate = GetDate(),
+                        PrimaryResumeId = @primaryResumeId
                     WHERE AccountId = @accountId;";
             }
 
@@ -49,12 +50,19 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateApplication = @"
-
                     DECLARE @StatusID int;
 
                     SELECT @StatusID = StatusId
                     FROM ApplicationStatus
                     WHERE Status = @Status;
+
+                    IF @StatusID IS NULL
+                    BEGIN
+                        INSERT INTO ApplicationStatus (Status)
+                        VALUES (@Status);
+
+                        SET @StatusID = SCOPE_IDENTITY();
+                    END
 
                     UPDATE Applications
                     SET StatusId = @StatusID,
@@ -282,6 +290,68 @@ namespace ResumeRocketQuery.DataLayer
                     ORDER BY 1 DESC, 
 	                    CASE WHEN ProfilePhotoLink IS NULL THEN 1 ELSE 0 END,
 	                    CASE WHEN FirstName IS NULL OR LastName is null THEN 1 ELSE 0 END";
+
+            }
+            public class Profile
+            {
+                //search State query
+                public const string SearchStatesNameASC = @"
+                SELECT *
+                FROM States
+                WHERE StatesName LIKE @stateName
+                ORDER BY StatesName ASC;
+                ";
+
+                public const string SearchStatesNameDESC = @"
+                SELECT *
+                FROM States
+                WHERE StatesName LIKE @stateName
+                ORDER BY StatesName DESC;
+                ";
+
+                //seach University query
+                public const string SearchUniversityNameASC = @"
+                SELECT *
+                FROM University
+                WHERE UniversityName LIKE @uName
+                ORDER BY UniversityName ASC;
+                ";
+
+                public const string SearchUniversityNameDESC = @"
+                SELECT *
+                FROM dbo.University
+                WHERE UniversityName LIKE @uName
+                ORDER BY UniversityName DESC;
+                ";
+
+                //search career query
+                public const string SearchCareerNameASC = @"
+                SELECT *
+                FROM Career
+                WHERE CareerName LIKE @cName
+                ORDER BY CareerName ASC
+                ";
+
+                public const string SearchCareerNameDESC = @"
+                SELECT *
+                FROM Career
+                WHERE CareerName LIKE @cName
+                ORDER BY CareerName DESC
+                ";
+
+                //search career query
+                public const string SearchMajorNameASC = @" 
+                SELECT *
+                FROM Major
+                WHERE MajorName LIKE @mName
+                ORDER BY MajorName ASC";
+
+                public const string SearchMajorNameDESC = @" 
+                SELECT *
+                FROM Major
+                WHERE MajorName LIKE @mName
+                ORDER BY MajorName DESC";
+
 
             }
         }

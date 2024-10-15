@@ -13,7 +13,7 @@ namespace ResumeRocketQuery.Domain.Api.Response
         public string Email { get; set; }
         public string Location { get; set; }
         public string PortfolioLink { get; set; }
-        public string Resume { get; set; }
+        public int? PrimaryResumeId { get; set; }
         public List<Skill> Skills { get; set; }
         public List<Experience> Experience { get; set; }
         public List<Education> Education { get; set; }

@@ -10,5 +10,6 @@
         public int Version { get; set; }
         public System.DateTime InsertDate { get; set; }
         public System.DateTime UpdateDate { get; set; }
+        public string Html { get; set; }
     }
 }

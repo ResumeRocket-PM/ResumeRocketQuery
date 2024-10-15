@@ -139,6 +139,7 @@ namespace ResumeRocketQuery.Services
                     StartDate = x.StartDate,
                     Type = x.Type   
                 }).ToList(),
+                PrimaryResumeId = account.Result.PrimaryResumeId
             };
         }
 
@@ -161,6 +162,7 @@ namespace ResumeRocketQuery.Services
                 Title = updates.ContainsKey("Title") ? updates["Title"] : account.Title,
                 StateLocation = updates.ContainsKey("Location") ? updates["Location"] : account.StateLocation,
                 PortfolioLink = updates.ContainsKey("PortfolioLink") ? updates["PortfolioLink"] : account.PortfolioLink,
+                PrimaryResumeId = updates.ContainsKey("PrimaryResumeId") ? int.Parse(updates["PrimaryResumeId"]) : account.PrimaryResumeId
             };
 
             await _accountDataLayer.UpdateAccountStorageAsync(updatedAccount);

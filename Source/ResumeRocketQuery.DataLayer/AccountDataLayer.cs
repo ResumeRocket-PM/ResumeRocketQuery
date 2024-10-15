@@ -31,6 +31,7 @@ namespace ResumeRocketQuery.DataLayer
                         title = account.Title,
                         stateLocation = account.StateLocation,
                         portfolioLink = account.PortfolioLink,
+                        primaryResumeId = account.PrimaryResumeId
                     },
                     commandType: CommandType.Text);
                 return result;
@@ -69,6 +70,7 @@ namespace ResumeRocketQuery.DataLayer
                         title = accountStorage.Title,
                         stateLocation = accountStorage.StateLocation,
                         portfolioLink = accountStorage.PortfolioLink,
+                        PrimaryResumeId = accountStorage.PrimaryResumeId
                     },
                     commandType: CommandType.Text);
             }

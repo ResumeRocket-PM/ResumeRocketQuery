@@ -41,6 +41,8 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IResumeDataLayer, ResumeDataLayer>();
             services.AddSingleton<ISearchDataLayer, SearchDataLayer>();
 
+            services.AddSingleton<IResumeService, ResumeService>();
+            services.AddSingleton<IPdfToHtmlClient, PdfToHtmlClient>();
             services.AddSingleton<IOpenAiClient, OpenAiClient>(); 
             services.AddTransient<IJobScraper, jobScraper>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
@@ -51,7 +53,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IPdfService, PdfService>();
             services.AddSingleton<IJobService, JobService>();
             services.AddSingleton<ISearchService, SearchService>();
-
+            services.AddSingleton<IProfileDataLayer, ProfileDataLayer>();
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
 
