@@ -48,8 +48,8 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpGet]
-        [Route("history")]
-        public async Task<ServiceResponseGeneric<List<ResumeResult>>> History(int originalResumeId)
+        [Route("{originalResumeId}/history")]
+        public async Task<ServiceResponseGeneric<List<ResumeResult>>> History([FromRoute] int originalResumeId)
         {
             var resumeHistory = await _resumeService.GetResumeHistory(originalResumeId);
             return _serviceResponseBuilder.BuildServiceResponse(resumeHistory, HttpStatusCode.OK);
