@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Helper;
 using ResumeRocketQuery.Domain.Services.Repository;
@@ -141,6 +142,29 @@ namespace ResumeRocketQuery.Services
                 }).ToList(),
                 PrimaryResumeId = account.Result.PrimaryResumeId
             };
+        }
+
+        public async Task UpdateAccount(AccountDetails accountDetails)
+        {
+            var account = await _accountDataLayer.GetAccountAsync(accountDetails.AccountId);
+
+            var updatedAccount = new AccountStorage
+            {
+                AccountAlias = account.AccountAlias,
+                AccountId = accountDetails.AccountId,
+                FirstName = account.FirstName,
+                LastName = account.LastName,
+                ProfilePhotoLink = account.ProfilePhotoLink,
+                Title = accountDetails.Title,
+                StateLocation = accountDetails.StateLocation,
+                PortfolioLink = account.PortfolioLink,
+                PrimaryResumeId = accountDetails.PrimaryResumeId
+            };
+
+            await _accountDataLayer.UpdateAccountStorageAsync(updatedAccount);
+            await CreateEducationsAsync(accountDetails.AccountId, accountDetails.Education);
+            await CreateExperiencesAsync(accountDetails.AccountId, accountDetails.Experience);
+            await CreateSkillsAsync(accountDetails.AccountId, accountDetails.Skills);
         }
 
         public async Task UpdateAccount(int accountId, Dictionary<string, string> updates)

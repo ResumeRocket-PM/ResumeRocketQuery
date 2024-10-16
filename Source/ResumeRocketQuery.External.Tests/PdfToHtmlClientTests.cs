@@ -23,27 +23,54 @@ namespace ResumeRocketQuery.Repository.Tests
             _systemUnderTest = serviceProvider.GetService<IPdfToHtmlClient>();
         }
 
-        public class SendMessageAsync : PdfToHtmlClientTests
+        public class ConvertPdf : PdfToHtmlClientTests
         {
             [Fact]
             public async Task WHEN_Convert_is_called_THEN_response_is_NOT_NULL()
             {
                 // Arrange
                 using var memoryStream = new MemoryStream();
-                // Load your PDF data into memoryStream, e.g., from a file or byte array
+
                 var pdfBytes = File.ReadAllBytes("resume.pdf");
+
                 await memoryStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
-                memoryStream.Position = 0; // Reset stream position
+                memoryStream.Position = 0; 
 
                 // Act
                 var resultStream = await _systemUnderTest.ConvertPdf(memoryStream);
 
                 var fileName = $"{Guid.NewGuid().ToString()}.html";
 
-                // Write the output to a file
                 using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    resultStream.Position = 0; // Reset position before writing
+                    resultStream.Position = 0;
+                    await resultStream.CopyToAsync(fileStream);
+                }
+
+                // Assert
+                Assert.True(File.Exists(fileName), "The output HTML file was not created.");
+            }
+
+            [Fact]
+            public async Task GIVEN_html_WHEN_Convert_is_called_THEN_response_is_NOT_NULL()
+            {
+                // Arrange
+                using var memoryStream = new MemoryStream();
+                var pdfBytes = File.ReadAllBytes("resume.pdf");
+
+                await memoryStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+                memoryStream.Position = 0;
+
+                // Act
+                var htmlStream = await _systemUnderTest.ConvertPdf(memoryStream);
+
+                var resultStream = await _systemUnderTest.StripHtmlElements(htmlStream);
+
+                var fileName = $"{Guid.NewGuid().ToString()}.html";
+
+                using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    resultStream.Position = 0; 
                     await resultStream.CopyToAsync(fileStream);
                 }
 
