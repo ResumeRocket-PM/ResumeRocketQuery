@@ -1,7 +1,10 @@
-﻿using ResumeRocketQuery.Domain.External;
+﻿using HtmlAgilityPack;
+using ResumeRocketQuery.Domain.External;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.External
@@ -30,6 +33,26 @@ namespace ResumeRocketQuery.External
 
                 return responseStream;
             }
+        }
+
+        public async Task<Stream> StripHtmlElements(Stream html)
+        {
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.Load(html);
+
+            foreach (var tag in new[]{ "style", "link", "script", "img", "head", "meta" })
+            {
+                var nodes = htmlDoc.DocumentNode.Descendants(tag).ToList();
+
+                foreach (var node in nodes)
+                {
+                    node.Remove();
+                }
+            }
+
+            byte[] byteArray = Encoding.UTF8.GetBytes(htmlDoc.DocumentNode.InnerHtml);
+
+            return new MemoryStream(byteArray);
         }
     }
 }
