@@ -4,12 +4,11 @@ using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using System.Diagnostics;
-﻿using iText.Html2pdf;
-using iText.Kernel.Pdf;
 using ResumeRocketQuery.Domain.External;
 using System.IO;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.Services.Repository;
+using PuppeteerSharp;
 
 namespace ResumeRocketQuery.Services
 {
@@ -51,7 +50,7 @@ namespace ResumeRocketQuery.Services
         {
             var html = await GetPrimaryResume(accountId);
 
-            return ConvertFromHtml(html);
+            return await ConvertFromHtml(html);
         }
 
         public async Task CreatePrimaryResume(ResumeRequest request)
@@ -243,25 +242,33 @@ namespace ResumeRocketQuery.Services
         {
             var resume = await _resumeDataLayer.GetResumeAsync(resumeId);
 
-            return ConvertFromHtml(resume.Resume);
+            return await ConvertFromHtml(resume.Resume);
         }
 
-        private byte[] ConvertFromHtml(string html)
+        private async Task<byte[]> ConvertFromHtml(string html)
         {
             if(html == null)
             {
                 return new byte[0];
             }
 
-            using (MemoryStream pdfStream = new MemoryStream())
+            await new BrowserFetcher().DownloadAsync();
+
+            using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }))
             {
-                PdfWriter writer = new PdfWriter(pdfStream);
+                using (var page = await browser.NewPageAsync())
+                {
+                    await page.SetContentAsync(html);
 
-                ConverterProperties converterProperties = new ConverterProperties();
+                    var pdfStream = await page.PdfStreamAsync();
 
-                HtmlConverter.ConvertToPdf(html, writer, converterProperties);
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        pdfStream.CopyTo(memoryStream);
 
-                return pdfStream.ToArray();
+                        return memoryStream.ToArray();
+                    }
+                }
             }
         }
 
