@@ -51,6 +51,7 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <summary>
         ///     Retrieves the version history of a Resume
         /// </summary>
+        /// <param name="originalResumeId"></param>
         /// <returns>A PDF Object</returns>
         [HttpGet]
         [Route("{originalResumeId}/history")]
@@ -136,11 +137,12 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <summary>
         ///   Retrieves all Resumes for the account
         /// </summary>
-        /// <param name="accountId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("all/{accountId}")]
-        public async Task<List<ResumeResult>> GetAccountResumes([FromRoute] int accountId) {
+        [Route("all")]
+        public async Task<List<ResumeResult>> GetAccountResumes() {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var accountId = user.AccountId;
             var result = await _resumeService.GetAccountResumes(accountId);
             return result;
         }
