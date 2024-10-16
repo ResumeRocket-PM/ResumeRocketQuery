@@ -9,6 +9,9 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Web;
+using System.Collections;
+using System.Text;
 
 namespace ResumeRocketQuery.Services
 {
@@ -19,6 +22,7 @@ namespace ResumeRocketQuery.Services
         private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IApplicationDataLayer _applicationDataLayer;
         private readonly IPdfToHtmlClient _pdfToHtmlClient;
+        private readonly IResumeService _resumeService;
         private readonly ILanguageService _languageService;
 
         public JobService(IPdfService pdfService, 
@@ -26,7 +30,8 @@ namespace ResumeRocketQuery.Services
             ILanguageService languageService,
             IResumeDataLayer resumeDataLayer,
             IApplicationDataLayer applicationDataLayer,
-            IPdfToHtmlClient pdfToHtmlClient)
+            IPdfToHtmlClient pdfToHtmlClient,
+            IResumeService resumeService)
         {
             _pdfService = pdfService;
             _openAiClient = openAiClient;
@@ -34,7 +39,66 @@ namespace ResumeRocketQuery.Services
             _resumeDataLayer = resumeDataLayer;
             _applicationDataLayer = applicationDataLayer;
             _pdfToHtmlClient = pdfToHtmlClient;
+            _resumeService = resumeService;
         }
+
+        public async Task<int> CreateJobAsync(ApplicationRequest applicationRequest)
+        {
+            //Take the HTML from the Posting, Pass
+            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
+
+            var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
+
+            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
+            string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
+
+            var newHtml = "";
+            try
+            {
+                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
+
+                newHtml = jsonResult.html;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Error parsing returned JSON", e);
+                throw;
+            }
+
+            var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = applicationRequest.AccountId,
+                Resume = primaryResume,
+                OriginalResumeID = null,
+                OriginalResume = true,
+                Version = 1
+            });
+
+            var newResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = applicationRequest.AccountId,
+                Resume = newHtml,
+                OriginalResumeID = originalResumeId,
+                OriginalResume = false,
+                Version = 2
+            });
+
+            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+            {
+                JobPostingUrl = applicationRequest.JobUrl,
+                AccountId = applicationRequest.AccountId,
+                ApplyDate = DateTime.Now,
+                CompanyName = jobResult.CompanyName,
+                Position = jobResult.Title,
+                Status = "Pending",
+                ResumeId = newResumeId
+            });
+
+            return result;
+        }
+
+
 
         public async Task<int> CreateJobResumeAsync(Job job)
         {
@@ -53,36 +117,8 @@ namespace ResumeRocketQuery.Services
                 originalHtml = reader.ReadToEnd();
             }
 
-            //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
-            var prompt = 
-                    $@"Using this input resume content, along with this job description:
+            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
-                    {jobResult.Description}
-
-                    and these 10 keywords:
-
-                    {jobResult.Keywords}
-
-                    produce 5 suggestiobs for changes that should be made to the resume, and apply them to the resume.
-
-                    These updates should not falsify any information, meaning no additional skills, education, or work experience 
-                    should be added you are only allowed to reword items on the resume to better match the job posting.
-
-                    Your output should be plain text JSON (no markdown code block syntax) with 3 keys. 
-
-                    The first key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
-                    a new resume using the suggested changes. The name of the stylesheet in the link to the css style sheet is style.css.
-
-                    The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
-
-                    The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
-                    each item will have the following JSON array item structure: a key for ""section"" with string value specifying the section
-                    the original resume that is being addressed, a key of ""original"" with string value that is the original content that was on
-                    the resume, and a key for ""modified"" with string value of the suggested change to the ""original"" text.
-
-                    {{$input}}";
-
-            
             string response = await _openAiClient.SendMessageAsync(prompt, originalHtml);
             var recommendations = new List<Change>();
             var newHtml = "";
@@ -133,6 +169,40 @@ namespace ResumeRocketQuery.Services
             return result;
         }
 
+        private string GeneratePrompt(string description, List<string> keywords)
+        {
+            //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
+            var prompt =
+                $@"Using this input resume content, along with this job description:
+
+                    {description}
+
+                    and these 10 keywords:
+
+                    {string.Join(", ", keywords)}
+
+                    produce 5 suggestiobs for changes that should be made to the resume, and apply them to the resume.
+
+                    These updates should not falsify any information, meaning no additional skills, education, or work experience 
+                    should be added you are only allowed to reword items on the resume to better match the job posting.
+
+                    Your output should be plain text JSON (no markdown code block syntax) with 3 keys. 
+
+                    The first key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
+                    a new resume using the suggested changes. The name of the stylesheet in the link to the css style sheet is style.css.
+
+                    The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
+
+                    The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
+                    each item will have the following JSON array item structure: a key for ""section"" with string value specifying the section
+                    the original resume that is being addressed, a key of ""original"" with string value that is the original content that was on
+                    the resume, and a key for ""modified"" with string value of the suggested change to the ""original"" text.
+
+                    {{$input}}";
+
+            return prompt;
+        }
+
         public async Task<List<ApplicationResult>> GetJobPostings(int accountId)
         {
             var applications = await _applicationDataLayer.GetApplicationsAsync(accountId);
@@ -180,12 +250,14 @@ namespace ResumeRocketQuery.Services
         private async Task<ApplicationResult> ConvertApplication(Application x)
         {
             var resumeContent = "";
+            int? resumeId = null;
 
             if (x.ResumeId.HasValue)
             {
                 var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
 
                 resumeContent = resumeResult.Resume;
+                resumeId = resumeResult.ResumeId;
             }
 
             return new ApplicationResult
@@ -197,7 +269,8 @@ namespace ResumeRocketQuery.Services
                 Position = x.Position,
                 ResumeID = x.ApplicationId,
                 Status = x.Status,
-                ResumeContent = resumeContent
+                ResumeContent = resumeContent,
+                ResumeContentId = resumeId
             };
         }
     }

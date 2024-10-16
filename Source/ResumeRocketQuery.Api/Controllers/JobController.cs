@@ -54,6 +54,7 @@ namespace ResumeRocketQuery.Api.Controllers
                     ResumeContent = resumeResult.ResumeContent,
                     ResumeID = resumeResult.ResumeID,
                     Status = resumeResult.Status,
+                    ResumeContentId = resumeResult.ResumeContentId
                 };
 
                 return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
@@ -94,6 +95,21 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
+        [HttpPost]
+        [Route("extension/postings")]
+        public async Task<ServiceResponseGeneric<int>> CreateJobPosting([FromBody] CreateApplicationRequest applicationRequest)
+        {
+            var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var applicationId = await _jobService.CreateJobAsync(new ApplicationRequest
+            {
+                JobHtml = applicationRequest.Html,
+                JobUrl = applicationRequest.Url,
+                AccountId = account.AccountId
+            });
+
+            return _serviceResponseBuilder.BuildServiceResponse(applicationId, HttpStatusCode.Created);
+        }
 
         [HttpPost]
         [Route("postings")]

@@ -11,4 +11,5 @@ public interface IJobService
     
     Task UpdateApplication(int applicationId, string status);
 
+    Task<int> CreateJobAsync(ApplicationRequest applicationRequest);
 }
