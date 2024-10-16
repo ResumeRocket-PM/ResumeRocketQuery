@@ -7,6 +7,7 @@ namespace ResumeRocketQuery.Domain.Services
     public interface IResumeService
     {
         Task CreatePrimaryResume(ResumeRequest request);
+        Task<int> CreateResume(ResumeRequest resume);
         Task<ResumeResult> CreateResumeFromPdf(ResumeRequest request);
         Task<string> GetPrimaryResume(int accountId);
         Task<byte[]> GetPrimaryResumePdf(int accountId);

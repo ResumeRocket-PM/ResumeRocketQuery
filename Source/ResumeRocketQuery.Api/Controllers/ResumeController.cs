@@ -14,6 +14,7 @@ using ResumeRocketQuery.Api.Builder;
 using System.IO;
 using System;
 using Microsoft.AspNetCore.Http;
+using OpenQA.Selenium.Interactions;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -24,6 +25,7 @@ namespace ResumeRocketQuery.Api.Controllers
         private readonly IResumeService _resumeService;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
+        
         public ResumeController(IServiceResponseBuilder serviceResponseBuilder, 
             IResumeService resumeService,
             IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
@@ -33,7 +35,11 @@ namespace ResumeRocketQuery.Api.Controllers
             _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
         }
 
-
+        /// <summary>
+        ///    Retrieves a Resume by its ID
+        /// </summary>
+        /// <param name="resumeId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{resumeId}")]
         public async Task<ServiceResponseGeneric<string>> Get([FromRoute] int resumeId)
@@ -43,7 +49,7 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         /// <summary>
-        ///     This retrieves the version history of a Resume
+        ///     Retrieves the version history of a Resume
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpGet]
@@ -55,7 +61,7 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         /// <summary>
-        ///     This updates the Resume content
+        ///     Updates a Resume's content
         /// </summary>
         /// <returns>A PDF Object</returns>
         [HttpPost]
@@ -66,6 +72,11 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
 
+        /// <summary>
+        ///     Creates the primary Resume for the account
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("primary")]
         public async Task<ServiceResponse> CreatePrimary([FromForm] IFormFile file)
@@ -93,6 +104,10 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);
         }
 
+        /// <summary>
+        ///     Retrieves the primary Resume for the account
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("primary/pdf")]
         public async Task<IActionResult> GetPrimaryPdf()
@@ -104,6 +119,11 @@ namespace ResumeRocketQuery.Api.Controllers
             return File(result, "application/pdf", "resume.pdf");
         }
 
+        /// <summary>
+        ///    Retrieves a Resume for the account by ID as a PDF
+        /// </summary>
+        /// <param name="resumeId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{resumeId}/pdf")]
         public async Task<IActionResult> GetPdf([FromRoute] int resumeId)
@@ -113,11 +133,48 @@ namespace ResumeRocketQuery.Api.Controllers
             return File(result, "application/pdf", "resume.pdf");
         }
 
+        /// <summary>
+        ///   Retrieves all Resumes for the account
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("all/{accountId}")]
         public async Task<List<ResumeResult>> GetAccountResumes([FromRoute] int accountId) {
             var result = await _resumeService.GetAccountResumes(accountId);
             return result;
+        }
+        
+        /// <summary>
+        ///    Creates a Resume for the account
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("create")]
+        public async Task<ServiceResponse> CreateResume([FromForm] IFormFile file)
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var resultResume = new Dictionary<string, string>();
+
+            using (var ms = new MemoryStream())
+            {
+                file.CopyTo(ms);
+                var fileByteArray = ms.ToArray();
+                string fileBytes = Convert.ToBase64String(fileByteArray);
+
+                resultResume.Add("FileName", file.FileName);
+                resultResume.Add("FileBytes", fileBytes);
+            }
+
+            await _resumeService.CreateResume(new ResumeRequest
+            {
+                AccountId = user.AccountId,
+                Pdf = resultResume
+            });
+
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);
         }
     }
 }
