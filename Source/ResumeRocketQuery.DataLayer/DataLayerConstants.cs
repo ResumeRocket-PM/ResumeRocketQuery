@@ -183,8 +183,8 @@ namespace ResumeRocketQuery.DataLayer
             public class Resume
             {
                 public const string InsertResume = @"
-                    INSERT INTO Resumes (AccountId, Resume)
-                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume));
+                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, Version)
+                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume), @OriginalResume, @OriginalResumeId, @Version);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateResume = @"
