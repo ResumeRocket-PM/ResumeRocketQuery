@@ -39,7 +39,6 @@ namespace ResumeRocketQuery.Api.Controllers
         public async Task<ServiceResponseGeneric<string>> Get([FromRoute] int resumeId)
         {
             var result = await _resumeService.GetResume(resumeId);
-
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
@@ -112,6 +111,13 @@ namespace ResumeRocketQuery.Api.Controllers
             var result = await _resumeService.GetResumePdf(resumeId);
 
             return File(result, "application/pdf", "resume.pdf");
+        }
+
+        [HttpGet]
+        [Route("all/{accountId}")]
+        public async Task<List<ResumeResult>> GetAccountResumes([FromRoute] int accountId) {
+            var result = await _resumeService.GetAccountResumes(accountId);
+            return result;
         }
     }
 }

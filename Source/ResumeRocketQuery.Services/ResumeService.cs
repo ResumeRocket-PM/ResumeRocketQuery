@@ -315,5 +315,10 @@ namespace ResumeRocketQuery.Services
                 return false;
             }
         }
+
+        public async Task<List<ResumeResult>> GetAccountResumes(int accountId) {
+            var result = await _resumeDataLayer.GetResumesAsync(accountId);
+            return result;
+        }
     }
 }
