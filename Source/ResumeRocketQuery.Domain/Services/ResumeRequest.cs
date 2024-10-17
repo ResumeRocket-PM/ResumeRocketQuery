@@ -6,6 +6,8 @@ namespace ResumeRocketQuery.Domain.Services
     {
         public int AccountId { get; set; }
         public Dictionary<string, string> Pdf { get; set; }
+
+        public bool? OriginalResume { get; set; }
         public int? OriginalResumeID { get; set; }
         public int? ResumeId { get; set; }
 

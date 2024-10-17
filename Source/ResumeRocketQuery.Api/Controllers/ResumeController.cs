@@ -147,15 +147,16 @@ namespace ResumeRocketQuery.Api.Controllers
             var result = await _resumeService.GetAccountResumes(accountId);
             return result;
         }
-        
+
         /// <summary>
         ///    Creates a Resume for the account
         /// </summary>
         /// <param name="file"></param>
+        /// <param name="createResumeRequest"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<ServiceResponseGeneric<CreateResumeResponse>> CreateResume([FromForm] IFormFile file)
+        public async Task<ServiceResponseGeneric<CreateResumeResponse>> CreateResume([FromForm] IFormFile file, CreateResumeRequest createResumeRequest)
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
@@ -174,7 +175,8 @@ namespace ResumeRocketQuery.Api.Controllers
             var resumeId = await _resumeService.CreateResume(new ResumeRequest
             {
                 AccountId = user.AccountId,
-                Pdf = resultResume
+                Pdf = resultResume,
+                OriginalResume = createResumeRequest.OriginalResume,
             });
 
             var response = new CreateResumeResponse
@@ -191,32 +193,32 @@ namespace ResumeRocketQuery.Api.Controllers
         /// </summary>
         /// <param name="file"></param>
         /// <param name="originalResumeId"></param>
-        /// <param name="resumeId"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{originalResumeId}/addToVersionHistory/{resumeId}")]
-        public async Task<ServiceResponseGeneric<CreateResumeResponse>> AddToVersionHistory([FromForm] IFormFile file, [FromRoute] int originalResumeId, [FromRoute] int resumeId)
+        [Route("{originalResumeId}/addToVersionHistory")]
+        public async Task<ServiceResponseGeneric<CreateResumeResponse>> AddToVersionHistory(CreateResumeRequest createResumeRequest, [FromRoute] int originalResumeId)
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
+            var resumeHtmlString = createResumeRequest.ResumeHtmlString;
+
             var resultResume = new Dictionary<string, string>();
 
-            using (var ms = new MemoryStream())
-            {
-                file.CopyTo(ms);
-                var fileByteArray = ms.ToArray();
-                string fileBytes = Convert.ToBase64String(fileByteArray);
+            //using (var ms = new MemoryStream())
+            //{
+            //    file.CopyTo(ms);
+            //    var fileByteArray = ms.ToArray();
+            //    string fileBytes = Convert.ToBase64String(fileByteArray);
 
-                resultResume.Add("FileName", file.FileName);
-                resultResume.Add("FileBytes", fileBytes);
-            }
+            //    resultResume.Add("FileName", file.FileName);
+            //    resultResume.Add("FileBytes", fileBytes);
+            //}
 
-            await _resumeService.CreateResume(new ResumeRequest
+            var resumeId = await _resumeService.CreateResume(new ResumeRequest
             {
                 AccountId = user.AccountId,
                 Pdf = resultResume,
                 OriginalResumeID = originalResumeId,
-                ResumeId = resumeId
             });
 
             var response = new CreateResumeResponse
