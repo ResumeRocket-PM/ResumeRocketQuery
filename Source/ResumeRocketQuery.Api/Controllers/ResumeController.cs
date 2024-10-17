@@ -15,6 +15,7 @@ using System.IO;
 using System;
 using Microsoft.AspNetCore.Http;
 using OpenQA.Selenium.Interactions;
+using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -146,15 +147,16 @@ namespace ResumeRocketQuery.Api.Controllers
             var result = await _resumeService.GetAccountResumes(accountId);
             return result;
         }
-        
+
         /// <summary>
         ///    Creates a Resume for the account
         /// </summary>
         /// <param name="file"></param>
+        /// <param name="createResumeRequest"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<ServiceResponse> CreateResume([FromForm] IFormFile file)
+        public async Task<ServiceResponseGeneric<CreateResumeResponse>> CreateResume([FromForm] IFormFile file, CreateResumeRequest createResumeRequest)
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
@@ -170,13 +172,61 @@ namespace ResumeRocketQuery.Api.Controllers
                 resultResume.Add("FileBytes", fileBytes);
             }
 
-            await _resumeService.CreateResume(new ResumeRequest
+            var resumeId = await _resumeService.CreateResume(new ResumeRequest
             {
                 AccountId = user.AccountId,
-                Pdf = resultResume
+                Pdf = resultResume,
+                OriginalResume = createResumeRequest.OriginalResume,
             });
 
-            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);
+            var response = new CreateResumeResponse
+            {
+                ResumeId = resumeId.ToString()
+            };
+
+            return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.Created);
+        }
+
+
+        /// <summary>
+        ///    Adds a resume to version history of the original resume
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="originalResumeId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{originalResumeId}/addToVersionHistory")]
+        public async Task<ServiceResponseGeneric<CreateResumeResponse>> AddToVersionHistory(CreateResumeRequest createResumeRequest, [FromRoute] int originalResumeId)
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var resumeHtmlString = createResumeRequest.ResumeHtmlString;
+
+            var resultResume = new Dictionary<string, string>();
+
+            //using (var ms = new MemoryStream())
+            //{
+            //    file.CopyTo(ms);
+            //    var fileByteArray = ms.ToArray();
+            //    string fileBytes = Convert.ToBase64String(fileByteArray);
+
+            //    resultResume.Add("FileName", file.FileName);
+            //    resultResume.Add("FileBytes", fileBytes);
+            //}
+
+            var resumeId = await _resumeService.CreateResume(new ResumeRequest
+            {
+                AccountId = user.AccountId,
+                Pdf = resultResume,
+                OriginalResumeID = originalResumeId,
+            });
+
+            var response = new CreateResumeResponse
+            {
+                ResumeId = resumeId.ToString()
+            };
+
+            return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.Created);
         }
     }
 }

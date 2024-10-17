@@ -198,7 +198,7 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResumeByAccount = @"
-                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version
+                    SELECT ResumeId, AccountId, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 
@@ -211,6 +211,17 @@ namespace ResumeRocketQuery.DataLayer
                 public const string DeleteResume = @"
                     DELETE FROM Resumes
                     WHERE ResumeId = @ResumeId;";
+
+                public const string GetNumResumeVersionsByAccount = @"
+                    SELECT COUNT(1)
+                    FROM Resumes
+                    WHERE OriginalResumeId = @OriginalResumeId AND AccountId = @AccountId;";
+
+
+                public const string GetNumOriginalResumesByAccount = @"
+                    SELECT COUNT(1)
+                    FROM Resumes
+                    WHERE OriginalResume = 1 AND AccountId = @AccountId;";
             }
 
             public class Experience

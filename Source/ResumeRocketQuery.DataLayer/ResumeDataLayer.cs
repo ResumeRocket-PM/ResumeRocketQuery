@@ -20,6 +20,32 @@ namespace ResumeRocketQuery.DataLayer
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
+                // If OriginalResume is true, find out how many original resumes exist for the account.
+                if (resume.OriginalResume == true)
+                {
+                    var originalResumeCount = await connection.ExecuteScalarAsync<int>(
+                        DataLayerConstants.StoredProcedures.Resume.GetNumOriginalResumesByAccount,
+                        new { AccountId = resume.AccountId }, // Pass the AccountId to the query
+                        commandType: CommandType.Text
+                    );
+
+                    // Set OriginalResumeID to originalResumeCount + 1
+                    resume.OriginalResumeID = originalResumeCount + 1;
+                }
+                else
+                {
+                    // If OriginalResume is false, get the number of resume versions for the OriginalResumeId.
+                    var resumeVersionCount = await connection.ExecuteScalarAsync<int>(
+                        DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersionsByAccount,
+                        new { OriginalResumeId = resume.OriginalResumeID, AccountId = resume.AccountId }, // Pass OriginalResumeId and AccountId
+                        commandType: CommandType.Text
+                    );
+
+                    // Set the Version to the number of versions + 1
+                    resume.Version = resumeVersionCount + 1;
+                }
+
+                // insert the resume
                 var result = await connection.ExecuteScalarAsync<int>(
                     DataLayerConstants.StoredProcedures.Resume.InsertResume,
                     new
@@ -103,5 +129,16 @@ namespace ResumeRocketQuery.DataLayer
                     commandType: CommandType.Text);
             }
         }
+
+        //public async Task GetNumResumeVersions(int originalResumeId)
+        //{
+        //    using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+        //    {
+        //        await connection.ExecuteAsync(
+        //            DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersions,
+        //            new { OriginalResumeID = originalResumeId },
+        //            commandType: CommandType.Text);
+        //    }
+        //}
     }
 }
