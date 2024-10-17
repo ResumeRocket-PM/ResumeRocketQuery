@@ -201,18 +201,19 @@ namespace ResumeRocketQuery.Api.Controllers
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
             var resumeHtmlString = createResumeRequest.ResumeHtmlString;
+            var file = await _resumeService.GetResumePdfFromHtml(resumeHtmlString);
 
             var resultResume = new Dictionary<string, string>();
 
-            //using (var ms = new MemoryStream())
-            //{
-            //    file.CopyTo(ms);
-            //    var fileByteArray = ms.ToArray();
-            //    string fileBytes = Convert.ToBase64String(fileByteArray);
+            using (var ms = new MemoryStream())
+            {
+                ms.Write(file, 0, file.Length); 
 
-            //    resultResume.Add("FileName", file.FileName);
-            //    resultResume.Add("FileBytes", fileBytes);
-            //}
+                var fileBytes = Convert.ToBase64String(ms.ToArray());
+
+                resultResume.Add("FileName", "resumeVersionFor" + originalResumeId);
+                resultResume.Add("FileBytes", fileBytes);
+            }
 
             var resumeId = await _resumeService.CreateResume(new ResumeRequest
             {

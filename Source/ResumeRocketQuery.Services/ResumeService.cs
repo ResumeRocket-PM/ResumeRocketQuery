@@ -263,6 +263,10 @@ namespace ResumeRocketQuery.Services
             return await ConvertFromHtml(resume.Resume);
         }
 
+        public async Task<byte[]> GetResumePdfFromHtml(string html)
+        {
+            return await ConvertFromHtml(html);
+        }
         private async Task<byte[]> ConvertFromHtml(string html)
         {
             if(html == null)
