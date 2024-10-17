@@ -103,5 +103,16 @@ namespace ResumeRocketQuery.DataLayer
                     commandType: CommandType.Text);
             }
         }
+
+        public async Task GetNumResumeVersions(int originalResumeId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersions,
+                    new { OriginalResumeID = originalResumeId },
+                    commandType: CommandType.Text);
+            }
+        }
     }
 }
