@@ -32,18 +32,18 @@ namespace ResumeRocketQuery.DataLayer
                     // Set OriginalResumeID to originalResumeCount + 1
                     resume.OriginalResumeID = originalResumeCount + 1;
                 }
-                else
-                {
-                    // If OriginalResume is false, get the number of resume versions for the OriginalResumeId.
-                    var resumeVersionCount = await connection.ExecuteScalarAsync<int>(
-                        DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersionsByAccount,
-                        new { OriginalResumeId = resume.OriginalResumeID, AccountId = resume.AccountId }, // Pass OriginalResumeId and AccountId
-                        commandType: CommandType.Text
-                    );
+                //else
+                //{
+                //    // If OriginalResume is false, get the number of resume versions for the OriginalResumeId.
+                //    var resumeVersionCount = await connection.ExecuteScalarAsync<int>(
+                //        DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersionsByAccount,
+                //        new { OriginalResumeId = resume.OriginalResumeID, AccountId = resume.AccountId }, // Pass OriginalResumeId and AccountId
+                //        commandType: CommandType.Text
+                //    );
 
-                    // Set the Version to the number of versions + 1
-                    resume.Version = resumeVersionCount + 1;
-                }
+                //    // Set the Version to the number of versions + 1
+                //    resume.Version = resumeVersionCount + 1;
+                //}
 
                 // insert the resume
                 var result = await connection.ExecuteScalarAsync<int>(

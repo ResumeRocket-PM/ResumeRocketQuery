@@ -67,7 +67,6 @@ namespace ResumeRocketQuery.Services
                     Resume = savedResumeHtml,
                     OriginalResumeID = resume.OriginalResumeID,
                     OriginalResume = resume.OriginalResume,
-                    ResumeId = resume.ResumeId
                 });
                 return resumeId;
             }
