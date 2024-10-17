@@ -12,5 +12,6 @@ namespace ResumeRocketQuery.Domain.Services
         Task CreateSkillsAsync(int accountId, List<Skill> skills);
         Task<AccountDetails> GetAccountAsync(int accountId);
         Task UpdateAccount(int accountId, Dictionary<string, string> updates);
+        Task UpdateAccount(AccountDetails accountDetails);
     }
 }

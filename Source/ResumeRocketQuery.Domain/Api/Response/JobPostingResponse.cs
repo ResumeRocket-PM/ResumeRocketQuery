@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace ResumeRocketQuery.Domain.Api.Response
 {
@@ -10,8 +9,9 @@ namespace ResumeRocketQuery.Domain.Api.Response
         public string JobUrl { get; set; }
         public int AccountID { get; set; }
         public string Status { get; set; }
-        public Dictionary<string, string> ResumeContent { get; set; }
+        public string ResumeContent { get; set; }
         public string Position { get; set; }
         public string CompanyName { get; set; }
+        public int? ResumeContentId { get; set; }
     }
 }

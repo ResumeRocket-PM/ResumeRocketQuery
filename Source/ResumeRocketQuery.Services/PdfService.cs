@@ -42,6 +42,7 @@ namespace ResumeRocketQuery.Service
                 }
                 return pageText.ToString();
             }
+
         }
 
         public async Task<string> UpdatePdfAsync(string filepath, string update)

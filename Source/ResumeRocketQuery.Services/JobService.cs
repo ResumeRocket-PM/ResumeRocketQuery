@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
-using ResumeRocketQuery.Service;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using iText.Layout.Properties.Grid;
+using System.Web;
+using System.Collections;
+using System.Text;
 
 namespace ResumeRocketQuery.Services
 {
@@ -23,20 +21,84 @@ namespace ResumeRocketQuery.Services
         private readonly IOpenAiClient _openAiClient;
         private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IApplicationDataLayer _applicationDataLayer;
+        private readonly IPdfToHtmlClient _pdfToHtmlClient;
+        private readonly IResumeService _resumeService;
         private readonly ILanguageService _languageService;
 
         public JobService(IPdfService pdfService, 
             IOpenAiClient openAiClient, 
             ILanguageService languageService,
             IResumeDataLayer resumeDataLayer,
-            IApplicationDataLayer applicationDataLayer)
+            IApplicationDataLayer applicationDataLayer,
+            IPdfToHtmlClient pdfToHtmlClient,
+            IResumeService resumeService)
         {
             _pdfService = pdfService;
             _openAiClient = openAiClient;
             _languageService = languageService;
             _resumeDataLayer = resumeDataLayer;
             _applicationDataLayer = applicationDataLayer;
+            _pdfToHtmlClient = pdfToHtmlClient;
+            _resumeService = resumeService;
         }
+
+        public async Task<int> CreateJobAsync(ApplicationRequest applicationRequest)
+        {
+            //Take the HTML from the Posting, Pass
+            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
+
+            var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
+
+            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
+            string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
+
+            var newHtml = "";
+            try
+            {
+                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
+
+                newHtml = jsonResult.html;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Error parsing returned JSON", e);
+                throw;
+            }
+
+            var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = applicationRequest.AccountId,
+                Resume = primaryResume,
+                OriginalResumeID = null,
+                OriginalResume = true,
+                Version = 1
+            });
+
+            var newResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = applicationRequest.AccountId,
+                Resume = newHtml,
+                OriginalResumeID = originalResumeId,
+                OriginalResume = false,
+                Version = 2
+            });
+
+            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+            {
+                JobPostingUrl = applicationRequest.JobUrl,
+                AccountId = applicationRequest.AccountId,
+                ApplyDate = DateTime.Now,
+                CompanyName = jobResult.CompanyName,
+                Position = jobResult.Title,
+                Status = "Pending",
+                ResumeId = newResumeId
+            });
+
+            return result;
+        }
+
+
 
         public async Task<int> CreateJobResumeAsync(Job job)
         {
@@ -47,17 +109,77 @@ namespace ResumeRocketQuery.Services
             var pdf = new MemoryStream(pdfBytes);
             
             // Take the Text of the Resume
-            var pdfText = await _pdfService.ReadPdfAsync(pdf);
+            var htmlStream = await _pdfToHtmlClient.ConvertPdf(pdf);
+            var originalHtml = "";
+            //Store this as part of the ResumeContent dictionary.
+            using (StreamReader reader = new StreamReader(htmlStream))
+            {
+                originalHtml = reader.ReadToEnd();
+            }
 
+            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
+            string response = await _openAiClient.SendMessageAsync(prompt, originalHtml);
+            var recommendations = new List<Change>();
+            var newHtml = "";
+            try
+            {
+                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
+                newHtml = jsonResult.html;
+                recommendations = jsonResult.changes;
+            }
+            catch (Exception e) {
+                Debug.WriteLine("Error parsing returned JSON", e);
+                throw;
+            }
+
+            var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = job.AccountId,
+                Resume = originalHtml,
+                OriginalResumeID = null,
+                OriginalResume = true,
+                Version = 1
+            });
+
+            var newResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = job.AccountId,
+                Resume = newHtml,
+                OriginalResumeID = originalResumeId,
+                OriginalResume = false,
+                Version = 2
+            });
+
+            // job.Resume.Add("Recommendations", recommendations.ToString());
+
+            var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
+
+            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+            {
+                JobPostingUrl = job.JobUrl,
+                AccountId = job.AccountId,
+                ApplyDate = DateTime.Now,
+                CompanyName = regex,
+                Position = jobResult.Title,
+                Status = "Pending",
+                ResumeId = newResumeId
+            });
+
+            return result;
+        }
+
+        private string GeneratePrompt(string description, List<string> keywords)
+        {
             //Pass it to the language model, with the keywords and description from the Job Posting and ask the language model what changes would be good to make
-            var prompt = 
-                    $@"Using this input resume content, along with this job description:
+            var prompt =
+                $@"Using this input resume content, along with this job description:
 
-                    {jobResult.Description}
+                    {description}
 
                     and these 10 keywords:
 
-                    {jobResult.Keywords}
+                    {string.Join(", ", keywords)}
 
                     produce 5 suggestiobs for changes that should be made to the resume, and apply them to the resume.
 
@@ -78,58 +200,7 @@ namespace ResumeRocketQuery.Services
 
                     {{$input}}";
 
-            //Store this as part of the ResumeContent dictionary.
-            string response = await _openAiClient.SendMessageAsync(prompt, pdfText);
-            var recommendations = new List<Change>();
-            var html = "";
-            var css = "";
-
-            try
-            {
-                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
-                html = jsonResult.html;
-                css = jsonResult.css;
-                recommendations = jsonResult.changes;
-
-            }
-            catch (Exception e) {
-                Debug.WriteLine("Error parsing returned JSON", e);
-                throw;
-            }
-
-            // Store css in filepath for use by PDF library then delete
-            FileInfo file = new FileInfo("style.css");
-            if (!file.Exists)
-                file.Directory.Create();
-            var newPDF = await _pdfService.CreatePdfAsync(job.Resume["FileName"], html);
-            file.Delete();
-
-            job.Resume["FileBytes"] = Convert.ToBase64String(File.ReadAllBytes(newPDF));
-            File.Delete(newPDF);
-            var resumeContent = job.Resume;
-
-            resumeContent.Add("Recommendations", recommendations.ToString());
-
-            var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
-
-            var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
-            {
-                Resume = JsonConvert.SerializeObject(resumeContent),
-                AccountId = job.AccountId,
-            });
-
-            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
-            {
-                JobPostingUrl = job.JobUrl,
-                AccountId = job.AccountId,
-                ApplyDate = DateTime.Now,
-                CompanyName = regex,
-                Position = jobResult.Title,
-                Status = "Pending",
-                ResumeId = resumeId
-            });
-
-            return result;
+            return prompt;
         }
 
         public async Task<List<ApplicationResult>> GetJobPostings(int accountId)
@@ -149,7 +220,16 @@ namespace ResumeRocketQuery.Services
             return result;
         }
 
-        public async Task<ApplicationResult> GetResume(int resumeId)
+        public async Task<ApplicationResult> GetApplication(int applicationId)
+        {
+            var application = await _applicationDataLayer.GetApplicationAsync(applicationId);
+
+            var result = await ConvertApplication(application);
+
+            return result;
+        }
+
+        public async Task<ApplicationResult> GetResumeHistory(int resumeId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
 
@@ -158,24 +238,26 @@ namespace ResumeRocketQuery.Services
             return result;
         }
 
-        public async Task UpdateResume(int resumeId, string status)
+        public async Task UpdateApplication(int applicationId, string status)
         {
             await _applicationDataLayer.UpdateApplicationAsync(new ApplicationStorage
             {
-                ApplicationId = resumeId,
+                ApplicationId = applicationId,
                 Status = status
             });
         }
 
         private async Task<ApplicationResult> ConvertApplication(Application x)
         {
-            var resumeContent = new Dictionary<string, string>();
+            var resumeContent = "";
+            int? resumeId = null;
 
             if (x.ResumeId.HasValue)
             {
                 var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
 
-                resumeContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(resumeResult.Resume);
+                resumeContent = resumeResult.Resume;
+                resumeId = resumeResult.ResumeId;
             }
 
             return new ApplicationResult
@@ -187,7 +269,8 @@ namespace ResumeRocketQuery.Services
                 Position = x.Position,
                 ResumeID = x.ApplicationId,
                 Status = x.Status,
-                ResumeContent = resumeContent
+                ResumeContent = resumeContent,
+                ResumeContentId = resumeId
             };
         }
     }
