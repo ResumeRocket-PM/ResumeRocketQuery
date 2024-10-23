@@ -205,7 +205,7 @@ namespace ResumeRocketQuery.DataLayer
                 public const string SelectResumeByOriginal = @"
                     SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
-                    WHERE OgirinalResumeId = @OgirinalResumeId
+                    WHERE OriginalResumeId = @OriginalResumeId
                     ORDER BY Version;";
 
                 public const string DeleteResume = @"
