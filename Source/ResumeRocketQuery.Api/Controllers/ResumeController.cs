@@ -13,6 +13,7 @@ using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Api.Builder;
 using System.IO;
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using OpenQA.Selenium.Interactions;
 using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
@@ -56,10 +57,19 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <returns>A PDF Object</returns>
         [HttpGet]
         [Route("{originalResumeId}/history")]
-        public async Task<ServiceResponseGeneric<List<ResumeResult>>> History([FromRoute] int originalResumeId)
+        public async Task<ServiceResponseGeneric<List<ResumesResponseBody>>> History([FromRoute] int originalResumeId)
         {
             var resumeHistory = await _resumeService.GetResumeHistory(originalResumeId);
-            return _serviceResponseBuilder.BuildServiceResponse(resumeHistory, HttpStatusCode.OK);
+
+            var result = resumeHistory.Select(x => new ResumesResponseBody
+            {
+                ResumeId = x.ResumeId,
+                InsertDate = x.InsertDate,
+                OriginalResumeID = x.OriginalResumeID,
+                UpdateDate = x.UpdateDate
+            }).ToList();
+
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -141,11 +151,18 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("all")]
-        public async Task<List<ResumeResult>> GetAccountResumes() {
+        public async Task<List<ResumesResponseBody>> GetAccountResumes() {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
             var accountId = user.AccountId;
             var result = await _resumeService.GetAccountResumes(accountId);
-            return result;
+
+            return result.Select(x => new ResumesResponseBody
+            {
+                ResumeId = x.ResumeId,
+                InsertDate = x.InsertDate,
+                OriginalResumeID = x.OriginalResumeID,
+                UpdateDate = x.UpdateDate
+            }).ToList();
         }
 
         /// <summary>

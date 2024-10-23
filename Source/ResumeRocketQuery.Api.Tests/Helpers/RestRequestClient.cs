@@ -64,7 +64,10 @@ namespace ResumeRocketQuery.Api.Tests.Helpers
 
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ServiceResponseGeneric<T>>(responseContent);
+                var result = JsonConvert.DeserializeObject<ServiceResponseGeneric<T>>(responseContent, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
 
                 return result;
             }
@@ -72,6 +75,23 @@ namespace ResumeRocketQuery.Api.Tests.Helpers
             {
                 //
                 throw e;
+            }
+        }
+
+        public async Task<HttpResponseMessage> SendMultipartFormRequest(string requestUri, string filePath, string fileName)
+        {
+            using (var content = new MultipartFormDataContent())
+            {
+                byte[] fileData = await File.ReadAllBytesAsync(filePath);
+
+                var fileContent = new ByteArrayContent(fileData);
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/pdf");
+
+                content.Add(fileContent, "file", fileName);
+
+                var response = await _client.PostAsync(requestUri, content);
+
+                return response;
             }
         }
     }

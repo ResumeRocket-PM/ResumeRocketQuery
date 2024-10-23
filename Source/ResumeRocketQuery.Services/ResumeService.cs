@@ -9,6 +9,7 @@ using System.IO;
 using Newtonsoft.Json;
 using ResumeRocketQuery.Domain.Services.Repository;
 using PuppeteerSharp;
+using ResumeRocketQuery.Domain.Api.Response;
 
 namespace ResumeRocketQuery.Services
 {
@@ -67,6 +68,8 @@ namespace ResumeRocketQuery.Services
                     Resume = savedResumeHtml,
                     OriginalResumeID = resume.OriginalResumeID,
                     OriginalResume = resume.OriginalResume,
+                    InsertDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
                 });
                 return resumeId;
             }
@@ -223,6 +226,8 @@ namespace ResumeRocketQuery.Services
                 {
                     AccountId = request.AccountId,
                     Resume = savedResumeHtml,
+                    InsertDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
                 });
 
                 updatedAccount.PrimaryResumeId = resumeId;
@@ -310,6 +315,8 @@ namespace ResumeRocketQuery.Services
                 {
                     AccountId = request.AccountId,
                     Resume = html,
+                    InsertDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
                 });
 
                 var result = new ResumeResult
@@ -322,7 +329,7 @@ namespace ResumeRocketQuery.Services
             }
         }
 
-        public async Task<List<ResumeResult>> GetResumeHistory(int originalResumeId) {
+        public async Task<List<ResumeStorage>> GetResumeHistory(int originalResumeId) {
             var result = await _resumeDataLayer.GetResumeHistoryAsync(originalResumeId);
             return result;
         }
@@ -338,7 +345,7 @@ namespace ResumeRocketQuery.Services
             }
         }
 
-        public async Task<List<ResumeResult>> GetAccountResumes(int accountId) {
+        public async Task<List<ResumeStorage>> GetAccountResumes(int accountId) {
             var result = await _resumeDataLayer.GetResumesAsync(accountId);
             return result;
         }

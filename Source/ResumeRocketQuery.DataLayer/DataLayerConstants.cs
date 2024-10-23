@@ -183,8 +183,8 @@ namespace ResumeRocketQuery.DataLayer
             public class Resume
             {
                 public const string InsertResume = @"
-                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, Version)
-                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume), @OriginalResume, @OriginalResumeId, @Version);
+                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, Version, InsertDate, UpdateDate)
+                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume), @OriginalResume, @OriginalResumeId, @Version, @InsertDate, @UpdateDate);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateResume = @"
@@ -193,17 +193,17 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResume = @"
-                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResumeByAccount = @"
-                    SELECT ResumeId, AccountId, OriginalResumeId, Version, InsertDate, UpdateDate
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 
                 public const string SelectResumeByOriginal = @"
-                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE OgirinalResumeId = @OgirinalResumeId
                     ORDER BY Version;";
