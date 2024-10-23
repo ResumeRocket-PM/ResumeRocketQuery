@@ -1,4 +1,6 @@
-﻿namespace ResumeRocketQuery.Domain.DataLayer
+﻿using System;
+
+namespace ResumeRocketQuery.Domain.DataLayer
 {
     public class ResumeStorage
     {
@@ -6,7 +8,9 @@
         public int AccountId { get; set; }
         public string Resume { get; set; }
         public int? OriginalResumeID { get; set; }
-        public bool? OriginalResume { get; set; }
-        public int Version { get; set; }
+        public bool OriginalResume { get; set; }
+        public int? Version { get; set; }
+        public DateTime InsertDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace ResumeRocketQuery.Domain.Api.Request
 {
     public class CreateResumeRequest
     {
-        public bool? OriginalResume { get; set; }
-        public string? ResumeHtmlString { get; set; }
+        public bool OriginalResume { get; set; }
+        public string ResumeHtmlString { get; set; }
     }
 }

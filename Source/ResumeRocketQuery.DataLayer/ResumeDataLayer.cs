@@ -20,29 +20,14 @@ namespace ResumeRocketQuery.DataLayer
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                // If OriginalResume is true, find out how many original resumes exist for the account.
-                //if (resume.OriginalResume == true)
-                //{
-                //    var originalResumeCount = await connection.ExecuteScalarAsync<int>(
-                //        DataLayerConstants.StoredProcedures.Resume.GetNumOriginalResumesByAccount,
-                //        new { AccountId = resume.AccountId }, // Pass the AccountId to the query
-                //        commandType: CommandType.Text
-                //    );
-
-                //    // Set OriginalResumeID to originalResumeCount + 1
-                //    resume.OriginalResumeID = originalResumeCount + 1;
-                //}
-                //else
-                if (resume.OriginalResume == null)
+                if (!resume.OriginalResume)
                 {
-                    // If OriginalResume is false, get the number of resume versions for the OriginalResumeId.
                     var resumeVersionCount = await connection.ExecuteScalarAsync<int>(
                         DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersionsByAccount,
-                        new { OriginalResumeId = resume.OriginalResumeID, AccountId = resume.AccountId }, // Pass OriginalResumeId and AccountId
+                        new { OriginalResumeId = resume.OriginalResumeID, AccountId = resume.AccountId },
                         commandType: CommandType.Text
                     );
 
-                    // Set the Version to the number of versions + 1
                     resume.Version = resumeVersionCount + 1;
                 }
 
@@ -55,7 +40,9 @@ namespace ResumeRocketQuery.DataLayer
                         Resume = resume.Resume,
                         OriginalResumeID = resume.OriginalResumeID,
                         OriginalResume = resume.OriginalResume,
-                        Version = resume.Version
+                        Version = resume.Version,
+                        InsertDate = resume.InsertDate,
+                        UpdateDate = resume.UpdateDate,
                     },
                     commandType: CommandType.Text);
 
@@ -81,11 +68,11 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task<List<ResumeResult>> GetResumesAsync(int accountId)
+        public async Task<List<ResumeStorage>> GetResumesAsync(int accountId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryAsync<ResumeResult>(
+                var result = await connection.QueryAsync<ResumeStorage>(
                     DataLayerConstants.StoredProcedures.Resume.SelectResumeByAccount,
                     new { AccountId = accountId },
                     commandType: CommandType.Text);
@@ -94,11 +81,11 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task<ResumeResult> GetResumeAsync(int resumeId)
+        public async Task<ResumeStorage> GetResumeAsync(int resumeId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryFirstOrDefaultAsync<ResumeResult>(
+                var result = await connection.QueryFirstOrDefaultAsync<ResumeStorage>(
                     DataLayerConstants.StoredProcedures.Resume.SelectResume,
                     new { ResumeId = resumeId },
                     commandType: CommandType.Text);
@@ -107,11 +94,11 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task<List<ResumeResult>> GetResumeHistoryAsync(int originalResumeId)
+        public async Task<List<ResumeStorage>> GetResumeHistoryAsync(int originalResumeId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryAsync<ResumeResult>(
+                var result = await connection.QueryAsync<ResumeStorage>(
                     DataLayerConstants.StoredProcedures.Resume.SelectResumeByOriginal,
                     new { originalResumeId = originalResumeId },
                     commandType: CommandType.Text);
@@ -130,16 +117,5 @@ namespace ResumeRocketQuery.DataLayer
                     commandType: CommandType.Text);
             }
         }
-
-        //public async Task GetNumResumeVersions(int originalResumeId)
-        //{
-        //    using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
-        //    {
-        //        await connection.ExecuteAsync(
-        //            DataLayerConstants.StoredProcedures.Resume.GetNumResumeVersions,
-        //            new { OriginalResumeID = originalResumeId },
-        //            commandType: CommandType.Text);
-        //    }
-        //}
     }
 }

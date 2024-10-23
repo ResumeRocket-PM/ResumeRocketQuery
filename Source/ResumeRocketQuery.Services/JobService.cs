@@ -81,7 +81,7 @@ namespace ResumeRocketQuery.Services
                 Resume = newHtml,
                 OriginalResumeID = originalResumeId,
                 OriginalResume = false,
-                Version = 2
+                Version = 1
             });
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
@@ -139,7 +139,9 @@ namespace ResumeRocketQuery.Services
                 Resume = originalHtml,
                 OriginalResumeID = null,
                 OriginalResume = true,
-                Version = 1
+                Version = 1,
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             });
 
             var newResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
@@ -148,7 +150,9 @@ namespace ResumeRocketQuery.Services
                 Resume = newHtml,
                 OriginalResumeID = originalResumeId,
                 OriginalResume = false,
-                Version = 2
+                Version = 1,
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             });
 
             // job.Resume.Add("Recommendations", recommendations.ToString());

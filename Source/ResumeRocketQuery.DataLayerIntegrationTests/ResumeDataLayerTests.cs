@@ -27,6 +27,51 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
         [Theory]
         [InlineData(typeof(ResumeDataLayer))]
+        public async Task GIVEN_original_resumeId_set_WHEN_InsertResumeAsync_is_called_THEN_version_is_incremented(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today,
+            });
+
+            var expected = new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today,
+                OriginalResumeID = resumeId,
+                OriginalResume = false
+            };
+
+            var resumeId2 = await systemUnderTest.InsertResumeAsync(expected);
+
+            expected.Version = 1;
+            expected.ResumeId = resumeId2;
+
+            var actual = await systemUnderTest.GetResumeAsync(resumeId2);
+
+            expected.ToExpectedObject().ShouldMatch(actual);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
         public async Task WHEN_InsertResumeAsync_is_called_THEN_resume_is_stored(Type storageType)
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
@@ -45,7 +90,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
             {
                 AccountId = accountId,
-                Resume = "Sample Resume Text"
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             });
 
             Assert.True(resumeId > 0);
@@ -71,7 +118,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var insertRequest = new ResumeStorage
             {
                 AccountId = accountId,
-                Resume = "Sample Resume Text"
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             };
 
             var resumeId = await systemUnderTest.InsertResumeAsync(insertRequest);
@@ -107,7 +156,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
             {
                 AccountId = accountId,
-                Resume = "Sample Resume Text"
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             });
 
             var updatedResume = new ResumeStorage
@@ -115,6 +166,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
                 ResumeId = resumeId,
                 AccountId = accountId,
                 Resume = "Updated Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today,
+                Version = 1
             };
 
             var expected = new[]
@@ -149,7 +203,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
             {
                 AccountId = accountId,
-                Resume = "Sample Resume Text"
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             });
 
             await systemUnderTest.DeleteResumeAsync(resumeId);
@@ -179,7 +235,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var expected = new ResumeStorage
             {
                 AccountId = accountId,
-                Resume = "Sample Resume Text"
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
             };
 
             var resumeId = await systemUnderTest.InsertResumeAsync(expected);
