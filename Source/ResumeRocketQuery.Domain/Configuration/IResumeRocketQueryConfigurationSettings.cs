@@ -4,5 +4,7 @@ namespace ResumeRocketQuery.Domain.Configuration
     {
         string AuthenticationPrivateKey { get; }
         string ResumeRocketQueryDatabaseConnectionString { get; }
+        string BlobStorageConnectionString { get; }
+        string BlobStorageContainerName { get; }
     }
 }
