@@ -365,6 +365,30 @@ namespace ResumeRocketQuery.DataLayer
 
 
             }
+
+            // ***** These are not usable yet, do not know if we're doing
+            // an images table, or/and ImageId
+            public class Image
+            {
+                public const string InsertImage = @"
+                    INSERT INTO Images (ImageUrl, FileName)
+                    VALUES (@imageUrl, @fileName);
+                    SELECT SCOPE_IDENTITY();";
+
+                public const string SelectImage = @"
+                    SELECT ImageId, ImageUrl, FileName
+                    FROM Images
+                    WHERE ImageId = @imageId;";
+
+                public const string SelectImageByFileName = @"
+                    SELECT ImageId, ImageUrl, FileName
+                    FROM Images
+                    WHERE FileName = @fileName;";
+
+                public const string DeleteImage = @"
+                    DELETE FROM Images
+                    WHERE ImageId = @imageId;";
+            }
         }
     }
 }
