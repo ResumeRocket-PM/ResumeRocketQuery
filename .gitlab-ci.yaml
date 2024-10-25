@@ -4,6 +4,11 @@ stages:
 variables:
   IMAGE_TAG: $CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
 
+services:
+  - docker:dind
+
+image: docker:latest
+
 before_script:
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
 
@@ -13,4 +18,4 @@ docker-build:
     - docker build -f ./Source/Dockerfile -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
   only:
-    - main 
+    - main
