@@ -18,5 +18,5 @@ build:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin 
 
   script:
-    - docker build -f ./Source/Dockerfile -t $IMAGE_TAG .
+    - docker build -f ./Source/Dockerfile -t $IMAGE_TAG ./Source
     - docker push $IMAGE_TAG
