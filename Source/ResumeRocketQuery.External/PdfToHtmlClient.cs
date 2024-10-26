@@ -6,12 +6,18 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using ResumeRocketQuery.Domain.Configuration;
 
 namespace ResumeRocketQuery.External
 {
     public class PdfToHtmlClient : IPdfToHtmlClient
     {
-        private string _apiUrl = "http://localhost:5010/convert";
+        private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
+
+        public PdfToHtmlClient(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
+        {
+            _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
+        }
 
         public async Task<Stream> ConvertPdf(MemoryStream stream)
         {
@@ -26,7 +32,7 @@ namespace ResumeRocketQuery.External
                 form.Add(fileContent, "file", "uploaded.pdf"); 
 
 
-                HttpResponseMessage response = await httpClient.PostAsync(_apiUrl, form);
+                HttpResponseMessage response = await httpClient.PostAsync(_resumeRocketQueryConfigurationSettings.Pdf2HtmlUrl, form);
 
                 response.EnsureSuccessStatusCode();
 

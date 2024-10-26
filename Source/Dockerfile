@@ -4,6 +4,8 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
+ENV ASPNETCORE_ENVIRONMENT=Production
+
 # Use the .NET SDK 8.0 image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
