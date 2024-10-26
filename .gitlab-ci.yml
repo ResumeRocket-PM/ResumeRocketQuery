@@ -20,3 +20,6 @@ build:
   script:
     - docker build -f ./Source/Dockerfile -t $IMAGE_TAG ./Source
     - docker push $IMAGE_TAG
+  
+  only:
+    - release
