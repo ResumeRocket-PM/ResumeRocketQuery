@@ -1,6 +1,7 @@
 using System.IO;
 using ResumeRocketQuery.Domain.Configuration;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
@@ -10,9 +11,12 @@ namespace ResumeRocketQuery.Api.Configuration
 
         public ResumeRocketQueryConfigurationSettings()
         {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true);
 
             _configurationRoot = builder.Build();
         }
