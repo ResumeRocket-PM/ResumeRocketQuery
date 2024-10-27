@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ResumeRocketQuery.Api
 {
@@ -12,6 +13,10 @@ namespace ResumeRocketQuery.Api
 
         public static IHostBuilder CreateHostBuilder() =>
             Host.CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

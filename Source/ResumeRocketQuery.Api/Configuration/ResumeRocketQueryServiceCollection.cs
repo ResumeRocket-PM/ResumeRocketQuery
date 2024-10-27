@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.Extensions.Logging;
 using ResumeRocketQuery.Api.Builder;
 using ResumeRocketQuery.Api.Filters;
 using ResumeRocketQuery.Domain.Api;
