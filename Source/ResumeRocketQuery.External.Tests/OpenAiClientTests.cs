@@ -111,8 +111,6 @@ namespace ResumeRocketQuery.Repository.Tests
             {
                 string json =
                     @"{
-                      ""html"": ""<html><body><h1>Resume</h1><p><strong>Skills:</strong> SQL, Python, JavaScript, Data Visualization (Tableau), Data Analysis, System Development Life Cycle (SDLC), Team Collaboration.</p><h2>Work Experience</h2><p><strong>IT Service Desk Technician, Nerds at Work</strong></p><ul><li>Collaborated with cross-functional teams to present data insights for improving processes.</li><li>Utilized SQL and Python for data querying, automation, and process optimization.</li></ul><h2>Projects</h2><p><strong>Database Fundamentals Class Project</strong></p><ul><li>Designed relational databases and processed large datasets using SQL and Python.</li><li>Collaborated with team members to analyze data and present insights using data visualization tools.</li></ul></body></html>"",
-                      ""css"": ""body { font-family: Arial, sans-serif; } h1 { color: #333; } h2 { font-size: 1.5em; } p { line-height: 1.6; } ul { list-style-type: square; margin-left: 20px; }"",
                       ""changes"": [
                         {
                           ""section"": ""Skills"",
@@ -142,7 +140,7 @@ namespace ResumeRocketQuery.Repository.Tests
                       ]
                     }";
 
-                var result = JsonConvert.DeserializeObject<Updates>(json);
+                var result = JsonConvert.DeserializeObject<List<Change>>(json);
             }
         }
     }
