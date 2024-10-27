@@ -4,6 +4,7 @@ using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using System.Data;
+using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 
 namespace ResumeRocketQuery.DataLayer
 {
@@ -114,6 +115,54 @@ namespace ResumeRocketQuery.DataLayer
                 await connection.ExecuteAsync(
                     DataLayerConstants.StoredProcedures.Resume.DeleteResume,
                     new { ResumeId = resumeId },
+                    commandType: CommandType.Text);
+            }
+        }
+
+
+        public async Task<List<ResumeChangesStorage>> SelectResumeChangesAsync(int resumeId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryAsync<ResumeChangesStorage>(
+                    DataLayerConstants.StoredProcedures.Resume.SelectResumeChanges,
+                    new { ResumeId = resumeId },
+                    commandType: CommandType.Text);
+
+                return result.ToList();
+            }
+        }
+
+        public async Task InsertResumeChangeAsync(ResumeChangesStorage resumeChangesStorage)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Resume.InsertResumeChanges,
+                    new
+                    {
+                        ResumeId = resumeChangesStorage.ResumeId,
+                        OriginalText = resumeChangesStorage.OriginalText,
+                        ModifiedText = resumeChangesStorage.ModifiedText,
+                        ExplanationString = resumeChangesStorage.ExplanationString,
+                        Accepted = resumeChangesStorage.Accepted,
+                        HtmlID = resumeChangesStorage.HtmlID,
+                    },
+                    commandType: CommandType.Text);
+            }
+        }
+
+        public async Task UpdateResumeChangeAsync(ResumeChangesStorage resumeChangesStorage)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                await connection.ExecuteAsync(
+                    DataLayerConstants.StoredProcedures.Resume.UpdateResumeChanges,
+                    new
+                    {
+                        ResumeChangeId = resumeChangesStorage.ResumeChangeId,
+                        Accepted = resumeChangesStorage.Accepted,
+                    },
                     commandType: CommandType.Text);
             }
         }
