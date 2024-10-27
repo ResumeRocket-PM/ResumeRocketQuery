@@ -110,8 +110,7 @@ namespace ResumeRocketQuery.Repository.Tests
             public static void WHEN_JSON()
             {
                 string json =
-                    @"{
-                      ""changes"": [
+                    @"[
                         {
                           ""section"": ""Skills"",
                           ""original"": ""Programming: Java, HTML, CSS, C++, SQL, C#, Python, PHP, bash, PowerShell, JavaScript"",
@@ -138,7 +137,7 @@ namespace ResumeRocketQuery.Repository.Tests
                           ""modified"": ""Utilized SQL and Python for data querying, automation, and process optimization""
                         }
                       ]
-                    }";
+                    ";
 
                 var result = JsonConvert.DeserializeObject<List<Change>>(json);
             }

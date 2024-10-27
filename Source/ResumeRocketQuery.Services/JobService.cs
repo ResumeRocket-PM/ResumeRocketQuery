@@ -158,7 +158,7 @@ namespace ResumeRocketQuery.Services
                     the resume, a key for ""modified"" with string value of the suggested change to the ""original"" text, and a key for ""explanation"" 
                     with a short 2-3 sentence string value specifying why the change was suggested.
 
-                    {{$input}}";
+                    {{{{$input}}}}";
 
             return prompt;
         }
