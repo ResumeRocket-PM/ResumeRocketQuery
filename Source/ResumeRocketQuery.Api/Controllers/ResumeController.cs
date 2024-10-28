@@ -50,7 +50,6 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
-
         [HttpGet]
         [Route("{resumeId}/suggestions")]
         public async Task<ServiceResponseGeneric<GetResumeResult>> GetPerfectResume([FromRoute] int resumeId)
