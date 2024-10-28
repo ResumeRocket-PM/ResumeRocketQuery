@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ResumeRocketQuery.Domain.DataLayer;
-using ResumeRocketQuery.Domain.Services;
-using System.Diagnostics;
-using ResumeRocketQuery.Domain.External;
-using System.IO;
+﻿using HtmlAgilityPack;
+using iText.Layout.Element;
 using Newtonsoft.Json;
-using ResumeRocketQuery.Domain.Services.Repository;
 using PuppeteerSharp;
-using ResumeRocketQuery.Domain.Api.Response;
+using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.External;
+using ResumeRocketQuery.Domain.Services;
+using ResumeRocketQuery.Domain.Services.Repository;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Services
 {
@@ -348,6 +350,54 @@ namespace ResumeRocketQuery.Services
         public async Task<List<ResumeStorage>> GetAccountResumes(int accountId) {
             var result = await _resumeDataLayer.GetResumesAsync(accountId);
             return result;
+        }
+
+
+        public async Task ApplyResumeSuggestion(int resumeChangeId)
+        {
+            await _resumeDataLayer.UpdateResumeChangeAsync(new ResumeChangesStorage
+            {
+                Accepted = true,
+                ResumeChangeId = resumeChangeId
+            });
+        }
+
+        public async Task<GetResumeResult> GetPerfectResume(int resumeId)
+        {
+            var resumeHtml = await GetResume(resumeId);
+
+            var resumeSuggestions = await _resumeDataLayer.SelectResumeChangesAsync(resumeId);
+
+            var acceptedSuggestions = resumeSuggestions.Where(x => x.Accepted).ToList();
+
+            var htmlDoc = new HtmlDocument();
+
+            htmlDoc.LoadHtml(resumeHtml);
+
+            foreach (var acceptedSuggestion in acceptedSuggestions)
+            {
+                var div = htmlDoc.GetElementbyId(acceptedSuggestion.HtmlID);
+
+                if (div != null)
+                {
+                    div.InnerHtml = acceptedSuggestion.ModifiedText;
+                }
+            }
+
+            return new GetResumeResult
+            {
+                ResumeHTML = htmlDoc.DocumentNode.OuterHtml,
+                ResumeId = resumeId,
+                ResumeSuggestions = resumeSuggestions.Select(x => new ResumeSuggestions
+                {
+                    Accepted = x.Accepted,
+                    ResumeChangeId = x.ResumeChangeId,
+                    ExplanationString = x.ExplanationString,
+                    HtmlID = x.HtmlID,
+                    ModifiedText = x.ModifiedText,
+                    OriginalText = x.OriginalText
+                }).ToList()
+            };
         }
     }
 }

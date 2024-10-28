@@ -9,15 +9,11 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Web;
-using System.Collections;
-using System.Text;
 
 namespace ResumeRocketQuery.Services
 {
     public class JobService : IJobService
     {
-        private readonly IPdfService _pdfService;
         private readonly IOpenAiClient _openAiClient;
         private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IApplicationDataLayer _applicationDataLayer;
@@ -25,15 +21,13 @@ namespace ResumeRocketQuery.Services
         private readonly IResumeService _resumeService;
         private readonly ILanguageService _languageService;
 
-        public JobService(IPdfService pdfService, 
-            IOpenAiClient openAiClient, 
+        public JobService(IOpenAiClient openAiClient, 
             ILanguageService languageService,
             IResumeDataLayer resumeDataLayer,
             IApplicationDataLayer applicationDataLayer,
             IPdfToHtmlClient pdfToHtmlClient,
             IResumeService resumeService)
         {
-            _pdfService = pdfService;
             _openAiClient = openAiClient;
             _languageService = languageService;
             _resumeDataLayer = resumeDataLayer;
@@ -46,22 +40,14 @@ namespace ResumeRocketQuery.Services
         {
             //Take the HTML from the Posting, Pass
             var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
-
             var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
-
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
-
             string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
 
-            var newHtml = "";
-            try
-            {
-                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
-
-                newHtml = jsonResult.html;
+            try {
+                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Debug.WriteLine("Error parsing returned JSON", e);
                 throw;
             }
@@ -75,15 +61,6 @@ namespace ResumeRocketQuery.Services
                 Version = 1
             });
 
-            var newResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
-            {
-                AccountId = applicationRequest.AccountId,
-                Resume = newHtml,
-                OriginalResumeID = originalResumeId,
-                OriginalResume = false,
-                Version = 1
-            });
-
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
             {
                 JobPostingUrl = applicationRequest.JobUrl,
@@ -92,13 +69,11 @@ namespace ResumeRocketQuery.Services
                 CompanyName = jobResult.CompanyName,
                 Position = jobResult.Title,
                 Status = "Pending",
-                ResumeId = newResumeId
+                ResumeId = originalResumeId
             });
 
             return result;
         }
-
-
 
         public async Task<int> CreateJobResumeAsync(Job job)
         {
@@ -111,6 +86,7 @@ namespace ResumeRocketQuery.Services
             // Take the Text of the Resume
             var htmlStream = await _pdfToHtmlClient.ConvertPdf(pdf);
             var originalHtml = "";
+
             //Store this as part of the ResumeContent dictionary.
             using (StreamReader reader = new StreamReader(htmlStream))
             {
@@ -118,15 +94,13 @@ namespace ResumeRocketQuery.Services
             }
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
-
             string response = await _openAiClient.SendMessageAsync(prompt, originalHtml);
             var recommendations = new List<Change>();
-            var newHtml = "";
+            
             try
             {
-                var jsonResult = JsonConvert.DeserializeObject<Updates>(response);
-                newHtml = jsonResult.html;
-                recommendations = jsonResult.changes;
+                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
+                recommendations = jsonResult;
             }
             catch (Exception e) {
                 Debug.WriteLine("Error parsing returned JSON", e);
@@ -144,18 +118,9 @@ namespace ResumeRocketQuery.Services
                 UpdateDate = DateTime.Today
             });
 
-            var newResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
-            {
-                AccountId = job.AccountId,
-                Resume = newHtml,
-                OriginalResumeID = originalResumeId,
-                OriginalResume = false,
-                Version = 1,
-                InsertDate = DateTime.Today,
-                UpdateDate = DateTime.Today
-            });
 
-            // job.Resume.Add("Recommendations", recommendations.ToString());
+
+
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
@@ -167,9 +132,8 @@ namespace ResumeRocketQuery.Services
                 CompanyName = regex,
                 Position = jobResult.Title,
                 Status = "Pending",
-                ResumeId = newResumeId
+                ResumeId = originalResumeId
             });
-
             return result;
         }
 
@@ -185,24 +149,20 @@ namespace ResumeRocketQuery.Services
 
                     {string.Join(", ", keywords)}
 
-                    produce 5 suggestiobs for changes that should be made to the resume, and apply them to the resume.
+                    produce 5 suggestions for changes that should be made to the resume.
 
                     These updates should not falsify any information, meaning no additional skills, education, or work experience 
-                    should be added you are only allowed to reword items on the resume to better match the job posting.
+                    should be added you are only allowed to reword items on the resume that are synonyms for items in the job posting
+                     to better match the job posting.
 
-                    Your output should be plain text JSON (no markdown code block syntax) with 3 keys. 
+                    Your output should be plain text JSON (no markdown code block syntax).
 
-                    The first key is 'html' which has a string value. This string contains all of the HTML to be used to construct 
-                    a new resume using the suggested changes. The name of the stylesheet in the link to the css style sheet is style.css.
+                    The returned JSON will be an array with five JSON objects corresponding to the suggestions, each item will have the following 
+                    JSON array item structure: a key of ""original"" with string value that is the exact (word for word) original content that is on
+                    the resume, a key for ""modified"" with string value of the suggested change to the ""original"" text, and a key for ""explanation"" 
+                    with a short 2-3 sentence string value specifying why the change was suggested.
 
-                    The second key is 'css' which has a string value containing the CSS to format the HTML from the second key.
-
-                    The last key is 'changes' which will have a value of a JSON array with fives items corresponding to the suggestions key, 
-                    each item will have the following JSON array item structure: a key for ""section"" with string value specifying the section
-                    the original resume that is being addressed, a key of ""original"" with string value that is the original content that was on
-                    the resume, and a key for ""modified"" with string value of the suggested change to the ""original"" text.
-
-                    {{$input}}";
+                    {{{{$input}}}}";
 
             return prompt;
         }

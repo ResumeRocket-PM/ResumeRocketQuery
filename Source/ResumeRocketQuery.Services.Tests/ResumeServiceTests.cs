@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Collections.Generic;
 using Sprache;
+using Microsoft.Identity.Client;
+using ResumeRocketQuery.Domain.DataLayer;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -14,6 +16,7 @@ namespace ResumeRocketQuery.Services.Tests
     {
         private readonly IResumeService _systemUnderTest;
         private readonly IAccountService _accountService;
+        private readonly IResumeDataLayer _resumeDataLayer;
 
         public ResumeServiceTests()
         {
@@ -21,6 +24,7 @@ namespace ResumeRocketQuery.Services.Tests
 
             _systemUnderTest = serviceProvider.GetService<IResumeService>();
             _accountService = serviceProvider.GetService<IAccountService>();
+            _resumeDataLayer = serviceProvider.GetService<IResumeDataLayer>();
         }
 
         public class CreatePrimaryResume : ResumeServiceTests
@@ -169,6 +173,118 @@ namespace ResumeRocketQuery.Services.Tests
                 Assert.True(result.ResumeId > 0);
 
                 Assert.NotNull(result.Html);
+            }
+        }
+
+        public class ApplyResumeSuggestion : ResumeServiceTests
+        {
+            [Fact]
+            public async Task WHEN_ApplyResumeSuggestion_is_called_THEN_resuume_storage_updated_correctly()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var suggestedChangeId = Guid.NewGuid().ToString();
+
+                var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+                {
+                    AccountId = account.AccountId,
+                    Resume = $"<div id=\"{ suggestedChangeId}\">Sample Resume Text</div>",
+                    InsertDate = DateTime.Today,
+                    UpdateDate = DateTime.Today
+                });
+
+                var resumeChangeId = await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ResumeId = resumeId,
+                    Accepted = false,
+                    ExplanationString = "Because it sounds nicer",
+                    HtmlID = suggestedChangeId,
+                    ModifiedText = "Sample Resume Text",
+                    OriginalText = "Professional Job Engineer",
+                });
+
+                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId);
+
+
+                var expected = new List<ResumeChangesStorage>
+                {
+                    new ResumeChangesStorage
+                    {
+                        ResumeChangeId = resumeChangeId,
+                        ResumeId = resumeId,
+                        Accepted = true,
+                        ExplanationString = "Because it sounds nicer",
+                        HtmlID = suggestedChangeId,
+                        ModifiedText = "Sample Resume Text",
+                        OriginalText = "Professional Job Engineer",
+                    }
+                };
+
+                var actual = await _resumeDataLayer.SelectResumeChangesAsync(resumeId);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
+            }
+        }
+
+        public class GetPerfectResume : ResumeServiceTests
+        {
+            [Fact]
+            public async Task GIVEN_change_applied_WHEN_GetPerfectResume_is_called_THEN_resuume_storage_updated_correctly()
+            {
+                var account = await _accountService.CreateAccountAsync(new CreateAccountRequest
+                {
+                    EmailAddress = $"{Guid.NewGuid().ToString()}@gmail.com",
+                    Password = Guid.NewGuid().ToString()
+                });
+
+                var suggestedChangeId = Guid.NewGuid().ToString();
+
+                var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+                {
+                    AccountId = account.AccountId,
+                    Resume = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
+                    InsertDate = DateTime.Today,
+                    UpdateDate = DateTime.Today
+                });
+
+                var resumeChangeId = await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ResumeId = resumeId,
+                    Accepted = false,
+                    ExplanationString = "Because it sounds nicer",
+                    HtmlID = suggestedChangeId,
+                    ModifiedText = "Professional Job Engineer",
+                    OriginalText = "Sample Resume Text",
+                });
+
+                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId);
+
+
+                var expected = new GetResumeResult
+                {
+                    ResumeHTML = $"<div id=\"{suggestedChangeId}\">Professional Job Engineer</div>",
+                    ResumeId = resumeId,
+                    ResumeSuggestions = new List<ResumeSuggestions>()
+                    {
+                        new ResumeSuggestions
+                        {
+                            ResumeChangeId = resumeChangeId,
+                            Accepted = true,
+                            ExplanationString = "Because it sounds nicer",
+                            HtmlID = suggestedChangeId,
+                            ModifiedText = "Professional Job Engineer",
+                            OriginalText = "Sample Resume Text",
+                        }
+                    }
+                };
+
+                var actual = await _systemUnderTest.GetPerfectResume(resumeId);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
             }
         }
 

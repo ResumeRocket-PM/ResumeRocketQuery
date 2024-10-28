@@ -1,5 +1,6 @@
 ﻿using ExpectedObjects;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client;
 using ResumeRocketQuery.DataLayer;
 using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.DataLayer;
@@ -247,6 +248,189 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             var actual = await systemUnderTest.GetResumeAsync(expected.ResumeId);
 
             expected.ToExpectedObject().ShouldMatch(actual);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_InsertResumeChangeAsync_is_called_THEN_resume_change_is_stored(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
+            });
+
+            var resumeChange = new ResumeChangesStorage
+            {
+                ResumeId = resumeId,
+                OriginalText = "Original text",
+                ModifiedText = "Modified text",
+                ExplanationString = "Explanation",
+                Accepted = false,
+                HtmlID = "<div>this is test html</div>"
+            };
+
+            await systemUnderTest.InsertResumeChangeAsync(resumeChange);
+
+            var storedChanges = await systemUnderTest.SelectResumeChangesAsync(resumeChange.ResumeId);
+
+            Assert.Contains(storedChanges, change =>
+                change.OriginalText == resumeChange.OriginalText &&
+                change.ModifiedText == resumeChange.ModifiedText &&
+                change.ExplanationString == resumeChange.ExplanationString &&
+                change.Accepted == resumeChange.Accepted &&
+                change.HtmlID == resumeChange.HtmlID
+            );
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_InsertResumeChangeAsync_is_called_THEN_id_is_correct(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
+            });
+
+            var resumeChange = new ResumeChangesStorage
+            {
+                ResumeId = resumeId,
+                OriginalText = "Original text",
+                ModifiedText = "Modified text",
+                ExplanationString = "Explanation",
+                Accepted = false,
+                HtmlID = "<div>this is test html</div>"
+            };
+
+            var actual = await systemUnderTest.InsertResumeChangeAsync(resumeChange);
+
+            Assert.True(actual > 0);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_SelectResumeChangesAsync_is_called_THEN_resume_changes_are_retrieved(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
+            });
+
+            var resumeChange = new ResumeChangesStorage
+            {
+                ResumeId = resumeId,
+                OriginalText = "Original text for selection",
+                ModifiedText = "Modified text for selection",
+                ExplanationString = "Explanation for selection",
+                Accepted = false,
+                HtmlID = "htmlSelect123"
+            };
+            await systemUnderTest.InsertResumeChangeAsync(resumeChange);
+
+            var changes = await systemUnderTest.SelectResumeChangesAsync(resumeId);
+
+            Assert.NotEmpty(changes);
+            Assert.Contains(changes, change => change.HtmlID == "htmlSelect123");
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_UpdateResumeChangeAsync_is_called_THEN_resume_change_is_updated(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
+            });
+
+            var resumeChange = new ResumeChangesStorage
+            {
+                ResumeId = resumeId,
+                OriginalText = "Text before update",
+                ModifiedText = "Text after update",
+                ExplanationString = "Update explanation",
+                Accepted = false,
+                HtmlID = "htmlUpdate123"
+            };
+
+            await systemUnderTest.InsertResumeChangeAsync(resumeChange);
+
+            var storedChanges = await systemUnderTest.SelectResumeChangesAsync(resumeChange.ResumeId);
+
+            var changeToUpdate = storedChanges.FirstOrDefault(change => change.HtmlID == resumeChange.HtmlID);
+
+            changeToUpdate.Accepted = true;
+
+            await systemUnderTest.UpdateResumeChangeAsync(changeToUpdate);
+
+            var updatedChanges = await systemUnderTest.SelectResumeChangesAsync(changeToUpdate.ResumeId);
+
+            Assert.Contains(updatedChanges, change =>
+                change.HtmlID == changeToUpdate.HtmlID &&
+                change.Accepted == true
+            );
         }
     }
 

@@ -12,5 +12,8 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<List<ResumeStorage>> GetResumesAsync(int accountId);
         Task<ResumeStorage> GetResumeAsync(int resumeId);
         Task<List<ResumeStorage>> GetResumeHistoryAsync(int originalResumeId);
+        Task<List<ResumeChangesStorage>> SelectResumeChangesAsync(int resumeId);
+        Task<int> InsertResumeChangeAsync(ResumeChangesStorage resumeChangesStorage);
+        Task UpdateResumeChangeAsync(ResumeChangesStorage resumeChangesStorage);
     }
 }
