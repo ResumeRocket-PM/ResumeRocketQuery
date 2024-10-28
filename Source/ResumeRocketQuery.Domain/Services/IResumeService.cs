@@ -17,7 +17,7 @@ namespace ResumeRocketQuery.Domain.Services
         Task<List<ResumeStorage>> GetResumeHistory(int originalResumeId);
         Task<bool> UpdateResume(ResumeStorage resume);
         Task<List<ResumeStorage>> GetAccountResumes(int accountId);
-        Task ApplyResumeSuggestion(int resumeChangeId);
         Task<GetResumeResult> GetPerfectResume(int resumeId);
+        Task ApplyResumeSuggestion(int resumeChangeId, bool accepted);
     }
 }

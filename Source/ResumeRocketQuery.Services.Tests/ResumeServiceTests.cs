@@ -207,7 +207,7 @@ namespace ResumeRocketQuery.Services.Tests
                     OriginalText = "Professional Job Engineer",
                 });
 
-                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId);
+                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId, true);
 
 
                 var expected = new List<ResumeChangesStorage>
@@ -261,7 +261,7 @@ namespace ResumeRocketQuery.Services.Tests
                     OriginalText = "Sample Resume Text",
                 });
 
-                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId);
+                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId, true);
 
 
                 var expected = new GetResumeResult

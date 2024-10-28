@@ -353,11 +353,11 @@ namespace ResumeRocketQuery.Services
         }
 
 
-        public async Task ApplyResumeSuggestion(int resumeChangeId)
+        public async Task ApplyResumeSuggestion(int resumeChangeId, bool accepted)
         {
             await _resumeDataLayer.UpdateResumeChangeAsync(new ResumeChangesStorage
             {
-                Accepted = true,
+                Accepted = accepted,
                 ResumeChangeId = resumeChangeId
             });
         }
