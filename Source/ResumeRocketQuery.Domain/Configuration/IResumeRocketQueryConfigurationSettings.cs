@@ -6,5 +6,6 @@ namespace ResumeRocketQuery.Domain.Configuration
         string ResumeRocketQueryDatabaseConnectionString { get; }
         string BlobStorageConnectionString { get; }
         string BlobStorageContainerName { get; }
+        string Pdf2HtmlUrl { get; }
     }
 }

@@ -1,23 +1,25 @@
-stages:
-  - docker
+default:
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+      command: ["--privileged"]
 
 variables:
   IMAGE_TAG: $CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
-  DOCKER_HOST: tcp://docker:2375 
+  DOCKER_TLS_CERTDIR: ""
+  SERVICE_PORT_2376_TCP_PORT: 2375
 
-services:
-  - name: docker:dind
-    command: ["--host=tcp://0.0.0.0:2375"] 
+build:
+  stage: build
+  before_script:
+    - docker info
+    - printenv
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin 
 
-image: docker:latest
-
-before_script:
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-
-docker-build:
-  stage: docker
   script:
-    - docker build -f ./Source/Dockerfile -t $IMAGE_TAG .
+    - docker build -f ./Source/Dockerfile -t $IMAGE_TAG ./Source
     - docker push $IMAGE_TAG
+  
   only:
-    - main
+    - deployment

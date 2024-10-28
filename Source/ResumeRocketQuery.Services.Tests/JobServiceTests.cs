@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 namespace ResumeRocketQuery.Services.Tests
 {
+    [Collection("External")]
     public class JobServiceTests
     {
         private readonly IJobService _systemUnderTest;

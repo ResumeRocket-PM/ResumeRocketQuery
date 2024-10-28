@@ -15,6 +15,7 @@ using Xunit;
 
 namespace ResumeRocketQuery.Api.Tests
 {
+    [Collection("External")]
     public class ExternalControllerTests
     {
         private readonly RestRequestClient _restRequestClient;

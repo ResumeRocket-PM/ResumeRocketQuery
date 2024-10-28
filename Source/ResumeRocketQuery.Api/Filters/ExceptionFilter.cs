@@ -3,15 +3,24 @@ using ResumeRocketQuery.Domain.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging; // Import this namespace
 using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.Api.Filters
 {
     public class ExceptionFilter : IAsyncExceptionFilter
     {
+        private readonly ILogger<ExceptionFilter> _logger; // Declare a logger
+
+        // Constructor to inject the logger
+        public ExceptionFilter(ILogger<ExceptionFilter> logger)
+        {
+            _logger = logger;
+        }
+
         public async Task OnExceptionAsync(ExceptionContext context)
         {
+            _logger.LogError(context.Exception, "{Message}", context.Exception.Message);
 
             var response = new ServiceResponseGeneric<object>
             {
@@ -20,31 +29,25 @@ namespace ResumeRocketQuery.Api.Filters
                 {
                     // Default response
                     HttpStatusCode = 500,
-                    Exception = context.Exception.Message // Don't expose this in production
+                    Exception = context.Exception.Message 
                 },
                 Succeeded = false
             };
 
             if (context.Exception is Domain.Services.ValidationException validationException)
             {
-                // Handle ValidationException separately
-                response.ResponseMetadata.HttpStatusCode = 400; // Bad Request
+                response.ResponseMetadata.HttpStatusCode = 400; 
                 response.ResponseMetadata.Exception = "One or more validation errors occurred.";
             }
 
-            // Serialize the response object to JSON
             var jsonObject = JsonConvert.SerializeObject(response);
 
-            // Set the response status code and content type
             context.HttpContext.Response.StatusCode = response.ResponseMetadata.HttpStatusCode;
             context.HttpContext.Response.ContentType = "application/json";
 
-            // Write the serialized JSON to the response body
             await context.HttpContext.Response.WriteAsync(jsonObject);
 
-            // Mark the exception as handled
             context.ExceptionHandled = true;
         }
     }
 }
-

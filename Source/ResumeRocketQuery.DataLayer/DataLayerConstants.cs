@@ -222,6 +222,46 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT COUNT(1)
                     FROM Resumes
                     WHERE OriginalResume = 1 AND AccountId = @AccountId;";
+
+
+                public const string SelectResumeChanges = @"
+                    SELECT 
+                        ResumeChangeId,
+                        ResumeId,
+                        OriginalText,
+                        ModifiedText,
+                        ExplanationString,
+                        Accepted,
+                        HtmlID
+                    FROM 
+                        ResumeChange
+                    WHERE 
+                        ResumeId = @ResumeId;";
+
+                public const string InsertResumeChanges = @"
+                    INSERT INTO ResumeChange (
+                        ResumeId, 
+                        OriginalText, 
+                        ModifiedText, 
+                        ExplanationString, 
+                        Accepted, 
+                        HtmlID
+                    ) VALUES (
+                        @ResumeId, 
+                        @OriginalText, 
+                        @ModifiedText, 
+                        @ExplanationString, 
+                        @Accepted, 
+                        @HtmlID
+                    );
+                    SELECT SCOPE_IDENTITY();
+                    ";
+
+                public const string UpdateResumeChanges = @"
+                    UPDATE ResumeChange
+                    SET Accepted = @Accepted
+                    WHERE ResumeChangeId = @ResumeChangeId;
+                ";
             }
 
             public class Experience

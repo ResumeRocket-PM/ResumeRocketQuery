@@ -13,6 +13,8 @@ using Xunit;
 using ResumeRocketQuery.Domain.Api;
 using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.DataLayer;
+using ResumeRocketQuery.Services;
 
 namespace ResumeRocketQuery.Api.Tests
 {
@@ -24,6 +26,148 @@ namespace ResumeRocketQuery.Api.Tests
         {
             _restRequestClient = new RestRequestClient();
         }
+
+
+        public class ApplyResumeChanges : ResumeControllerTests
+        {
+            [Fact]
+            public async Task GIVEN_resume_change_id_WHEN_ApplyResumeSuggestion_is_called_THEN_suggestion_is_applied_successfully()
+            {
+                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                {
+                    var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
+
+                    var email = $"{Guid.NewGuid().ToString()}@testemail.com";
+                    var password = "testPassword1";
+
+                    var createAccountResponse = await accountService.CreateAccountAsync(new CreateAccountRequest
+                    {
+                        EmailAddress = email,
+                        Password = password
+                    });
+
+                    var resumeDataLayer = selfHost.ServiceProvider.GetService<IResumeDataLayer>();
+
+                    var suggestedChangeId = Guid.NewGuid().ToString();
+
+
+                    var resumeId = await resumeDataLayer.InsertResumeAsync(new ResumeStorage
+                    {
+                        AccountId = createAccountResponse.AccountId,
+                        Resume = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
+                        InsertDate = DateTime.Today,
+                        UpdateDate = DateTime.Today,
+                    });
+
+                    var resumeChangeId = await resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                    {
+                        ResumeId = resumeId,
+                        Accepted = false,
+                        ExplanationString = "Because it sounds nicer",
+                        HtmlID = suggestedChangeId,
+                        ModifiedText = "Professional Job Engineer",
+                        OriginalText = "Sample Resume Text",
+                    });
+
+                    var headers = new Dictionary<string, string>
+                    {
+                        {"Authorization", $"Bearer {createAccountResponse.JsonWebToken}"}
+                    };
+
+                    var expected = new
+                    {
+                        Succeeded = true,
+                        ResponseMetadata = new
+                        {
+                            HttpStatusCode = 200
+                        }
+                    };
+
+                    var actual = await _restRequestClient.SendRequest<object>($"{selfHost.Url}/api/resume/{resumeId}/suggestions/{resumeChangeId}", HttpMethod.Put, null, headers);
+
+                    expected.ToExpectedObject().ShouldMatch(actual);
+                }
+            }
+        }
+
+        public class GetPerfectResume : ResumeControllerTests
+        {
+            [Fact]
+            public async Task GIVEN_resume_change_id_WHEN_ApplyResumeSuggestion_is_called_THEN_suggestion_is_applied_successfully()
+            {
+                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                {
+                    var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
+
+                    var email = $"{Guid.NewGuid().ToString()}@testemail.com";
+                    var password = "testPassword1";
+
+                    var createAccountResponse = await accountService.CreateAccountAsync(new CreateAccountRequest
+                    {
+                        EmailAddress = email,
+                        Password = password
+                    });
+
+                    var resumeDataLayer = selfHost.ServiceProvider.GetService<IResumeDataLayer>();
+
+                    var suggestedChangeId = Guid.NewGuid().ToString();
+
+                    var resumeId = await resumeDataLayer.InsertResumeAsync(new ResumeStorage
+                    {
+                        AccountId = createAccountResponse.AccountId,
+                        Resume = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
+                        InsertDate = DateTime.Today,
+                        UpdateDate = DateTime.Today,
+                    });
+
+                    var resumeChangeId = await resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                    {
+                        ResumeId = resumeId,
+                        Accepted = true,
+                        ExplanationString = "Because it sounds nicer",
+                        HtmlID = suggestedChangeId,
+                        ModifiedText = "Professional Job Engineer",
+                        OriginalText = "Sample Resume Text",
+                    });
+
+                    var headers = new Dictionary<string, string>
+                    {
+                        {"Authorization", $"Bearer {createAccountResponse.JsonWebToken}"}
+                    };
+
+                    var expected = new
+                    {
+                        Succeeded = true,
+                        ResponseMetadata = new
+                        {
+                            HttpStatusCode = 200
+                        },
+                        Result = new
+                        {
+                            ResumeHTML = $"<div id=\"{suggestedChangeId}\">Professional Job Engineer</div>",
+                            ResumeId = resumeId,
+                            ResumeSuggestions = new[]
+                            {
+                                new
+                                {
+                                    ResumeChangeId = resumeChangeId,
+                                    Accepted = true,
+                                    ExplanationString = "Because it sounds nicer",
+                                    HtmlID = suggestedChangeId,
+                                    ModifiedText = "Professional Job Engineer",
+                                    OriginalText = "Sample Resume Text",
+                                }
+                            }
+                        }
+                    };
+
+                    var actual = await _restRequestClient.SendRequest<GetResumeResult>($"{selfHost.Url}/api/resume/{resumeId}/suggestions", HttpMethod.Get, null, headers);
+
+                    expected.ToExpectedObject().ShouldMatch(actual);
+                }
+            }
+        }
+
 
         public class Get : ResumeControllerTests
         {
