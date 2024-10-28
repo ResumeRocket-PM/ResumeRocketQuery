@@ -24,28 +24,36 @@ namespace ResumeRocketQuery.External
             _containerName = resumeRocketQueryConfigurationSettings.BlobStorageContainerName;
         }
 
-        public async Task<string> UploadImageAsync(IFormFile file)
+        public async Task<(string, string)> UploadOrOverwriteImageAsync(IFormFile file, string imageId = null)
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
 
-            var blobClient = containerClient.GetBlobClient(file.FileName);
+            // Generate a unique ID for the image if not provided
+            var newImageId = imageId ?? Guid.NewGuid().ToString();
+
+            var blobFileName = newImageId;
+            var blobClient = containerClient.GetBlobClient(blobFileName);
+
             try
             {
                 using (var stream = file.OpenReadStream())
                 {
-                    await blobClient.UploadAsync(stream);
+                    await blobClient.UploadAsync(stream, overwrite: true);
                 }
             }
             catch (Exception ex)
             {
-                // Log or throw a specific error message
                 Console.WriteLine($"Error uploading file to Blob Storage: {ex.Message}");
                 throw new Exception("File upload to Blob Storage failed.", ex);
             }
 
-            // Return the URL of the uploaded image
-            return blobClient.Uri.ToString();
+            return (blobClient.Uri.ToString(), newImageId);
         }
+
+
+
+
+
 
         public string GenerateReadOnlySasToken()
         {

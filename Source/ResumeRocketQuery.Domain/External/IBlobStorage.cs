@@ -9,7 +9,7 @@ namespace ResumeRocketQuery.Domain.External
 {
     public interface IBlobStorage
     {
-        Task<string> UploadImageAsync(IFormFile file);
+        Task<(string, string)> UploadOrOverwriteImageAsync(IFormFile file, string imageId = null);
 
         string GenerateReadOnlySasToken();
     }
