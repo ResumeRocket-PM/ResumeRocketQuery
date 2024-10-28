@@ -254,6 +254,7 @@ namespace ResumeRocketQuery.DataLayer
                         @Accepted, 
                         @HtmlID
                     );
+                    SELECT SCOPE_IDENTITY();
                     ";
 
                 public const string UpdateResumeChanges = @"

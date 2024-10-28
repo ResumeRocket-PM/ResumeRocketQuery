@@ -6,22 +6,10 @@ using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.External
 {
-    public class Change()
+    public class Change
     {
-        public string explanation
-        {
-            get;
-            set;
-        }
-        public string original
-        {
-            get;
-            set;
-        }
-        public string modified
-        {
-            get;
-            set;
-        }
+        public string explanation { get; set;}
+        public string original { get; set; }
+        public string modified { get; set;}
     }
 }

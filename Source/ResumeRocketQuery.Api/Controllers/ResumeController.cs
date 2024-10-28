@@ -50,6 +50,26 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
+
+        [HttpGet]
+        [Route("{resumeId}/suggestions")]
+        public async Task<ServiceResponseGeneric<GetResumeResult>> GetPerfectResume([FromRoute] int resumeId)
+        {
+            var result = await _resumeService.GetPerfectResume(resumeId);
+
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpPut]
+        [Route("{resumeId}/suggestions/{resumeChangeId}")]
+        public async Task<ServiceResponse> ApplyResumeSuggestion([FromRoute] int resumeChangeId)
+        {
+            await _resumeService.ApplyResumeSuggestion(resumeChangeId);
+
+            return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
+        }
+
+
         /// <summary>
         ///     Retrieves the version history of a Resume
         /// </summary>

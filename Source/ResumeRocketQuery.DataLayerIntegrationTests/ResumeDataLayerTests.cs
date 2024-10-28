@@ -300,6 +300,46 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
         [Theory]
         [InlineData(typeof(ResumeDataLayer))]
+        public async Task WHEN_InsertResumeChangeAsync_is_called_THEN_id_is_correct(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+            var resumeId = await systemUnderTest.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = accountId,
+                Resume = "Sample Resume Text",
+                InsertDate = DateTime.Today,
+                UpdateDate = DateTime.Today
+            });
+
+            var resumeChange = new ResumeChangesStorage
+            {
+                ResumeId = resumeId,
+                OriginalText = "Original text",
+                ModifiedText = "Modified text",
+                ExplanationString = "Explanation",
+                Accepted = false,
+                HtmlID = "<div>this is test html</div>"
+            };
+
+            var actual = await systemUnderTest.InsertResumeChangeAsync(resumeChange);
+
+            Assert.True(actual > 0);
+        }
+
+        [Theory]
+        [InlineData(typeof(ResumeDataLayer))]
         public async Task WHEN_SelectResumeChangesAsync_is_called_THEN_resume_changes_are_retrieved(Type storageType)
         {
             var systemUnderTest = GetSystemUnderTest(storageType);

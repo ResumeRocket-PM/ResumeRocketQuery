@@ -118,6 +118,10 @@ namespace ResumeRocketQuery.Services
                 UpdateDate = DateTime.Today
             });
 
+
+
+
+
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage

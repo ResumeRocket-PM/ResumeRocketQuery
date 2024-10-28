@@ -133,11 +133,11 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        public async Task InsertResumeChangeAsync(ResumeChangesStorage resumeChangesStorage)
+        public async Task<int> InsertResumeChangeAsync(ResumeChangesStorage resumeChangesStorage)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                await connection.ExecuteAsync(
+                return await connection.ExecuteScalarAsync<int>(
                     DataLayerConstants.StoredProcedures.Resume.InsertResumeChanges,
                     new
                     {
