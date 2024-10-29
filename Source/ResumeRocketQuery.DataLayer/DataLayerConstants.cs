@@ -354,6 +354,65 @@ namespace ResumeRocketQuery.DataLayer
 
 
             }
+
+            public class Chat
+            {
+                public const string findAllFriendsAccount1 = @"
+                SELECT *
+                FROM Friendship
+                WHERE AccountId1 = @accountId AND Status = @status
+                ";
+
+                public const string findAllFriendsAccount2 = @"
+                SELECT *
+                FROM Friendship
+                WHERE AccountId2 = @accountId AND Status = @status
+                ";
+
+                /// <summary>
+                /// to prevent the duplicate of AccountId1 and AccountId2 pairs
+                /// this will make sure that the lower value of AccountId would be AccountId1
+                /// for the added pairs
+                /// 
+                /// So that the database would not able to add the pairs duplicate even thoug
+                /// the AccountId1 and AccountId2 are in different order
+                /// </summary>
+                public const string AddNewFriends = @"
+                DECLARE @accountId1 INT = @inputId1;
+                DECLARE @accountId2 INT = @inputId2;
+
+                IF @accountId1 > @accountId2
+                BEGIN
+                    DECLARE @Temp INT = @accountId1;
+                    SET @accountId1 = @accountId2;
+                    SET @accountId2 = @Temp;
+                END                
+                
+                INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
+                VALUES (@accountId1, @accountId2, @status, CURRENT_TIMESTAMP);
+                SELECT SCOPE_IDENTITY();";
+                
+                public const string UpdateFriendStatus = @"
+                UPDATE Friendship
+                SET Status = @status, CreatedTime = CURRENT_TIMESTAMP
+                OUTPUT INSERTED.*                
+                WHERE (FriendsId = @friendsId);";
+                
+                public const string DeleteFriend = @"
+                DECLARE @accountId1 INT = @inputAccountId1;
+                DECLARE @accountId2 INT = @inputAccountId2;
+
+                IF @accountId1 > @accountId2
+                BEGIN
+                    DECLARE @Temp INT = @accountId1;
+                    SET @accountId1 = @accountId2;
+                    SET @accountId2 = @Temp;
+                END                
+                
+                DELETE FROM Friendship
+                WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
+
+            }
         }
     }
 }

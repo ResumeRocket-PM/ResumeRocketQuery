@@ -45,7 +45,8 @@ namespace ResumeRocketQuery.Api.Controllers
                 {
                     uNameList.Add(u.UniversityName);
                 }
-                return _serviceResponseBuilder.BuildServiceResponse(uNameList, HttpStatusCode.OK);
+                var response = _serviceResponseBuilder.BuildServiceResponse(uNameList, HttpStatusCode.OK);
+                return response;
             }
             return _serviceResponseBuilder.BuildServiceResponse<List<string>>(null, HttpStatusCode.NotFound);
 
