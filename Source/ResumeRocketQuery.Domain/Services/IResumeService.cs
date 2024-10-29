@@ -13,8 +13,11 @@ namespace ResumeRocketQuery.Domain.Services
         Task<byte[]> GetPrimaryResumePdf(int accountId);
         Task<string> GetResume(int resumeId);
         Task<byte[]> GetResumePdf(int resumeId);
-        Task<List<ResumeResult>> GetResumeHistory(int originalResumeId);
+        Task<byte[]> GetResumePdfFromHtml(string html);
+        Task<List<ResumeStorage>> GetResumeHistory(int originalResumeId);
         Task<bool> UpdateResume(ResumeStorage resume);
-        Task<List<ResumeResult>> GetAccountResumes(int accountId);
+        Task<List<ResumeStorage>> GetAccountResumes(int accountId);
+        Task ApplyResumeSuggestion(int resumeChangeId);
+        Task<GetResumeResult> GetPerfectResume(int resumeId);
     }
 }

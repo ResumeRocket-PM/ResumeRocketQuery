@@ -1,14 +1,10 @@
 ﻿using ResumeRocketQuery.Domain.External;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.ChatCompletion;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 namespace ResumeRocketQuery.External
 {
@@ -23,8 +19,8 @@ namespace ResumeRocketQuery.External
         public async Task<string> SendMessageAsync(string prompt, string message)
         {
             var builder = Kernel.CreateBuilder();
-            //var models = new List<string>{"gpt-4o", "gpt-4-turbo", "o1-preview", "gpt-4", "gpt-4o-mini", "gpt-3.5-turbo" };
-            var models = new List<string>{ "gpt-4o-mini" };
+            var models = new List<string>{"gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-4o-mini", "gpt-3.5-turbo" };
+            //var models = new List<string>{ "gpt-4o-mini" };
             foreach (var model in models)
             {
                 try

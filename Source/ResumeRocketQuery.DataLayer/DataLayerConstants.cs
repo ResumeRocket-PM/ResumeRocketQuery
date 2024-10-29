@@ -183,8 +183,8 @@ namespace ResumeRocketQuery.DataLayer
             public class Resume
             {
                 public const string InsertResume = @"
-                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, Version)
-                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume), @OriginalResume, @OriginalResumeId, @Version);
+                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, Version, InsertDate, UpdateDate)
+                    VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume), @OriginalResume, @OriginalResumeId, @Version, @InsertDate, @UpdateDate);
                     SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateResume = @"
@@ -193,24 +193,75 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResume = @"
-                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResumeByAccount = @"
-                    SELECT ResumeId, AccountId, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 
                 public const string SelectResumeByOriginal = @"
-                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version
+                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
-                    WHERE OgirinalResumeId = @OgirinalResumeId
+                    WHERE OriginalResumeId = @OriginalResumeId
                     ORDER BY Version;";
 
                 public const string DeleteResume = @"
                     DELETE FROM Resumes
                     WHERE ResumeId = @ResumeId;";
+
+                public const string GetNumResumeVersionsByAccount = @"
+                    SELECT COUNT(1)
+                    FROM Resumes
+                    WHERE OriginalResumeId = @OriginalResumeId AND AccountId = @AccountId;";
+
+
+                public const string GetNumOriginalResumesByAccount = @"
+                    SELECT COUNT(1)
+                    FROM Resumes
+                    WHERE OriginalResume = 1 AND AccountId = @AccountId;";
+
+
+                public const string SelectResumeChanges = @"
+                    SELECT 
+                        ResumeChangeId,
+                        ResumeId,
+                        OriginalText,
+                        ModifiedText,
+                        ExplanationString,
+                        Accepted,
+                        HtmlID
+                    FROM 
+                        ResumeChange
+                    WHERE 
+                        ResumeId = @ResumeId;";
+
+                public const string InsertResumeChanges = @"
+                    INSERT INTO ResumeChange (
+                        ResumeId, 
+                        OriginalText, 
+                        ModifiedText, 
+                        ExplanationString, 
+                        Accepted, 
+                        HtmlID
+                    ) VALUES (
+                        @ResumeId, 
+                        @OriginalText, 
+                        @ModifiedText, 
+                        @ExplanationString, 
+                        @Accepted, 
+                        @HtmlID
+                    );
+                    SELECT SCOPE_IDENTITY();
+                    ";
+
+                public const string UpdateResumeChanges = @"
+                    UPDATE ResumeChange
+                    SET Accepted = @Accepted
+                    WHERE ResumeChangeId = @ResumeChangeId;
+                ";
             }
 
             public class Experience
@@ -353,6 +404,30 @@ namespace ResumeRocketQuery.DataLayer
                 ORDER BY MajorName DESC";
 
 
+            }
+
+            // ***** These are not usable yet, do not know if we're doing
+            // an images table, or/and ImageId
+            public class Image
+            {
+                public const string InsertImage = @"
+                    INSERT INTO Images (ImageUrl, FileName)
+                    VALUES (@imageUrl, @fileName);
+                    SELECT SCOPE_IDENTITY();";
+
+                public const string SelectImage = @"
+                    SELECT ImageId, ImageUrl, FileName
+                    FROM Images
+                    WHERE ImageId = @imageId;";
+
+                public const string SelectImageByFileName = @"
+                    SELECT ImageId, ImageUrl, FileName
+                    FROM Images
+                    WHERE FileName = @fileName;";
+
+                public const string DeleteImage = @"
+                    DELETE FROM Images
+                    WHERE ImageId = @imageId;";
             }
 
             public class Chat

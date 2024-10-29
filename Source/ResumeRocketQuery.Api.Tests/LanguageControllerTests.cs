@@ -12,6 +12,7 @@ using Xunit;
 
 namespace ResumeRocketQuery.Api.Tests
 {
+    [Collection("External")]
     public class LanguageControllerTests
     {
         private readonly RestRequestClient _restRequestClient;

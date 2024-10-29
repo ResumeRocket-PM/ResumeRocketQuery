@@ -72,7 +72,6 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-
         public async Task DeleteEducationStorageByAccountAsync(int accountId)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))

@@ -160,7 +160,9 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
                 var resumeId = await resumeService.InsertResumeAsync(new ResumeStorage
                 {
                     AccountId = accountId,
-                    Resume = "Sample Resume Text"
+                    Resume = "Sample Resume Text",
+                    InsertDate = DateTime.Today,
+                    UpdateDate = DateTime.Today
                 });
 
                 var updatedAccount = new AccountStorage
