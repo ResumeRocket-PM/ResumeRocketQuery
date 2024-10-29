@@ -10,20 +10,20 @@ using System.Collections.Generic;
 namespace ResumeRocketQuery.Services.Tests
 {
     [Collection("External")]
-    public class JobServiceTests
+    public class ApplicationServiceTests
     {
-        private readonly IJobService _systemUnderTest;
+        private readonly IApplicationService _systemUnderTest;
         private readonly IAccountService _accountService;
 
-        public JobServiceTests()
+        public ApplicationServiceTests()
         {
             var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
 
-            _systemUnderTest = serviceProvider.GetService<IJobService>();
+            _systemUnderTest = serviceProvider.GetService<IApplicationService>();
             _accountService = serviceProvider.GetService<IAccountService>();
         }
 
-        public class CaptureJobPostingAsync : JobServiceTests
+        public class CaptureApplicationPostingAsync : ApplicationServiceTests
         {
             [Fact]
             public async Task WHEN_CaptureJobPostingAsync_is_called_THEN_resume_is_persisted()
@@ -152,7 +152,7 @@ namespace ResumeRocketQuery.Services.Tests
             }
         }
 
-        public class GetResumes : JobServiceTests
+        public class GetResumes : ApplicationServiceTests
         {
             [Fact]
             public async Task WHEN_CaptureJobPostingAsync_is_called_THEN_resume_is_persisted()

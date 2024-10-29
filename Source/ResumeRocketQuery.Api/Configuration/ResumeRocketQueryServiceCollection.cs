@@ -55,7 +55,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IPortfolioService, PortfolioService>();
             services.AddSingleton<IProfileService, ProfileService>();
             services.AddSingleton<IPdfService, PdfService>();
-            services.AddSingleton<IJobService, JobService>();
+            services.AddSingleton<IApplicationService, ApplicationService>();
             services.AddSingleton<ISearchService, SearchService>();
             services.AddSingleton<IProfileDataLayer, ProfileDataLayer>();
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
