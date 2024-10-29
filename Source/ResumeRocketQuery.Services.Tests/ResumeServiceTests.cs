@@ -6,9 +6,12 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 using Sprache;
 using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.External;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -17,6 +20,8 @@ namespace ResumeRocketQuery.Services.Tests
         private readonly IResumeService _systemUnderTest;
         private readonly IAccountService _accountService;
         private readonly IResumeDataLayer _resumeDataLayer;
+        private readonly IPdfToHtmlClient _pdfToHtmlClient;
+        private readonly IOpenAiClient _openAiClient;
 
         public ResumeServiceTests()
         {
@@ -25,6 +30,9 @@ namespace ResumeRocketQuery.Services.Tests
             _systemUnderTest = serviceProvider.GetService<IResumeService>();
             _accountService = serviceProvider.GetService<IAccountService>();
             _resumeDataLayer = serviceProvider.GetService<IResumeDataLayer>();
+            _pdfToHtmlClient = serviceProvider.GetService<IPdfToHtmlClient>();
+
+            _openAiClient = serviceProvider.GetService<IOpenAiClient>();
         }
 
         public class CreatePrimaryResume : ResumeServiceTests
@@ -230,8 +238,36 @@ namespace ResumeRocketQuery.Services.Tests
             }
         }
 
+
         public class GetPerfectResume : ResumeServiceTests
         {
+            [Theory]
+            [InlineData(1482)]
+            public async Task GIVEN_accountId_WHEN_GetPerfectResume_then_resume_has_modifications_applied(int accountId)
+            {
+                using var memoryStream = new MemoryStream();
+
+                var pdfBytes = File.ReadAllBytes("resume.pdf");
+
+                await memoryStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+
+                memoryStream.Position = 0;
+
+                var resultStream = await _pdfToHtmlClient.ConvertPdf(memoryStream);
+
+                string resumeResult = null;
+
+                using (StreamReader reader = new StreamReader(resultStream))
+                {
+                    resumeResult = reader.ReadToEnd();
+                }
+
+
+
+
+
+            }
+
             [Fact]
             public async Task GIVEN_change_applied_WHEN_GetPerfectResume_is_called_THEN_resuume_storage_updated_correctly()
             {

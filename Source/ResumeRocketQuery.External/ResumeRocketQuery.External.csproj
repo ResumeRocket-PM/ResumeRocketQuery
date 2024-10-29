@@ -16,10 +16,4 @@
 		<ProjectReference Include="..\ResumeRocketQuery.Domain\ResumeRocketQuery.Domain.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Update="resume.pdf">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
 </Project>
