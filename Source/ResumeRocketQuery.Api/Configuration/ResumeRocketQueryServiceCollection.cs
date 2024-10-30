@@ -58,6 +58,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IApplicationService, ApplicationService>();
             services.AddSingleton<ISearchService, SearchService>();
             services.AddSingleton<IProfileDataLayer, ProfileDataLayer>();
+            services.AddSingleton<IChatDateLayer, ChatDataLayer>();
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
 

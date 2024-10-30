@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
 namespace ResumeRocketQuery.Services
 {
     public class ImageService : IImageService
@@ -20,22 +22,38 @@ namespace ResumeRocketQuery.Services
             _blobStorage = blobStorage;
         }
 
-        public async Task<string> UploadImageAsync(IFormFile image)
+        public async Task<(string, string)> UploadImageAsync(IFormFile image, string imageId)
         {
-            // You can add business logic here, like validating the file, checking file size, etc.
             if (image == null || image.Length == 0)
             {
                 throw new ArgumentException("Invalid image file.");
             }
+            if (string.IsNullOrWhiteSpace(imageId))
+            {
+                imageId = null;
+            }
 
-            // Call the BlobStorage class to upload the image and get the URL
-            string imageUrl = await _blobStorage.UploadImageAsync(image);
+            (string _imageUrl, string _imageId) = await _blobStorage.UploadOrOverwriteImageAsync(image, imageId);
 
-            // idk what we want to do with imageUrl or imageId yet. portfolio doesn't need either. 
-            //int imageId = await _imageDataLayer.InsertImageRecordAsync(imageUrl, image.FileName);
-
-            return imageUrl;
+            return (_imageUrl, _imageId);
         }
+
+
+        //public async Task<string> UploadImageAsync(IFormFile image)
+        //{
+        //    if (image == null || image.Length == 0)
+        //    {
+        //        throw new ArgumentException("Invalid image file.");
+        //    }
+
+        //    string imageUrl = await _blobStorage.UploadImageAsync(image);
+
+        //    // idk what we want to do with imageUrl or imageId yet. portfolio doesn't need either. 
+        //    //int imageId = await _imageDataLayer.InsertImageRecordAsync(imageUrl, image.FileName);
+
+        //    return imageUrl;
+        //}
+
 
         public string GenerateReadOnlySasToken()
         {

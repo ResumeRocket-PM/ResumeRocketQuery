@@ -9,7 +9,7 @@ namespace ResumeRocketQuery.Domain.Services
 {
     public interface IImageService
     {
-        Task<string> UploadImageAsync(IFormFile file);
+        Task<(string, string)> UploadImageAsync(IFormFile file, string imageId);
         string GenerateReadOnlySasToken();
     }
 }
