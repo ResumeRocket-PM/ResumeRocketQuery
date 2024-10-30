@@ -47,7 +47,7 @@ namespace ResumeRocketQuery.External
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(html);
 
-            foreach (var tag in new[]{ "style", "link", "script", "img", "head", "meta" })
+            foreach (var tag in new[]{ "style", "link", "script", "img", "head", "meta"  })
             {
                 var nodes = htmlDoc.DocumentNode.Descendants(tag).ToList();
 
@@ -55,6 +55,17 @@ namespace ResumeRocketQuery.External
                 {
                     node.Remove();
                 }
+            }
+
+            var spanNodes = htmlDoc.DocumentNode.Descendants("span").ToList();
+
+            foreach (var spanNode in spanNodes)
+            {
+                foreach (var childNode in spanNode.ChildNodes.ToList())
+                {
+                    spanNode.ParentNode.InsertBefore(childNode, spanNode);
+                }
+                spanNode.Remove();
             }
 
             byte[] byteArray = Encoding.UTF8.GetBytes(htmlDoc.DocumentNode.InnerHtml);

@@ -6,6 +6,8 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Collections.Generic;
+using Moq;
+using ResumeRocketQuery.Domain.External;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -22,6 +24,7 @@ namespace ResumeRocketQuery.Services.Tests
             _systemUnderTest = serviceProvider.GetService<IApplicationService>();
             _accountService = serviceProvider.GetService<IAccountService>();
         }
+
 
         public class CaptureApplicationPostingAsync : ApplicationServiceTests
         {

@@ -8,8 +8,9 @@ namespace ResumeRocketQuery.Domain.External
 {
     public class Change
     {
-        public string explanation { get; set;}
-        public string original { get; set; }
-        public string modified { get; set;}
+        public string OriginalText { get; set;}
+        public string ModifiedText { get; set; }
+        public string Explanation { get; set; }
+        public string DivClass { get; set; }
     }
 }

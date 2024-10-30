@@ -97,20 +97,9 @@ namespace ResumeRocketQuery.Services
             }
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
             string response = await _openAiClient.SendMessageAsync(prompt, originalHtml);
-            var recommendations = new List<Change>();
 
-
-            var changes = ParseResult(response);
-            try
-            {
-                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
-                recommendations = jsonResult;
-            }
-            catch (Exception e) {
-                Debug.WriteLine("Error parsing returned JSON", e);
-                throw;
-            }
 
             var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
@@ -123,9 +112,20 @@ namespace ResumeRocketQuery.Services
                 UpdateDate = DateTime.Today
             });
 
+            var changes = ParseResult(response);
 
-
-
+            foreach (var change in changes)
+            {
+                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ResumeId = originalResumeId,
+                    Accepted = true,
+                    ExplanationString = change.Explanation,
+                    HtmlID = change.DivClass,
+                    ModifiedText = change.ModifiedText,
+                    OriginalText = change.OriginalText,
+                });
+            }
 
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
@@ -154,11 +154,13 @@ namespace ResumeRocketQuery.Services
                     should be added. You are only allowed to reword items on the resume that are synonyms for items in the job posting
                     to better match the job posting. Your suggestions should match the provided Json SSchema.
 
-                     You will fill out the Json schema from the suggested changes 
-
-                    Your response should only be the result json object, and nothing more. 
-
-                    If the fields do not appear in the resume, return a default value in the Json object being returned. 
+                    You will fill out the Json schema from the suggested changes. 
+                    1) Original Text should be the text from the resume that you are suggesting be changed. 
+                    2) Modified should be that suggested change.
+                    3) Explanation should be a reason for the change.
+                    4) DivClass should be the value of the class attribute of the div surrounding the text.
+                    5) Your response should only be the result json object, and nothing more. 
+                    6) If the fields do not appear in the resume, return a default value in the Json object being returned. 
 
                     Job Description:
                     ```
@@ -175,7 +177,7 @@ namespace ResumeRocketQuery.Services
                           ""OriginalText"": {{ ""type"": ""string"" }},
                           ""ModifiedText"": {{ ""type"": ""string"" }},
                           ""Explanation"": {{ ""type"": ""string"" }},
-                          ""HtmlId"": {{ ""type"": ""string"" }}
+                          ""DivClass"": {{ ""type"": ""string"" }}
                         }},
                         ""required"": [""OriginalText"", ""ModifiedText"", ""Explanation"", ""HtmlId""]
                       }}
