@@ -376,11 +376,14 @@ namespace ResumeRocketQuery.Services
 
             foreach (var acceptedSuggestion in acceptedSuggestions)
             {
-                var div = htmlDoc.GetElementbyId(acceptedSuggestion.HtmlID);
+                var elements = htmlDoc.DocumentNode.SelectNodes($"//*[@class='{acceptedSuggestion.HtmlID}']");
 
-                if (div != null)
+                if (elements != null)
                 {
-                    div.InnerHtml = acceptedSuggestion.ModifiedText;
+                    foreach (var element in elements)
+                    {
+                        element.InnerHtml = acceptedSuggestion.ModifiedText;
+                    }
                 }
             }
 

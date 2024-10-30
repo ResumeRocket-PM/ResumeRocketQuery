@@ -12,6 +12,7 @@ using Sprache;
 using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.External;
+using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -21,7 +22,7 @@ namespace ResumeRocketQuery.Services.Tests
         private readonly IAccountService _accountService;
         private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IPdfToHtmlClient _pdfToHtmlClient;
-        private readonly IOpenAiClient _openAiClient;
+        private readonly IApplicationService _applicationService;
 
         public ResumeServiceTests()
         {
@@ -32,7 +33,7 @@ namespace ResumeRocketQuery.Services.Tests
             _resumeDataLayer = serviceProvider.GetService<IResumeDataLayer>();
             _pdfToHtmlClient = serviceProvider.GetService<IPdfToHtmlClient>();
 
-            _openAiClient = serviceProvider.GetService<IOpenAiClient>();
+            _applicationService = serviceProvider.GetService<IApplicationService>();
         }
 
         public class CreatePrimaryResume : ResumeServiceTests
@@ -247,24 +248,47 @@ namespace ResumeRocketQuery.Services.Tests
             {
                 using var memoryStream = new MemoryStream();
 
-                var pdfBytes = File.ReadAllBytes("resume.pdf");
+                var pdfBytes = File.ReadAllBytes("./Samples/Tyler DeBruin Resume.pdf");
 
                 await memoryStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
 
                 memoryStream.Position = 0;
 
-                var resultStream = await _pdfToHtmlClient.ConvertPdf(memoryStream);
+                byte[] byteArray = memoryStream.ToArray();
 
-                string resumeResult = null;
+                string base64String = Convert.ToBase64String(byteArray);
 
-                using (StreamReader reader = new StreamReader(resultStream))
+                var applicationId = await _applicationService.CreateJobResumeAsync(new Job
                 {
-                    resumeResult = reader.ReadToEnd();
-                }
+                    JobUrl = "https://www.metacareers.com/jobs/1145976100026066/",
+                    AccountId = accountId,
+                    Resume = new Dictionary<string, string>
+                        { { "FileBytes", base64String }, { "FileName", "testing.pdf" } },
+                });
 
+                var application = await _applicationService.GetApplication(applicationId);
 
+                var expected = new
+                {
+                    ResumeHTML = Expect.Any<string>(),
+                    ResumeId = Expect.Any<int>(),
+                    ResumeSuggestions = new[]
+                    {
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = "Because it sounds nicer",
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = "Professional Job Engineer",
+                            OriginalText = "Sample Resume Text",
+                        }
+                    }
+                };
 
+                var actual = await _systemUnderTest.GetPerfectResume(application.ResumeContentId.Value);
 
+                expected.ToExpectedObject().ShouldMatch(actual);
 
             }
 

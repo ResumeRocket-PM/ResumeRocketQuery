@@ -41,8 +41,11 @@ namespace ResumeRocketQuery.Services
         {
             //Take the HTML from the Posting, Pass
             var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
+
             var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
+
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
             string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
 
             try {
@@ -89,17 +92,24 @@ namespace ResumeRocketQuery.Services
 
             var cleanedHtmlStream = await _pdfToHtmlClient.StripHtmlElements(htmlStream);
 
-            var originalHtml = "";
-            //Store this as part of the ResumeContent dictionary.
+            string cleanedHtml = null;
             using (StreamReader reader = new StreamReader(cleanedHtmlStream))
             {
-                originalHtml = reader.ReadToEnd();
+                cleanedHtml = reader.ReadToEnd();
             }
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
-            string response = await _openAiClient.SendMessageAsync(prompt, originalHtml);
+            string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
 
+            string originalHtml = null;
+
+            htmlStream.Position = 0;
+
+            using (StreamReader reader = new StreamReader(htmlStream))
+            {
+                originalHtml = reader.ReadToEnd();
+            }
 
             var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
@@ -139,6 +149,7 @@ namespace ResumeRocketQuery.Services
                 Status = "Pending",
                 ResumeId = originalResumeId
             });
+
             return result;
         }
 
@@ -148,7 +159,7 @@ namespace ResumeRocketQuery.Services
             var prompt =
                 $@"I will provide you with a Json Schema, a Job Description, and a Resume. 
 
-                    You will produce any number of suggestions for changes that should be made to the resume.
+                    You will produce atleast 5 suggestions for changes that should be made to the resume.
 
                     These updates should not falsify any information, meaning no additional skills, education, or work experience 
                     should be added. You are only allowed to reword items on the resume that are synonyms for items in the job posting
