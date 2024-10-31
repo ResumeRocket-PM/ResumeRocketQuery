@@ -504,6 +504,40 @@ namespace ResumeRocketQuery.DataLayer
                 
                 DELETE FROM Friendship
                 WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
+//--------------------------------------------------MESSAGES--------------------------------------------------------
+                public const string AddMsgByFId = @"
+                INSERT INTO Messages (FriendId, SendId, ReceiveId, MsgContent, MsgTime, MsgStatus)
+                SELECT FriendsId, AccountId2, AccountId1, @newMsg, CURRENT_TIMESTAMP, 'sending'
+                FROM Friendship
+                WHERE FriendsId = @fId;
+                SELECT TOP (100) * FROM Messages 
+                WHERE FriendId = @fId 
+                ORDER BY MsgTime DESC";
+
+                public const string AddMsgByAId = @"
+                INSERT INTO Messages (FriendId, SendId, ReceiveId, MsgContent, MsgTime, MsgStatus)
+                VALUES (@fId, @sId, @rId, @content, CURRENT_TIMESTAMP, @status);
+                SELECT TOP(100) * FROM Messages
+                WHERE FriendId = @fId
+                ORDER BY MsgTime DESC";
+
+                public const string UpdateMsgStatus = @"
+                UPDATE Messages
+                SET MsgStatus = @status
+                OUTPUT INSERTED.*                
+                WHERE (MsgId = @msgId);";
+
+                public const string DeleteMsg = @"
+                DELETE FROM Messages
+                WHERE MsgId = @msgId;
+                ";
+
+                public const string GetAllMsgContent = @"
+                SELECT * FROM Messages Where FriendId = @FriendId
+                ORDER BY MsgTime DESC";
+
+                public const string GetRecentMsgContent = @"
+                SELECT TOP(@num) * FROM Messages WHERE FriendId = @fId";
 
                 public const string AddMessageEntity = @"
                 INSERT INTO Messages (FriendId, AccountId1, AccountId2, MText, MStatus)
