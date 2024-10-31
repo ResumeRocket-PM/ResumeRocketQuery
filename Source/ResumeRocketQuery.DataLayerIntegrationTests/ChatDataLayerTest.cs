@@ -70,7 +70,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             });
 
 
-            var results = await systemUnderTest.AddFriendPairs(1438, accountId);
+            var results = await systemUnderTest.AddFriendPairs(1438, accountId, "pending");
 
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
             Assert.IsType<int>(results);
@@ -82,7 +82,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
         {
             var systemUnderTest = GetSystemUnderTest(storageType);
 
-            var secondStore = await systemUnderTest.AddFriendPairs(1438, 1439);
+            var secondStore = await systemUnderTest.AddFriendPairs(1438, 1439, "pending");
 
             Assert.Equal(1, secondStore);
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
@@ -123,7 +123,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             });
 
 
-            var fId = await systemUnderTest.AddFriendPairs(1438, accountId);
+            var fId = await systemUnderTest.AddFriendPairs(1438, accountId, "pending");
             var acceptFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "friends");
 
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
@@ -153,7 +153,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             });
 
 
-            var fId = await systemUnderTest.AddFriendPairs(1438, accountId);
+            var fId = await systemUnderTest.AddFriendPairs(1438, accountId, "pending");
             var acceptFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "friends");
 
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");

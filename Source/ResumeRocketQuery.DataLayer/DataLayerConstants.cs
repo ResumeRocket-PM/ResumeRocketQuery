@@ -507,7 +507,7 @@ namespace ResumeRocketQuery.DataLayer
 //--------------------------------------------------MESSAGES--------------------------------------------------------
                 public const string AddMsgByFId = @"
                 INSERT INTO Messages (FriendId, SendId, ReceiveId, MsgContent, MsgTime, MsgStatus)
-                SELECT FriendsId, AccountId2, AccountId1, @newMsg, CURRENT_TIMESTAMP, 'sending'
+                SELECT FriendsId, AccountId1, AccountId2, @newMsg, CURRENT_TIMESTAMP, 'sending'
                 FROM Friendship
                 WHERE FriendsId = @fId;
                 SELECT TOP (100) * FROM Messages 
@@ -531,6 +531,9 @@ namespace ResumeRocketQuery.DataLayer
                 DELETE FROM Messages
                 WHERE MsgId = @msgId;
                 ";
+                public const string GetMsgbyMsgId = @"
+                SELECT * From Messages
+                WHERE MsgId = @msgId";
 
                 public const string GetAllMsgContent = @"
                 SELECT * FROM Messages Where FriendId = @FriendId
@@ -551,7 +554,7 @@ namespace ResumeRocketQuery.DataLayer
                 SELECT * FROM Messages
                 WHERE FriendId = @friendId";
 
-                public const string GetMessageIntityByAId = @"
+                public const string GetMessageEntityByAId = @"
                 DECLARE @accountId1 INT = @inputAccountId1;
                 DECLARE @accountId2 INT = @inputAccountId2;
 
@@ -565,7 +568,7 @@ namespace ResumeRocketQuery.DataLayer
                 SELECT * FROM Messages
                 WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2";
 
-                public const string UpdateMessageContent = @"";
+                //public const string UpdateMessageContent = @"";
 
             }
         }

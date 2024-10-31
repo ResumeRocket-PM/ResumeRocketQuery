@@ -13,6 +13,9 @@ using ResumeRocketQuery.Domain.Configuration;
 using ResumeRocketQuery.Domain.Services.Repository;
 using ResumeRocketQuery.Domain.DataLayer;
 using System.ComponentModel;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using OpenQA.Selenium.DevTools.V126.Console;
 namespace ResumeRocketQuery.DataLayer
 {
     /// <summary>
@@ -36,7 +39,7 @@ namespace ResumeRocketQuery.DataLayer
         /// <param name="myId"></param>
         /// <param name="newFriendId"></param>
         /// <returns></returns>
-        public async Task<int> AddFriendPairs(int myId, int newFriendId, string requestMsg = "")
+        public async Task<int> AddFriendPairs(int myId, int newFriendId, string myStatus = "pending", string requestMsg = "")
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
@@ -52,9 +55,25 @@ namespace ResumeRocketQuery.DataLayer
                                 {
                                     inputId1 = myId,
                                     inputId2 = newFriendId,
-                                    status = "pending"
+                                    status = myStatus
                                 },
                                 commandType: CommandType.Text);
+
+                    // add the request message into the Messages Table
+                    if (requestMsg.Length > 0)
+                    {
+                        var messageResult = await connection.QueryAsync<Message>(
+                                DataLayerConstants.StoredProcedures.Chat.AddMsgByAId,
+                                new
+                                {
+                                    fId = FriendshipResult,
+                                    sId = myId,
+                                    rId = newFriendId,
+                                    content = requestMsg,
+                                    status = myStatus
+                                },
+                                commandType: CommandType.Text);
+                    }
 
                     return FriendshipResult;
 
@@ -211,9 +230,95 @@ namespace ResumeRocketQuery.DataLayer
 
 //_______________________________________________Messages_____________________________________________________
         // add new messages and show the top 10 latest messages recording
-
+        public async Task<List<Message>> AddNewMessage(int sendId, int receiveId, string newMsg)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                //get friendsId
+                var myFId = await connection.QueryFirstOrDefaultAsync<Friends>(
+                            DataLayerConstants.StoredProcedures.Chat.GetFriendsByAccount,
+                            new
+                            {
+                                inputId1 = sendId,
+                                inputId2 = receiveId
+                            },
+                            commandType: CommandType.Text);
+                
+                // if there is no friendsId(they are not friends), but still wanna send the message
+                if (myFId == null)
+                {
+                    var newFid = AddFriendPairs(sendId, receiveId, "not Friend", newMsg);
+                    var result = await connection.QueryAsync<Message>(
+                            DataLayerConstants.StoredProcedures.Chat.GetMessageIntityByFId,
+                            new
+                            {
+                                friendId = myFId
+                            },
+                            commandType: CommandType.Text);
+                    return result.ToList();
+                }
+                else// they are already friends and send the message
+                {
+                    var result = await connection.QueryAsync<Message>(
+                           DataLayerConstants.StoredProcedures.Chat.AddMsgByAId,
+                           new
+                           {
+                               fId = myFId,
+                               sId = sendId,
+                               rId = receiveId,
+                               content = newMsg,
+                               status = "sent"
+                           },
+                           commandType: CommandType.Text);
+                    return result.ToList();
+                }
+            }
+        }
         // delete messages
+        public async Task<bool> DeleteMessage(int messageId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                DateTime now = DateTime.UtcNow;
+                var msg = await connection.QueryFirstOrDefaultAsync<Message>(
+                    DataLayerConstants.StoredProcedures.Chat.GetMsgbyMsgId,
+                    new
+                    {
+                        msgId = messageId
+                    }, commandType: CommandType.Text);
+                DateTime msgTime;
+                var timeResult = DateTime.TryParse(msg.MsgTime, out msgTime);
+                TimeSpan timeDifference = now - msgTime;
+                if (timeDifference.TotalMinutes > 5)
+                {
+                    return false;
+                }
+                else
+                {
+                    var msgList = await connection.QueryAsync<Message>(
+                    DataLayerConstants.StoredProcedures.Chat.DeleteMsg,
+                    new
+                    {
+                        msgId = messageId
+                    }, commandType: CommandType.Text);
+                    return true;
+                }
+            }
+        }
+        //show all messages
+        public async Task<List<Message>> GetAllMessages(int friendId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var msgList = await connection.QueryAsync<Message>(
+                    DataLayerConstants.StoredProcedures.Chat.GetAllMsgContent,
+                    new 
+                    {
+                        fId = friendId
+                    }, commandType: CommandType.Text);
+                return msgList.ToList();
 
-        //
+            }
+        }
     }
 }

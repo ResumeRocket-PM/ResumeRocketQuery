@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.Services.Repository
 {
-    internal class Message
+    public class Message
     {
         public int MsgId {  get; set; }
         public int FriendId { get; set; }
