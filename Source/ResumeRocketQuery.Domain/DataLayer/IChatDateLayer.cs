@@ -12,10 +12,15 @@ namespace ResumeRocketQuery.Domain.DataLayer
     /// </summary>
     public interface IChatDateLayer
     {
-        Task<int> AddFriendPairs(int myId, int newFriendId);
-        Task<Friends> updateFriendPairStatus(int friendId, string newStatus);
+        // Friendship table
+        Task<int> AddFriendPairs(int myId, int newFriendId, string requestMsg = "");
+        Task<Friends> GetFriendEntityByAccount(int AId1, int AId2);
+        Task<Friends> GetFriendEntityByFriendId(int friendId);
+        Task<Friends> UpdateFriendPairStatus(int friendId, string newStatus);
         Task<Friends> deleteFriendPairs(int myId, int friendId);
         Task<Dictionary<string, List<Friends>>> AllMyFriendPairs(int myId, string fStatus);
+        
+        
 
     }
 }

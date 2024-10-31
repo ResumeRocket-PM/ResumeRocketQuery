@@ -465,14 +465,32 @@ namespace ResumeRocketQuery.DataLayer
                 
                 INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
                 VALUES (@accountId1, @accountId2, @status, CURRENT_TIMESTAMP);
-                SELECT SCOPE_IDENTITY();";
+                SELECT SCOPE_IDENTITY()";
                 
                 public const string UpdateFriendStatus = @"
                 UPDATE Friendship
                 SET Status = @status, CreatedTime = CURRENT_TIMESTAMP
                 OUTPUT INSERTED.*                
                 WHERE (FriendsId = @friendsId);";
+
+                public const string GetFriendsByAccount = @"
+                DECLARE @accountId1 INT = @inputId1;
+                DECLARE @accountId2 INT = @inputId2;
+
+                IF @accountId1 > @accountId2
+                BEGIN
+                    DECLARE @Temp INT = @accountId1;
+                    SET @accountId1 = @accountId2;
+                    SET @accountId2 = @Temp;
+                END                
                 
+                SELECT * FROM Friendship
+                WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
+
+                public const string GetFriendPairs = @"
+                SELECT * FROM Friendship 
+                WHERE FriendsId = @friendsId";
+
                 public const string DeleteFriend = @"
                 DECLARE @accountId1 INT = @inputAccountId1;
                 DECLARE @accountId2 INT = @inputAccountId2;
@@ -486,6 +504,34 @@ namespace ResumeRocketQuery.DataLayer
                 
                 DELETE FROM Friendship
                 WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
+
+                public const string AddMessageEntity = @"
+                INSERT INTO Messages (FriendId, AccountId1, AccountId2, MText, MStatus)
+                SELECT FriendsId, AccountId1, AccountId2, 'Hi there', CURRENT_TIMESTAMP
+                FROM Friendship
+                WHERE FriendsId = @friendId;
+                SELECT SCOPE_IDENTITY();
+                ";
+
+                public const string GetMessageIntityByFId = @"
+                SELECT * FROM Messages
+                WHERE FriendId = @friendId";
+
+                public const string GetMessageIntityByAId = @"
+                DECLARE @accountId1 INT = @inputAccountId1;
+                DECLARE @accountId2 INT = @inputAccountId2;
+
+                IF @accountId1 > @accountId2
+                BEGIN
+                    DECLARE @Temp INT = @accountId1;
+                    SET @accountId1 = @accountId2;
+                    SET @accountId2 = @Temp;
+                END                 
+                
+                SELECT * FROM Messages
+                WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2";
+
+                public const string UpdateMessageContent = @"";
 
             }
         }

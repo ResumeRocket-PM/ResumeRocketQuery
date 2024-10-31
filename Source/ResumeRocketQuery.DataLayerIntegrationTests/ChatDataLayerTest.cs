@@ -70,10 +70,39 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             });
 
 
-            var results = await systemUnderTest.AddFriendPairs(1438, 7041);
+            var results = await systemUnderTest.AddFriendPairs(1438, accountId);
 
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
             Assert.IsType<int>(results);
+        }
+
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Stored_Friends_Pairs_Duplicate_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var secondStore = await systemUnderTest.AddFriendPairs(1438, 1439);
+
+            Assert.Equal(1, secondStore);
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+        }
+
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task GetFriendsByFId(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var friendPair = await systemUnderTest.GetFriendEntityByFriendId(2);
+
+            Assert.Equal(1438, friendPair.AccountId1);
+            Assert.Equal(1440, friendPair.AccountId2);
+
+            // 
+            var nan = await systemUnderTest.GetFriendEntityByFriendId(-1);
+            Assert.Null(nan);
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
         }
 
         [Theory]
@@ -94,16 +123,47 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             });
 
 
-            var fId = await systemUnderTest.AddFriendPairs(1438, 7041);
-            var acceptFriends = await systemUnderTest.updateFriendPairStatus(fId, "friends");
+            var fId = await systemUnderTest.AddFriendPairs(1438, accountId);
+            var acceptFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "friends");
 
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
             Assert.NotNull(acceptFriends);
             Assert.Equal("friends", acceptFriends.Status );
             
-            var blockFriends = await systemUnderTest.updateFriendPairStatus(fId, "block");
+            var blockFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "block");
             Assert.Equal("block", blockFriends.Status);
 
         }
+
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Delete_Friendship_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = $"{Guid.NewGuid().ToString()}_YY_Test",
+                LastName = $"{Guid.NewGuid().ToString()}_YY_Test",
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
+
+
+            var fId = await systemUnderTest.AddFriendPairs(1438, accountId);
+            var acceptFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "friends");
+
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+            Assert.NotNull(acceptFriends);
+            Assert.Equal("friends", acceptFriends.Status);
+
+            var blockFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "block");
+            Assert.Equal("block", blockFriends.Status);
+
+        }
+
     }
 }
