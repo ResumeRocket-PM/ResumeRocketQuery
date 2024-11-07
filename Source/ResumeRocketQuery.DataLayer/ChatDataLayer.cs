@@ -192,14 +192,14 @@ namespace ResumeRocketQuery.DataLayer
         }
 
         // show friend list
-        public async Task<Dictionary<string, List<Friends>>> AllMyFriendPairs(int myId, string fStatus)
+        public async Task<List<FriendInfo>> AllMyFriendPairs(int myId, string fStatus)
         {
             // find all the AccountId1 or AccountId2 that is same with the @myId
             // (*Notice: the Id might in AccountId1 or AccountId2*)
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var List1 = await connection.QueryAsync<Friends>(
-                            DataLayerConstants.StoredProcedures.Chat.findAllFriendsAccount1,
+                var result = await connection.QueryAsync<FriendInfo>(
+                            DataLayerConstants.StoredProcedures.Chat.FindAllFrinedsByAccountId,
                             new
                             {
                                 accountId = myId,
@@ -207,22 +207,7 @@ namespace ResumeRocketQuery.DataLayer
                             },
                             commandType: CommandType.Text);
 
-                var List2 = await connection.QueryAsync<Friends>(
-                            DataLayerConstants.StoredProcedures.Chat.findAllFriendsAccount2,
-                            new
-                            {
-                                accountId = myId,
-                                status = fStatus
-                            },
-                            commandType: CommandType.Text);
-
-                Dictionary<string, List<Friends>> result = new()
-                {
-                    {"me_is_accountId_1", List1.ToList() },
-                    {"me_is_accountId_2", List2.ToList() }
-
-                };
-                return result;
+                return result.ToList();
 
             }
 
