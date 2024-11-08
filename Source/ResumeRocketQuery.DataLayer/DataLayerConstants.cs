@@ -437,18 +437,42 @@ namespace ResumeRocketQuery.DataLayer
 
             public class Chat
             {
-                public const string findAllFriendsAccount1 = @"
-                SELECT *
-                FROM Friendship
-                WHERE AccountId1 = @accountId AND Status = @status
-                ";
+                //public const string findAllFriendsAccount1 = @"
+                //SELECT *
+                //FROM Friendship
+                //WHERE AccountId1 = @accountId AND Status = @status
+                //";
 
-                public const string findAllFriendsAccount2 = @"
-                SELECT *
-                FROM Friendship
-                WHERE AccountId2 = @accountId AND Status = @status
-                ";
+                //public const string findAllFriendsAccount2 = @"
+                //SELECT *
+                //FROM Friendship
+                //WHERE AccountId2 = @accountId AND Status = @status
+                //";
 
+                public const string FindAllFrinedsByAccountId = @"
+                SELECT 
+                Friendship.FriendsId, 
+                Accounts.FirstName, 
+                Accounts.LastName, 
+                Accounts.ProfilePhotoLink, 
+                Accounts.PortfolioLink, 
+                EmailAddresses.EmailAddress,
+                Friendship.CreatedTime 
+
+                FROM 
+                    Accounts
+                LEFT JOIN 
+                    EmailAddresses ON Accounts.AccountId = EmailAddresses.AccountId
+                JOIN 
+                    Friendship ON (
+                        (Accounts.AccountId = Friendship.AccountId2 AND Friendship.AccountId1 = @accountId AND Friendship.Status = @status)
+                    )
+                WHERE 
+                    Friendship.Status = @status 
+                    AND (
+                        Friendship.AccountId1 = @accountId OR Friendship.AccountId2 = @accountId
+                    );
+                ";
                 /// <summary>
                 /// to prevent the duplicate of AccountId1 and AccountId2 pairs
                 /// this will make sure that the lower value of AccountId would be AccountId1

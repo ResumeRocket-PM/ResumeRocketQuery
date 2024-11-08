@@ -165,5 +165,23 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
         }
 
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Search_My_Friends_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            
+            var Friends = await systemUnderTest.AllMyFriendPairs(7041, "unaccept");
+
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+            Assert.NotNull(Friends);
+            Assert.Equal(3, Friends.Count);
+            Assert.Equal("Mia", Friends[0].FirstName);
+
+
+
+        }
+
     }
 }
