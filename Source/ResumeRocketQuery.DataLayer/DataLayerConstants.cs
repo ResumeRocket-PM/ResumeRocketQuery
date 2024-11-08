@@ -178,6 +178,11 @@ namespace ResumeRocketQuery.DataLayer
                     FROM Portfolio
                     WHERE AccountId = @AccountId";
 
+                public const string SelectPortfolioByPortfolioId = @"
+                    SELECT PortfolioId, AccountId, Configuration
+                    FROM Portfolio
+                    WHERE PortfolioId = @PortfolioId";
+
             }
 
             public class Resume

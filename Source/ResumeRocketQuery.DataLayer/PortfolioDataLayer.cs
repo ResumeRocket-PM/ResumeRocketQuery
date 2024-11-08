@@ -62,5 +62,18 @@ namespace ResumeRocketQuery.DataLayer
                 return result;
             }
         }
+
+        public async Task<Portfolio> GetPortfolioByPortfolioIdAsync(int portfolioId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryFirstOrDefaultAsync<Portfolio>(
+                    DataLayerConstants.StoredProcedures.Portfolio.SelectPortfolioByPortfolioId,
+                    new { PortfolioId = portfolioId },
+                    commandType: CommandType.Text);
+
+                return result;
+            }
+        }
     }
 }

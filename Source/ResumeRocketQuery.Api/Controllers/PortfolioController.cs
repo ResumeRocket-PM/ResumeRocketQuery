@@ -30,7 +30,7 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         /// <summary>
-        /// This retrieves the User details
+        /// This retrieves the Portfolio details
         /// </summary>
         /// <returns>A User Object.</returns>
         [HttpGet]
@@ -54,13 +54,39 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse<PortfolioResponseBody>(null, HttpStatusCode.NotFound);
         }
 
+        /// <summary>
+        /// This retrieves the Portfolio details by a specific PortfolioId
+        /// </summary>
+        /// <param name="portfolioId"></param>
+        /// <returns>A User Object.</returns>
+        [HttpGet]
+        [Route("{portfolioId}/details")]
+        public async Task<ServiceResponseGeneric<PortfolioResponseBody>> Get([FromRoute] int portfolioId)
+        {
+            var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var portfolio = await _portfolioService.GetPortfolioByPortfolioId(account.AccountId);
+
+            if (portfolio != null)
+            {
+                var response = new PortfolioResponseBody
+                {
+                    Content = portfolio?.Configuration ?? string.Empty
+                };
+
+                return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+            }
+
+            return _serviceResponseBuilder.BuildServiceResponse<PortfolioResponseBody>(null, HttpStatusCode.NotFound);
+        }
+
         [HttpPost]
         [Route("")]
         public async Task<ServiceResponse> Post([FromBody] PortfolioRequestBody requestBody)
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            await _portfolioService.CreatePortfolio(new Portfolio
+            int portfolioId = await _portfolioService.CreatePortfolio(new Portfolio
             {
                 Configuration = requestBody.Content,
                 AccountId = account.AccountId,
