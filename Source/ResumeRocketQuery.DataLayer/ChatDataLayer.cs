@@ -220,7 +220,7 @@ namespace ResumeRocketQuery.DataLayer
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
                 //get friendsId if there is 
-                var Friends = await connection.QueryAsync<Friends>(
+                var Friend = await connection.QueryAsync<Friends>(
                             DataLayerConstants.StoredProcedures.Chat.GetFriendsByAccount,
                             new
                             {
@@ -228,8 +228,8 @@ namespace ResumeRocketQuery.DataLayer
                                 accountId2 = rId
                             },
                             commandType: CommandType.Text);
-                
-                if (Friends == null) // if there is no friendsId, then just add the message
+                var FriendsTuple = Friend.ToList();
+                if (FriendsTuple.Count == 0) // if there is no friendsId, then just add the message
                 {
                     var result = await connection.ExecuteScalarAsync<int>(
                             DataLayerConstants.StoredProcedures.Chat.AddMessageEntity,
@@ -245,7 +245,6 @@ namespace ResumeRocketQuery.DataLayer
                 }
                 else // check if the friends status is block 
                 {
-                    var FriendsTuple = Friends.ToList();
                     bool isBlock = FriendsTuple[0].Status == "block";
                     if (isBlock)
                     {
