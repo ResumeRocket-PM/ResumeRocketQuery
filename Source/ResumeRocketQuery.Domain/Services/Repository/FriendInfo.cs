@@ -8,6 +8,7 @@ namespace ResumeRocketQuery.Domain.Services.Repository
 {
     public class FriendInfo
     {
+        public int AccountId { get; set;}
         public int FriendsId{ get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

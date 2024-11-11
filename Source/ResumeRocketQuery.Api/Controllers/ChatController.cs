@@ -52,18 +52,20 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpPost]
         [Route("sendMsg")]
-        public async Task<ServiceResponseGeneric<List<Message>>> SendMessage([FromBody] SendMsgRequest request)
+        public async Task<ServiceResponseGeneric<string>> SendMessage([FromBody] Message msgRequest)
         {
-            var result = await _chatService.SendMsg(request.SendId, request.ReceiveId, request.Msg);
+            var sender = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var result = await _chatService.SendMsg(sender.AccountId, msgRequest.ReceiveId, msgRequest.MsgContent);
+            
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
-
         }
 
         [HttpGet]
-        [Route("MsgHistory/{fId}")]
-        public async Task<ServiceResponseGeneric<List<Message>>> GetChatHistory([FromBody] int fId)
+        [Route("MsgHistory/{theyId}")]
+        public async Task<ServiceResponseGeneric<List<Message>>> GetChatHistory([FromRoute] int theyId)
         {
-            var result = await _chatService.GetMessageHistory(fId);
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var result = await _chatService.GetMessageHistory(user.AccountId, theyId);
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
 
         }
@@ -74,6 +76,16 @@ namespace ResumeRocketQuery.Api.Controllers
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
             var result = await _chatService.ShowFriendsListWithStatus(user.AccountId, status);
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
+
+        }
+
+        [HttpGet]
+        [Route("AllTalkedPeople")]
+        public async Task<ServiceResponseGeneric<List<FriendInfo>>> GetFriendsList()
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var result = await _chatService.GetTalkedPeople(user.AccountId);
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
 
         }

@@ -12,27 +12,7 @@ using Xunit;
 
 namespace ResumeRocketQuery.DataLayerIntegrationTests
 {
-    /// <summary>
-    /// <Start> Oct. 18th, 2024 --Yinghua Yin
-    ///     
-    ///     <Form> Database samples
-    ///        FriendsId	AccountId1	AccountId2	Status	    CreatedTime
-    ///        1	        1438	    1439	    friends	    2024-10-27 15:53:15.160
-    ///        2	        1438	    1440	    friends	    2024-10-27 15:54:21.520
-    ///        3	        1438	    1441	    friends	    2024-10-27 15:54:21.520
-    ///        4	        1438	    1442	    friends	    2024-10-27 15:54:21.520
-    ///        5	        1438	    1443	    friends	    2024-10-27 15:54:21.523
-    ///        15	        1438	    1445	    friends	    2024-10-27 16:26:31.810
-    ///        16	        1438	    1446	    friends	    2024-10-27 16:37:39.113
-    ///        17	        1438	    1447	    friends	    2024-10-27 16:37:53.437
-    ///        18	        1438	    1448	    friends	    2024-10-27 16:37:59.523
-    ///        20	        1438	    1449	    pending	    2024-10-27 16:45:44.123
-    ///        23	        1718	    7041	    pending	    2024-10-27 21:33:53.390
-    ///     </Form>
-    ///     
-    /// </Start>
-    /// 
-    /// </summary>
+    
     [Rollback]
     public class ChatDataLayerTest
     {
@@ -181,6 +161,55 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
 
 
+        }
+
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Search_All_Talked_People_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+
+            var Friends = await systemUnderTest.GetAllTalkedAccount(1718);
+
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+            Assert.NotNull(Friends);
+            Assert.True(Friends.Count == 1);
+            Assert.Equal("Yinghua", Friends[0].FirstName);
+        }
+
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Search_personal_conversion_history_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var messages7041 = await systemUnderTest.GetAllPersonallyMessages(7041, 1448);
+
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+            Assert.NotNull(messages7041);
+            Assert.True(messages7041.Count == 6);
+            var messages1448 = await systemUnderTest.GetAllPersonallyMessages(1448, 7041);
+            Assert.NotNull(messages7041);
+            Assert.True(messages7041.Count == messages1448.Count);
+        }
+
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Add_New_Msg_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
+
+            var newMsg = await systemUnderTest.AddNewMessage(7041, 1448, "testMsg");
+
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+            Assert.NotNull(newMsg);
+            Assert.Equal("",newMsg);
+
+            // send msg to block people
+            var blockMsg = await systemUnderTest.AddNewMessage(1451, 7041, "hi");
+            Assert.NotNull(blockMsg);
+            Assert.Equal("block friends cannot send messages", blockMsg);
         }
 
     }

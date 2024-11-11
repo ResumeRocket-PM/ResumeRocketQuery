@@ -1,3 +1,4 @@
+using Microsoft.Identity.Client;
 using System.Security.Cryptography.X509Certificates;
 
 namespace ResumeRocketQuery.DataLayer
@@ -432,20 +433,9 @@ namespace ResumeRocketQuery.DataLayer
 
             public class Chat
             {
-                //public const string findAllFriendsAccount1 = @"
-                //SELECT *
-                //FROM Friendship
-                //WHERE AccountId1 = @accountId AND Status = @status
-                //";
-
-                //public const string findAllFriendsAccount2 = @"
-                //SELECT *
-                //FROM Friendship
-                //WHERE AccountId2 = @accountId AND Status = @status
-                //";
-
                 public const string FindAllFrinedsByAccountId = @"
                 SELECT 
+                Accounts.AccountId,
                 Friendship.FriendsId, 
                 Accounts.FirstName, 
                 Accounts.LastName, 
@@ -498,18 +488,9 @@ namespace ResumeRocketQuery.DataLayer
                 WHERE (FriendsId = @friendsId);";
 
                 public const string GetFriendsByAccount = @"
-                DECLARE @accountId1 INT = @inputId1;
-                DECLARE @accountId2 INT = @inputId2;
-
-                IF @accountId1 > @accountId2
-                BEGIN
-                    DECLARE @Temp INT = @accountId1;
-                    SET @accountId1 = @accountId2;
-                    SET @accountId2 = @Temp;
-                END                
-                
                 SELECT * FROM Friendship
-                WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
+                WHERE (AccountId1 = @accountId1 and AccountId2 = @accountId2)
+                   OR (AccountId1 = @accountId2 and AccountId2 = @accountId1)";
 
                 public const string GetFriendPairs = @"
                 SELECT * FROM Friendship 
@@ -528,7 +509,41 @@ namespace ResumeRocketQuery.DataLayer
                 
                 DELETE FROM Friendship
                 WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
-//--------------------------------------------------MESSAGES--------------------------------------------------------
+                //--------------------------------------------------MESSAGES--------------------------------------------------------
+                public const string GetAlltalkedAccounts = @"
+                SELECT 
+                    a.AccountId,                    
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    e.EmailAddress,
+                    m.LatestMsgTime AS MsgTime
+                FROM 
+                    (SELECT 
+                        CASE 
+                            WHEN SendId = @accountId THEN ReceiveId 
+                            ELSE SendId 
+                        END AS RelatedAccountId,
+                        MAX(MsgTime) AS LatestMsgTime
+                     FROM 
+                        Messages
+                     WHERE 
+                        SendId = @accountId OR ReceiveId = @accountId
+                     GROUP BY 
+                        CASE 
+                            WHEN SendId = @accountId THEN ReceiveId 
+                            ELSE SendId 
+                        END
+                    ) AS m
+                JOIN 
+                    Accounts AS a ON m.RelatedAccountId = a.AccountId
+                LEFT JOIN 
+                    EmailAddresses AS e ON a.AccountId = e.AccountId
+                ORDER BY 
+                    m.LatestMsgTime DESC;
+
+                ";
+
                 public const string AddMsgByFId = @"
                 INSERT INTO Messages (FriendId, SendId, ReceiveId, MsgContent, MsgTime, MsgStatus)
                 SELECT FriendsId, AccountId1, AccountId2, @newMsg, CURRENT_TIMESTAMP, 'sending'
@@ -557,20 +572,25 @@ namespace ResumeRocketQuery.DataLayer
                 ";
                 public const string GetMsgbyMsgId = @"
                 SELECT * From Messages
-                WHERE MsgId = @msgId";
+                WHERE MsgId = @msgId
+                ";
 
                 public const string GetAllMsgContent = @"
-                SELECT * FROM Messages Where FriendId = @FriendId
-                ORDER BY MsgTime DESC";
+                SELECT * FROM (
+                    SELECT TOP(200) * 
+                    FROM Messages 
+                    WHERE (SendId = @aId1 AND ReceiveId = @aId2) 
+                       OR (SendId = @aId2 AND ReceiveId = @aId1)
+                    ORDER BY MsgTime DESC
+                ) AS LatestMessages
+                ORDER BY MsgTime ASC;";
 
                 public const string GetRecentMsgContent = @"
                 SELECT TOP(@num) * FROM Messages WHERE FriendId = @fId";
 
                 public const string AddMessageEntity = @"
-                INSERT INTO Messages (FriendId, AccountId1, AccountId2, MText, MStatus)
-                SELECT FriendsId, AccountId1, AccountId2, 'Hi there', CURRENT_TIMESTAMP
-                FROM Friendship
-                WHERE FriendsId = @friendId;
+                INSERT INTO Messages (SendId, ReceiveId, MsgContent, MsgStatus, MsgTime)
+                VALUES(@sendId, @receiveId, @text, @status, CURRENT_TIMESTAMP)
                 SELECT SCOPE_IDENTITY();
                 ";
 
