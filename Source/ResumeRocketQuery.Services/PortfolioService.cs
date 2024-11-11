@@ -1,6 +1,7 @@
 ﻿using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Services
@@ -8,10 +9,13 @@ namespace ResumeRocketQuery.Services
     public class PortfolioService : IPortfolioService
     {
         private readonly IPortfolioDataLayer _portfolioDataLayer;
+        private readonly IAccountService _accountService;
 
-        public PortfolioService(IPortfolioDataLayer portfolioDataLayer)
+
+        public PortfolioService(IPortfolioDataLayer portfolioDataLayer, IAccountService accountService)
         {
             _portfolioDataLayer = portfolioDataLayer;
+            _accountService = accountService;
         }
 
         public async Task<int> CreatePortfolio(Portfolio portfolio)
@@ -27,6 +31,15 @@ namespace ResumeRocketQuery.Services
                     AccountId = portfolio.AccountId,
                     Configuration = portfolio.Configuration,
                 });
+
+                string portfolioLink = $"https://resume-rocket.net/{result}/portfolio"; // result is the PortfolioId here
+
+                Dictionary<string, string> updates = new Dictionary<string, string>
+                {
+                    { "PortfolioLink", portfolioLink }
+                };
+
+                await _accountService.UpdateAccount(portfolio.AccountId, updates);
             }
             else
             {
@@ -44,6 +57,13 @@ namespace ResumeRocketQuery.Services
         public async Task<Portfolio> GetPortfolio(int accountId)
         {
             var result = await _portfolioDataLayer.GetPortfolioAsync(accountId);
+
+            return result;
+        }
+
+        public async Task<Portfolio> GetPortfolioByPortfolioId(int portfolioId)
+        {
+            var result = await _portfolioDataLayer.GetPortfolioByPortfolioIdAsync(portfolioId);
 
             return result;
         }

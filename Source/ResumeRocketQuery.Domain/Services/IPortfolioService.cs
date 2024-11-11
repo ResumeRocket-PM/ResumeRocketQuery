@@ -6,5 +6,6 @@ namespace ResumeRocketQuery.Domain.Services
     {
         Task<int> CreatePortfolio(Portfolio portfolio);
         Task<Portfolio> GetPortfolio(int accountId);
+        Task<Portfolio> GetPortfolioByPortfolioId(int portfolioId);
     }
 }
