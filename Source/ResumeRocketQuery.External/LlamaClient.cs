@@ -10,7 +10,6 @@ namespace ResumeRocketQuery.External
     public class LlamaClient : ILlamaClient
     {
         private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
-        private string _url = "http://localhost:5014/message/";
 
         public LlamaClient(IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
         {
@@ -23,7 +22,7 @@ namespace ResumeRocketQuery.External
 
             var content = new StringContent(JsonSerializer.Serialize(new { message = input }), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PostAsync(_url, content);
+            HttpResponseMessage response = await httpClient.PostAsync($"{_resumeRocketQueryConfigurationSettings.LlamaClientUrl}/message", content);
 
             response.EnsureSuccessStatusCode();
 
