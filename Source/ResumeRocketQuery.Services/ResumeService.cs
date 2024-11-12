@@ -370,6 +370,7 @@ namespace ResumeRocketQuery.Services
 
             var acceptedSuggestions = resumeSuggestions.Where(x => x.Accepted).ToList();
 
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(resumeHtml);

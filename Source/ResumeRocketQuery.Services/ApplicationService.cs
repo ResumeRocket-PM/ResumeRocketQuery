@@ -202,20 +202,6 @@ namespace ResumeRocketQuery.Services
             return prompt;
         }
 
-        private List<Change> ParseResult(string input)
-        {
-            List<Change> result = new List<Change>();
-
-            string[] lines = input.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            if (lines.Length > 2)
-            {
-                var jsonResult = string.Join(Environment.NewLine, lines[1..^1]);
-
-                result = JsonConvert.DeserializeObject<List<Change>>(jsonResult);
-            }
-
-            return result;
-        }
 
         public async Task<List<ApplicationResult>> GetJobPostings(int accountId)
         {
@@ -286,6 +272,22 @@ namespace ResumeRocketQuery.Services
                 ResumeContent = resumeContent,
                 ResumeContentId = resumeId
             };
+        }
+
+
+        private List<Change> ParseResult(string input)
+        {
+            List<Change> result = new List<Change>();
+
+            string[] lines = input.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length > 2)
+            {
+                var jsonResult = string.Join(Environment.NewLine, lines[1..^1]);
+
+                result = JsonConvert.DeserializeObject<List<Change>>(jsonResult);
+            }
+
+            return result;
         }
     }
 }

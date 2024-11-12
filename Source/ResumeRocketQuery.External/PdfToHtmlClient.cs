@@ -57,20 +57,42 @@ namespace ResumeRocketQuery.External
                 }
             }
 
-            var spanNodes = htmlDoc.DocumentNode.Descendants("span").ToList();
+            var resultHtml = StripSpans(htmlDoc);
 
-            foreach (var spanNode in spanNodes)
-            {
-                foreach (var childNode in spanNode.ChildNodes.ToList())
-                {
-                    spanNode.ParentNode.InsertBefore(childNode, spanNode);
-                }
-                spanNode.Remove();
-            }
-
-            byte[] byteArray = Encoding.UTF8.GetBytes(htmlDoc.DocumentNode.InnerHtml);
+            byte[] byteArray = Encoding.UTF8.GetBytes(resultHtml.DocumentNode.InnerHtml);
 
             return new MemoryStream(byteArray);
         }
+
+        public async Task<Stream> StripSpans(Stream html)
+        {
+            var htmlDoc = new HtmlDocument();
+
+            htmlDoc.Load(html);
+
+            var resultHtml = StripSpans(htmlDoc);
+
+            byte[] byteArray = Encoding.UTF8.GetBytes(resultHtml.DocumentNode.InnerHtml);
+
+            return new MemoryStream(byteArray);
+        }
+
+        private HtmlDocument StripSpans(HtmlDocument htmlDoc)
+        {
+            var spans = htmlDoc.DocumentNode.SelectNodes("//span");
+
+            if (spans != null)
+            {
+                foreach (var span in spans)
+                {
+                    var innerText = span.InnerText;
+
+                    span.ParentNode.ReplaceChild(HtmlTextNode.CreateNode(innerText), span);
+                }
+            }
+
+            return htmlDoc;
+        }
+
     }
 }

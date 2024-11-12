@@ -41,6 +41,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IPortfolioDataLayer, PortfolioDataLayer>();
             services.AddSingleton<IResumeDataLayer, ResumeDataLayer>();
             services.AddSingleton<ISearchDataLayer, SearchDataLayer>();
+            services.AddSingleton<IFileService, FileService>();
 
             services.AddSingleton<IResumeService, ResumeService>();
             services.AddSingleton<IImageService, ImageService>();
