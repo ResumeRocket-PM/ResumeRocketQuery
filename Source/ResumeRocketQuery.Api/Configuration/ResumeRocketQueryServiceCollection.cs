@@ -62,6 +62,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IChatDateLayer, ChatDataLayer>();
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
+            services.AddSingleton<ILlamaClient, LlamaClient>();
 
             ConfigureJwtAuthentication(services);
             ConfigureMiddlewareServices(services);
