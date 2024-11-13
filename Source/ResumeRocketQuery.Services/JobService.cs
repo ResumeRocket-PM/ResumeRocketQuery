@@ -39,7 +39,7 @@ namespace ResumeRocketQuery.Services
         public async Task<int> CreateJobAsync(ApplicationRequest applicationRequest)
         {
             //Take the HTML from the Posting, Pass
-            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
+            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml, applicationRequest.JobUrl);
             var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
             string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);

@@ -16,7 +16,7 @@ namespace ResumeRocketQuery.External.Tests
 
         public LlamaClientTests()
         {
-            var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+            var serviceProvider = new ResumeRocketQueryServiceProvider().Create();
 
             _systemUnderTest = serviceProvider.GetService<ILlamaClient>();
         }
@@ -39,17 +39,17 @@ namespace ResumeRocketQuery.External.Tests
             {
                 using (var stream = new FileStream(@"./Samples/Meta/meta-swe.html", FileMode.Open, FileAccess.Read))
                 {
-                    var result = await _systemUnderTest.GetJobPosting(stream, "meta");
+                    var result = await _systemUnderTest.JobDetails(stream, "meta");
                     Assert.NotNull(result);
                 }
                  using (var stream = new FileStream(@"./Samples/Indeed/indeed-swe.html", FileMode.Open, FileAccess.Read))
                 {
-                    var result = await _systemUnderTest.GetJobPosting(stream, "indeed");
+                    var result = await _systemUnderTest.JobDetails(stream, "indeed");
                     Assert.NotNull(result);
                 }
                  using (var stream = new FileStream(@"./Samples/LinkedIn/linkedin-de.html", FileMode.Open, FileAccess.Read))
                 {
-                    var result = await _systemUnderTest.GetJobPosting(stream, "linkedin");
+                    var result = await _systemUnderTest.JobDetails(stream, "linkedin");
                     Assert.NotNull(result);
                 }
             }
@@ -62,7 +62,7 @@ namespace ResumeRocketQuery.External.Tests
             {
                 using (var stream = new FileStream(@"./Samples/Meta/meta-swe.html", FileMode.Open, FileAccess.Read))
                 {
-                    var result = await _systemUnderTest.GetJobPosting(stream, "meta");
+                    var result = await _systemUnderTest.JobDetails(stream, "meta");
                     result = await _systemUnderTest.ParseJobPosting(result);
                     Assert.NotNull(result);
                 }

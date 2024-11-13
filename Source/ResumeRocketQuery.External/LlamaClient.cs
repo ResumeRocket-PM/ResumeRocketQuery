@@ -35,7 +35,7 @@ namespace ResumeRocketQuery.External
             return responseContent;
         }
 
-        public async Task<string> GetJobPosting(Stream stream, string siteName)
+        public async Task<string> JobDetails(Stream stream, string siteName)
         {
             var httpClient = new HttpClient();
 

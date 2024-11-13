@@ -17,12 +17,14 @@ namespace ResumeRocketQuery.Services
         private readonly IOpenAiClient openAiClient;
         private readonly IJobScraper jobScraper;
         private readonly IPdfToHtmlClient _pdfToHtmlClient;
+        private readonly ILlamaClient _llamaClient;
 
-        public LanguageService(IOpenAiClient openAiClient, IJobScraper jobScraper, IPdfToHtmlClient pdfToHtmlClient)
+        public LanguageService(IOpenAiClient openAiClient, IJobScraper jobScraper, IPdfToHtmlClient pdfToHtmlClient, ILlamaClient llamaClient)
         {
             this.openAiClient = openAiClient;
             this.jobScraper = jobScraper;
             _pdfToHtmlClient = pdfToHtmlClient;
+            _llamaClient = llamaClient;
         }
 
         //Create a Method that takes in a URL.
@@ -32,54 +34,66 @@ namespace ResumeRocketQuery.Services
 
             var htmlBody = await jobScraper.ScrapeJobPosting("//html");
 
-            return await ProcessJobPosting(htmlBody);
+            return await ProcessJobPosting(htmlBody, url);
         }
         //Pass the Prompt that we've created, and the HTML into the External class.
         //Deserialize the result as our JobResult class.
 
-        public async Task<JobResult> ProcessJobPosting(string html)
+        public async Task<JobResult> ProcessJobPosting(string html, string url)
         {
-            var htmlStream = await _pdfToHtmlClient.StripHtmlElements(new MemoryStream(Encoding.UTF8.GetBytes(html)));
+            string siteName = ParseSiteName(url);
+            Stream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
+            var result = await _llamaClient.JobDetails(htmlStream, siteName);
+            var prompt = @"
+                        For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
 
-            using (var reader = new StreamReader(htmlStream, Encoding.UTF8))
-            {
-                var prompt = @"
-                          For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
+                        * Name of the Company posting this job application
+                        * the title of the position detailed in the job posting
+                        * Date published which  can be nullable
+                        * A 1 paragraph TLDR of the job posting description
+                        * The top 10 keywords of the job posting
+                        * A few perks of the job from the posting
+                        * A list  of the base job requirements
 
-                            * Name of the Company posting this job application
-                            * the title of the position detailed in the job posting
-                            * Date published which  can be nullable
-                            * A 1 paragraph TLDR of the job posting description
-                            * The top 10 keywords of the job posting
-                            * A few perks of the job from the posting
-                            * A list  of the base job requirements
+                        Arrange the returned data in a JSON object following this format:
 
-                            Arrange the returned data in a JSON object following this format:
+                        public class JobPosting:
+                        {
+                            public string CompanyName { get; set; }
+                            public string Title { get; set; }
+                            public string Description { get; set; }
+                            public List<string> Keywords { get; set; }
+                            public List<string> Perks { get; set; }
+                            public List<string> Requirements { get; set; }
+                        }
 
-                            public class JobPosting:
-                            {
-                                public string CompanyName { get; set; }
-                                public string Title { get; set; }
-                                public string Description { get; set; }
-                                public List<string> Keywords { get; set; }
-                                public List<string> Perks { get; set; }
-                                public List<string> Requirements { get; set; }
-                            }
+                        Your return content will only contain the requested JSON, no additional text.
+                        Additionally, there will be no formatting applied to the return content like
+                        markdown code block syntax.
 
-                            Your return content will only contain the requested JSON, no additional text.
-                            Additionally, there will be no formatting applied to the return content like
-                            markdown code block syntax.
+                        The following input is the job posting html
 
-                            The following input is the job posting html
+                        {{$input}}";
 
-                            {{$input}}";
+            result = await openAiClient.SendMessageAsync(prompt, result);
 
-                var result = await openAiClient.SendMessageAsync(prompt, reader.ReadToEnd());
+            result = FormatPreCheck(result);
 
-                result = FormatPreCheck(result);
+            return JsonConvert.DeserializeObject<JobResult>(result);
+        }
 
-                return JsonConvert.DeserializeObject<JobResult>(result);
-            }
+        private static string ParseSiteName(string url)
+        {
+            url = Regex.Replace(url, @"\.com.*", "");
+            
+            if (url.Contains("meta"))
+                return "meta";
+            else if (url.Contains("indeed"))
+                return "indeed";
+            else if (url.Contains("linkedin"))
+                return "linkedin";
+            else
+                throw new Exception("Site not supported");
         }
 
 
