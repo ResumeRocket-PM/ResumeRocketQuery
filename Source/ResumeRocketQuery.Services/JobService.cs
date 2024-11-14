@@ -118,10 +118,6 @@ namespace ResumeRocketQuery.Services
                 UpdateDate = DateTime.Today
             });
 
-
-
-
-
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
@@ -187,18 +183,14 @@ namespace ResumeRocketQuery.Services
         public async Task<ApplicationResult> GetApplication(int applicationId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(applicationId);
-
             var result = await ConvertApplication(application);
-
             return result;
         }
 
         public async Task<ApplicationResult> GetResumeHistory(int resumeId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
-
             var result = await ConvertApplication(application);
-
             return result;
         }
 

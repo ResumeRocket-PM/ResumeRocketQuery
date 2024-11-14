@@ -72,15 +72,8 @@ namespace ResumeRocketQuery.External
             try
             {
                 var html = await _httpClient.GetStringAsync(this._url);
-
                 string htmlpage = SetupDynamicContent("div");
-                var scraper = new TestScraper(htmlpage);
-
-                //scraper = new TestScraper(html);
-
-                var result = scraper.get_HTML_Body(target);
-
-                return result;
+                return htmlpage;
 
             }
             catch (Exception e)

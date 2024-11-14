@@ -8,6 +8,7 @@ using System.IO;
 using System.Net.Http.Json;
 using JetBrains.Annotations;
 using System;
+using System.Net.Http.Headers;
 
 namespace ResumeRocketQuery.External
 {
@@ -37,18 +38,31 @@ namespace ResumeRocketQuery.External
 
         public async Task<string> JobDetails(Stream stream, string siteName)
         {
-            var httpClient = new HttpClient();
-
-            var content = new MultipartFormDataContent
+            using (HttpClient client = new HttpClient())
             {
-                { new StreamContent(stream), "file", "job-posting.html" },
-                { new StringContent(siteName), "site" }
-            };
+                using (var multipartContent = new MultipartFormDataContent())
+                {
+                    multipartContent.Add(new StringContent(siteName), "site");
 
-            HttpResponseMessage response = await httpClient.PostAsync($"{_resumeRocketQueryConfigurationSettings.LlamaClientUrl}/get_job_details", content);
-            response.EnsureSuccessStatusCode();
-            string responseContent = await response.Content.ReadAsStringAsync();
-            return responseContent;
+                    var fileContent = new StreamContent(stream);
+                    fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+
+                    multipartContent.Add(fileContent, "file", "job.html");
+
+                    HttpResponseMessage response = await client.PostAsync($"{_resumeRocketQueryConfigurationSettings.LlamaClientUrl}/get_job_details", multipartContent);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string result = await response.Content.ReadAsStringAsync();
+                        return result;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {response.StatusCode}");
+                        return null;
+                    }
+                }
+            }
         }
 
         public async Task<string> ParseJobPosting(string html)

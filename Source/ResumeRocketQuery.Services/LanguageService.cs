@@ -52,7 +52,7 @@ namespace ResumeRocketQuery.Services
                         * Date published which  can be nullable
                         * A 1 paragraph TLDR of the job posting description
                         * The top 10 keywords of the job posting
-                        * A few perks of the job from the posting
+                        * A few perks of the job from the posting, if there are any otherwise an empty list
                         * A list  of the base job requirements
 
                         Arrange the returned data in a JSON object following this format:
