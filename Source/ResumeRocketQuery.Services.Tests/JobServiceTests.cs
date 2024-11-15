@@ -34,7 +34,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
 
                 var resumeId = await  _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -68,7 +68,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -125,7 +125,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -140,7 +140,7 @@ namespace ResumeRocketQuery.Services.Tests
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
-                    Position = "Application Engineer",
+                    Position = "Solutions Architect",
                     ResumeID = resumeId,
                     Status = "Pending"
                 };
@@ -217,7 +217,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },

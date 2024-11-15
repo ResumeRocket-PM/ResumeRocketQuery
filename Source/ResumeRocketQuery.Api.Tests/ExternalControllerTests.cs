@@ -69,7 +69,7 @@ namespace ResumeRocketQuery.Api.Tests
 
                     var actual = await _restRequestClient.SendRequest<CreateJobPostingResponse>(resource, HttpMethod.Post, new CreateJobPostingRequest
                     {
-                        Url = "https://www.metacareers.com/jobs/788246929742797/"
+                        Url = "https://www.metacareers.com/jobs/1604078213531024/"
                     }, headers);
 
                     expected.ToExpectedObject().ShouldMatch(actual);
