@@ -7,6 +7,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using ResumeRocketQuery.Domain.Configuration;
+using System;
+using System.Text.RegularExpressions;
 
 namespace ResumeRocketQuery.External
 {
@@ -61,5 +63,53 @@ namespace ResumeRocketQuery.External
 
             return new MemoryStream(byteArray);
         }
+
+        public async Task<string> StripText(Stream htmlsStream)
+        {
+            var strippedStream = await StripHtmlElements(htmlsStream);
+
+            var htmlDoc = new HtmlDocument();
+
+            htmlDoc.Load(strippedStream);
+
+            string textContent = GetVisibleText(htmlDoc.DocumentNode);
+
+            string alphanumericText = Regex.Replace(textContent, @"[^a-zA-Z0-9\s]", " ");
+
+            alphanumericText = Regex.Replace(alphanumericText, @"[\r\n]+", " ");
+
+            alphanumericText = Regex.Replace(alphanumericText, @"\s+", " "); 
+
+
+            return alphanumericText;
+        }
+
+        private string GetVisibleText(HtmlNode node)
+        {
+            if (node.NodeType == HtmlNodeType.Element)
+            {
+                var style = node.GetAttributeValue("style", string.Empty);
+                if (style.Contains("display: none", StringComparison.OrdinalIgnoreCase) ||
+                    style.Contains("visibility: hidden", StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.Empty;
+                }
+            }
+
+            if (node.NodeType == HtmlNodeType.Text)
+            {
+                return node.InnerText;
+            }
+
+            var visibleText = string.Empty;
+
+            foreach (var childNode in node.ChildNodes)
+            {
+                visibleText += GetVisibleText(childNode);
+            }
+
+            return visibleText;
+        }
+
     }
 }

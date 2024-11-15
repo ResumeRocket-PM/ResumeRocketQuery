@@ -4,5 +4,5 @@ namespace ResumeRocketQuery.Domain.Services;
 
 public interface ILlamaClient
 {
-    Task<string> CreateMessage(string input);
+    Task<string> CreateMessage(string prompt, string input );
 }
