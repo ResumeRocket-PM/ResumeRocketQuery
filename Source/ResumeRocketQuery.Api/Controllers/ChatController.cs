@@ -24,13 +24,18 @@ namespace ResumeRocketQuery.Api.Controllers
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
         private readonly IChatService _chatService;
+        private readonly IAccountService _accountService;
         public ChatController(IServiceResponseBuilder serviceResponseBuilder,
-            IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder,
+            IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder, 
+            IAccountService accountService,
             IChatService chatService)
         {
             _serviceResponseBuilder = serviceResponseBuilder;
             _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
             _chatService = chatService;
+            _accountService = accountService;
+
+
         }
 
         [HttpPost]
@@ -89,5 +94,55 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
 
         }
+
+        [HttpGet]
+        [Route("searchUser/{input}")]
+        public async Task<ServiceResponseGeneric<List<FriendInfo>>> searchUser([FromRoute] string input)
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var result = await _chatService.searchUserAccount(user.AccountId, input);
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
+
+        }
+
+        [HttpGet]
+        [Route("UserInfo/{theyId}")]
+        public async Task<ServiceResponseGeneric<AccountResponseBody>> Get([FromRoute] int theyId)
+        {
+            var accountResponse = await _accountService.GetAccountAsync(theyId);
+
+            var response = new AccountResponseBody
+            {
+                FirstName = accountResponse.FirstName,
+                LastName = accountResponse.LastName,
+                ProfilePhotoLink = accountResponse.ProfilePhotoLink,
+                Title = accountResponse.Title,
+                Email = accountResponse.EmailAddress,
+                Location = accountResponse.StateLocation,
+                PortfolioLink = accountResponse.PortfolioLink,
+                PrimaryResumeId = accountResponse.PrimaryResumeId,
+                Skills = accountResponse.Skills,
+                Experience = accountResponse.Experience.Select(e => new Domain.Api.Response.Experience
+                {
+                    Company = e.Company,
+                    Description = e.Description,
+                    EndDate = e.EndDate,
+                    Position = e.Position,
+                    StartDate = e.StartDate,
+                    Type = e.Type
+                }).ToList(),
+                Education = accountResponse.Education.Select(edu => new Domain.Api.Response.Education
+                {
+                    Degree = edu.Degree,
+                    GraduationDate = edu.GraduationDate,
+                    Major = edu.Major,
+                    Minor = edu.Minor,
+                    SchoolName = edu.SchoolName
+                }).ToList()
+            };
+
+            return _serviceResponseBuilder.BuildServiceResponse(response, HttpStatusCode.OK);
+        }
+
     }
 }
