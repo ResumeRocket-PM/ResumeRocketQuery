@@ -36,7 +36,7 @@ namespace ResumeRocketQuery.Services
             _resumeService = resumeService;
         }
 
-        public async Task<int> CreateJobAsync(ApplicationRequest applicationRequest)
+        public async Task<(int, List<Change>)> CreateJobAsync(ApplicationRequest applicationRequest)
         {
             //Take the HTML from the Posting, Pass
             var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
@@ -44,8 +44,26 @@ namespace ResumeRocketQuery.Services
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
             string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
 
-            try {
-                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
+            List<Change> suggestions = null;
+
+            try
+            {
+                // Remove any potential code block markers (```json at the beginning and ``` at the end)
+                string cleanedResponse = response.Trim();
+
+                if (cleanedResponse.StartsWith("```json"))
+                {
+                    cleanedResponse = cleanedResponse.Substring(7).Trim();  // Remove ```json
+                }
+
+                if (cleanedResponse.EndsWith("```"))
+                {
+                    cleanedResponse = cleanedResponse.Substring(0, cleanedResponse.Length - 3).Trim();  // Remove ```
+                }
+
+                // Now attempt deserialization with the cleaned response
+                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(cleanedResponse);
+                suggestions = jsonResult;
             }
             catch (Exception e) {
                 Debug.WriteLine("Error parsing returned JSON", e);
@@ -74,7 +92,7 @@ namespace ResumeRocketQuery.Services
                 ResumeId = originalResumeId
             });
 
-            return result;
+            return (result, suggestions);
         }
 
         public async Task<int> CreateJobResumeAsync(Job job)

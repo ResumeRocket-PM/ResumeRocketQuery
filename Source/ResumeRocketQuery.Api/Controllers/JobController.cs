@@ -97,18 +97,30 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpPost]
         [Route("extension/postings")]
-        public async Task<ServiceResponseGeneric<int>> CreateJobPosting([FromBody] CreateApplicationRequest applicationRequest)
+        public async Task<ServiceResponseGeneric<ExtensionPostingsResponse>> CreateJobPosting([FromBody] CreateApplicationRequest applicationRequest)
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            var applicationId = await _jobService.CreateJobAsync(new ApplicationRequest
+            var (applicationId, suggestions) = await _jobService.CreateJobAsync(new ApplicationRequest
             {
                 JobHtml = applicationRequest.Html,
                 JobUrl = applicationRequest.Url,
                 AccountId = account.AccountId
             });
 
-            return _serviceResponseBuilder.BuildServiceResponse(applicationId, HttpStatusCode.Created);
+            var result = new ExtensionPostingsResponse
+            {
+                ApplicationID = applicationId,
+                Suggestions = suggestions.Select(x => new ResumeRocketQuery.Domain.Api.Response.Change
+                {
+                    explanation = x.explanation,
+                    original = x.original,
+                    modified = x.modified
+                }).ToList()
+            };
+
+
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.Created);
         }
 
         [HttpPost]
