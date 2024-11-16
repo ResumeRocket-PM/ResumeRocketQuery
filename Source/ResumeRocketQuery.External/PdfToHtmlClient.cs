@@ -59,25 +59,11 @@ namespace ResumeRocketQuery.External
                 }
             }
 
-            var resultHtml = StripSpans(htmlDoc);
-
-            byte[] byteArray = Encoding.UTF8.GetBytes(resultHtml.DocumentNode.InnerHtml);
+            byte[] byteArray = Encoding.UTF8.GetBytes(htmlDoc.DocumentNode.InnerHtml);
 
             return new MemoryStream(byteArray);
         }
 
-        public async Task<Stream> StripSpans(Stream html)
-        {
-            var htmlDoc = new HtmlDocument();
-
-            htmlDoc.Load(html);
-
-            var resultHtml = StripSpans(htmlDoc);
-
-            byte[] byteArray = Encoding.UTF8.GetBytes(resultHtml.DocumentNode.InnerHtml);
-
-            return new MemoryStream(byteArray);
-        }
 
         public async Task<string> StripText(Stream htmlsStream)
         {

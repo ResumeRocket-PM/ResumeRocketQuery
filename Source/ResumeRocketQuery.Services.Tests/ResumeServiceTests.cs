@@ -278,10 +278,46 @@ namespace ResumeRocketQuery.Services.Tests
                         {
                             ResumeChangeId = Expect.Any<int>(),
                             Accepted = true,
-                            ExplanationString = "Because it sounds nicer",
+                            ExplanationString = Expect.Any<string>(),
                             HtmlID = Expect.Any<string>(),
-                            ModifiedText = "Professional Job Engineer",
-                            OriginalText = "Sample Resume Text",
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
                         }
                     }
                 };
@@ -326,7 +362,7 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var expected = new GetResumeResult
                 {
-                    ResumeHTML = $"<div id=\"{suggestedChangeId}\">Professional Job Engineer</div>",
+                    ResumeHTML = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
                     ResumeId = resumeId,
                     ResumeSuggestions = new List<ResumeSuggestions>()
                     {

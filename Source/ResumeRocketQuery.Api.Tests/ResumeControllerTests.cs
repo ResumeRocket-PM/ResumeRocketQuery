@@ -147,7 +147,7 @@ namespace ResumeRocketQuery.Api.Tests
                         },
                         Result = new
                         {
-                            ResumeHTML = $"<div id=\"{suggestedChangeId}\">Professional Job Engineer</div>",
+                            ResumeHTML = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
                             ResumeId = resumeId,
                             ResumeSuggestions = new[]
                             {

@@ -166,7 +166,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/757328535991512/";
 
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {

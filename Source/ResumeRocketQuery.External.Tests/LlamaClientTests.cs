@@ -24,7 +24,7 @@ namespace ResumeRocketQuery.External.Tests
             [Fact]
             public async Task WHEN_Convert_is_called_THEN_response_is_NOT_NULL()
             {
-                var result = await _systemUnderTest.CreateMessage("Hello, can you tell me what a json object is?");
+                var result = await _systemUnderTest.CreateMessage("Hello, is this a json object?", "{this isnt valid}");
 
                 Assert.NotNull(result);
             }
