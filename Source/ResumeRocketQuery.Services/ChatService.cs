@@ -28,17 +28,26 @@ namespace ResumeRocketQuery.Services
         /// <param name="newFId"></param>
         /// <param name="requestMsg"></param>
         /// <returns></returns>
-        public async Task<int> RequestNewFriends(int myId, int newFId, string requestMsg)
+        public async Task<Friends> RequestNewFriends(int myId, int newFId)
         {
-            var result  = await _chatDataLayer.AddFriendPairs(myId, newFId, "pending", requestMsg);
+            var result  = await _chatDataLayer.AddFriendPairs(myId, newFId, "pending");
             return result;
         }
 
         // accept/reject friends
-        public async Task<Friends> RespondNewFriends(int FId, string updateStatus)
+        public async Task<Friends> RespondNewFriends(int meId, int theyId, string updateStatus)
         {
-            var result = await _chatDataLayer.UpdateFriendPairStatus(FId, updateStatus);
-            return result;
+            if (updateStatus == "accept")
+            {
+                var result = await _chatDataLayer.UpdateFriendPairStatus(meId, theyId, "friends", "friends");
+                return result;
+
+            }
+            else
+            {
+                var result = await _chatDataLayer.UpdateFriendPairStatus(meId, theyId, "reject", "pending");
+                return result;
+            }
         }
 
         /// <summary>

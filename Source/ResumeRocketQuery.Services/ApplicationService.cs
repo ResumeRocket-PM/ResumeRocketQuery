@@ -40,7 +40,7 @@ namespace ResumeRocketQuery.Services
         public async Task<int> CreateJobAsync(ApplicationRequest applicationRequest)
         {
             //Take the HTML from the Posting, Pass
-            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
+            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml, applicationRequest.JobUrl);
 
             var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
 
@@ -225,18 +225,14 @@ namespace ResumeRocketQuery.Services
         public async Task<ApplicationResult> GetApplication(int applicationId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(applicationId);
-
             var result = await ConvertApplication(application);
-
             return result;
         }
 
         public async Task<ApplicationResult> GetResumeHistory(int resumeId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
-
             var result = await ConvertApplication(application);
-
             return result;
         }
 

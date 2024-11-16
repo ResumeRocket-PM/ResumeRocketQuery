@@ -438,8 +438,36 @@ namespace ResumeRocketQuery.DataLayer
 
             public class Chat
             {
+                public const string AddNewFriends = @"
+                INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
+                VALUES (@accountId1, @accountId2, @status1, CURRENT_TIMESTAMP);
+                
+                INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
+                VALUES (@accountId2, @accountId1, @status2, CURRENT_TIMESTAMP);
+                SELECT * FROM Friendship
+                WHERE (AccountId1 = @accountId1 and AccountId2 = @accountId2)
+                ";
+                
+                public const string GetFriendsByAccount = @"
+                SELECT * FROM Friendship
+                WHERE (AccountId1 = @accountId1 and AccountId2 = @accountId2)
+                   OR (AccountId1 = @accountId2 and AccountId2 = @accountId1)";
+
+                public const string UpdateFriendsStatus = @"
+                UPDATE Friendship 
+                SET Status = @status1 
+                WHERE AccountId1 = @accountId1 AND AccountId2 = @accountId2;
+                
+                UPDATE Friendship 
+                SET Status = @status2 
+                WHERE AccountId1 = @accountId2 AND AccountId2 = @accountId1;
+                SELECT * FROM Friendship
+                WHERE (AccountId1 = @accountId1 and AccountId2 = @accountId2)
+                ;
+                ";
+
                 public const string FindAllFrinedsByAccountId = @"
-                SELECT 
+                SELECT DISTINCT
                 Accounts.AccountId,
                 Friendship.FriendsId, 
                 Accounts.FirstName, 
@@ -455,29 +483,16 @@ namespace ResumeRocketQuery.DataLayer
                     EmailAddresses ON Accounts.AccountId = EmailAddresses.AccountId
                 JOIN 
                     Friendship ON (
-                        (Accounts.AccountId = Friendship.AccountId2 AND Friendship.AccountId1 = @accountId AND Friendship.Status = @status)
+                        (Accounts.AccountId = Friendship.AccountId2 AND Friendship.AccountId1 = @accountId AND Friendship.Status Like @status)
                     )
                 WHERE 
-                    Friendship.Status = @status 
+                    Friendship.Status Like @status 
                     AND (
                         Friendship.AccountId1 = @accountId OR Friendship.AccountId2 = @accountId
                     );
                 ";
                 
-                public const string AddNewFriends = @"
-                DECLARE @accountId1 INT = @inputId1;
-                DECLARE @accountId2 INT = @inputId2;
 
-                IF @accountId1 > @accountId2
-                BEGIN
-                    DECLARE @Temp INT = @accountId1;
-                    SET @accountId1 = @accountId2;
-                    SET @accountId2 = @Temp;
-                END                
-                
-                INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
-                VALUES (@accountId1, @accountId2, @status, CURRENT_TIMESTAMP);
-                SELECT SCOPE_IDENTITY()";
 
                 public const string SearchUserByName = @"
                 SELECT DISTINCT 
@@ -539,10 +554,6 @@ namespace ResumeRocketQuery.DataLayer
                 OUTPUT INSERTED.*                
                 WHERE (FriendsId = @friendsId);";
 
-                public const string GetFriendsByAccount = @"
-                SELECT * FROM Friendship
-                WHERE (AccountId1 = @accountId1 and AccountId2 = @accountId2)
-                   OR (AccountId1 = @accountId2 and AccountId2 = @accountId1)";
 
                 public const string GetFriendPairs = @"
                 SELECT * FROM Friendship 
