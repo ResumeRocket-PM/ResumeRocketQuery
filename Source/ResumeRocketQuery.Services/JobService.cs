@@ -39,7 +39,7 @@ namespace ResumeRocketQuery.Services
         public async Task<int> CreateJobAsync(ApplicationRequest applicationRequest)
         {
             //Take the HTML from the Posting, Pass
-            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml);
+            var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml, applicationRequest.JobUrl);
             var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
             string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
@@ -120,10 +120,6 @@ namespace ResumeRocketQuery.Services
                 UpdateDate = DateTime.Today
             });
 
-
-
-
-
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
@@ -189,18 +185,14 @@ namespace ResumeRocketQuery.Services
         public async Task<ApplicationResult> GetApplication(int applicationId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(applicationId);
-
             var result = await ConvertApplication(application);
-
             return result;
         }
 
         public async Task<ApplicationResult> GetResumeHistory(int resumeId)
         {
             var application = await _applicationDataLayer.GetApplicationAsync(resumeId);
-
             var result = await ConvertApplication(application);
-
             return result;
         }
 
