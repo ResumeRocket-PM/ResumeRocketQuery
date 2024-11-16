@@ -16,15 +16,13 @@ namespace ResumeRocketQuery.External
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }
 
-        public async Task<string> CreateMessage(string input)
+        public async Task<string> CreateMessage(string prompt, string input )
         {
             var httpClient = new HttpClient();
 
-            var content = new StringContent(JsonSerializer.Serialize(new { message = input }), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(new { message = input, prompt = prompt }), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await httpClient.PostAsync($"{_resumeRocketQueryConfigurationSettings.LlamaClientUrl}/message", content);
-
-            response.EnsureSuccessStatusCode();
 
             string responseContent = await response.Content.ReadAsStringAsync();
 
