@@ -62,7 +62,9 @@ namespace ResumeRocketQuery.Services
                 Resume = primaryResume,
                 OriginalResumeID = null,
                 OriginalResume = true,
-                Version = 1
+                Version = 1,
+                InsertDate = DateTime.Now,
+                UpdateDate = DateTime.Now
             });
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage

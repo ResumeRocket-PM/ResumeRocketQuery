@@ -7,6 +7,6 @@ namespace ResumeRocketQuery.Domain.External
     {
         Task<Stream> ConvertPdf(MemoryStream stream);
         Task<Stream> StripHtmlElements(Stream html);
-        Task<Stream> StripSpans(Stream html);
+        Task<string> StripText(Stream htmlsStream);
     }
 }

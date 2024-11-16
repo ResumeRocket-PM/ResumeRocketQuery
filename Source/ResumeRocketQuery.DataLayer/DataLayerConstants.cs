@@ -1,3 +1,4 @@
+using Microsoft.Identity.Client;
 using System.Security.Cryptography.X509Certificates;
 
 namespace ResumeRocketQuery.DataLayer
@@ -177,6 +178,11 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT PortfolioId, AccountId, Configuration
                     FROM Portfolio
                     WHERE AccountId = @AccountId";
+
+                public const string SelectPortfolioByPortfolioId = @"
+                    SELECT PortfolioId, AccountId, Configuration
+                    FROM Portfolio
+                    WHERE PortfolioId = @PortfolioId";
 
             }
 
@@ -432,26 +438,32 @@ namespace ResumeRocketQuery.DataLayer
 
             public class Chat
             {
-                public const string findAllFriendsAccount1 = @"
-                SELECT *
-                FROM Friendship
-                WHERE AccountId1 = @accountId AND Status = @status
+                public const string FindAllFrinedsByAccountId = @"
+                SELECT 
+                Accounts.AccountId,
+                Friendship.FriendsId, 
+                Accounts.FirstName, 
+                Accounts.LastName, 
+                Accounts.ProfilePhotoLink, 
+                Accounts.PortfolioLink, 
+                EmailAddresses.EmailAddress,
+                Friendship.CreatedTime, 
+                Friendship.Status
+                FROM 
+                    Accounts
+                LEFT JOIN 
+                    EmailAddresses ON Accounts.AccountId = EmailAddresses.AccountId
+                JOIN 
+                    Friendship ON (
+                        (Accounts.AccountId = Friendship.AccountId2 AND Friendship.AccountId1 = @accountId AND Friendship.Status = @status)
+                    )
+                WHERE 
+                    Friendship.Status = @status 
+                    AND (
+                        Friendship.AccountId1 = @accountId OR Friendship.AccountId2 = @accountId
+                    );
                 ";
-
-                public const string findAllFriendsAccount2 = @"
-                SELECT *
-                FROM Friendship
-                WHERE AccountId2 = @accountId AND Status = @status
-                ";
-
-                /// <summary>
-                /// to prevent the duplicate of AccountId1 and AccountId2 pairs
-                /// this will make sure that the lower value of AccountId would be AccountId1
-                /// for the added pairs
-                /// 
-                /// So that the database would not able to add the pairs duplicate even thoug
-                /// the AccountId1 and AccountId2 are in different order
-                /// </summary>
+                
                 public const string AddNewFriends = @"
                 DECLARE @accountId1 INT = @inputId1;
                 DECLARE @accountId2 INT = @inputId2;
@@ -465,14 +477,77 @@ namespace ResumeRocketQuery.DataLayer
                 
                 INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
                 VALUES (@accountId1, @accountId2, @status, CURRENT_TIMESTAMP);
-                SELECT SCOPE_IDENTITY();";
+                SELECT SCOPE_IDENTITY()";
+
+                public const string SearchUserByName = @"
+                SELECT DISTINCT 
+                    a.AccountId, 
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    a.PortfolioLink,
+                    e.EmailAddress, 
+                    f.Status
+                FROM Accounts a
+                    LEFT JOIN EmailAddresses e ON a.AccountId = e.AccountId
+                    LEFT JOIN Friendship f ON (
+                        (f.AccountId1 = a.AccountId AND f.AccountId2 = 7041) 
+                        OR (f.AccountId1 = 7041 AND f.AccountId2 = a.AccountId)
+                    )
+                WHERE a.FirstName LIKE @fName OR a.LastName LIKE @lName
+                ";
                 
+                public const string SearchUserByEmail = @"
+                SELECT 
+                    a.AccountId, 
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    a.PortfolioLink,
+                    e.EmailAddress, 
+                    f.Status
+                FROM Accounts a
+                JOIN EmailAddresses e ON a.AccountId = e.AccountId
+                LEFT JOIN Friendship f ON (
+                    (f.AccountId1 = a.AccountId AND f.AccountId2 = @myId) 
+                    OR (f.AccountId1 = @myId AND f.AccountId2 = a.AccountId)
+                )
+                WHERE e.EmailAddress LIKE @email
+                ";
+
+                public const string SearchUserByPortfolio = @"
+                SELECT DISTINCT 
+                    a.AccountId, 
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    a.PortfolioLink,
+                    e.EmailAddress, 
+                    f.Status
+                FROM Accounts a
+                    LEFT JOIN EmailAddresses e ON a.AccountId = e.AccountId
+                    LEFT JOIN Friendship f ON (
+                        (f.AccountId1 = a.AccountId AND f.AccountId2 = 7041) 
+                        OR (f.AccountId1 = 7041 AND f.AccountId2 = a.AccountId)
+                    )
+                WHERE a.PortfolioLink = @pLink
+                ";
+
                 public const string UpdateFriendStatus = @"
                 UPDATE Friendship
                 SET Status = @status, CreatedTime = CURRENT_TIMESTAMP
                 OUTPUT INSERTED.*                
                 WHERE (FriendsId = @friendsId);";
-                
+
+                public const string GetFriendsByAccount = @"
+                SELECT * FROM Friendship
+                WHERE (AccountId1 = @accountId1 and AccountId2 = @accountId2)
+                   OR (AccountId1 = @accountId2 and AccountId2 = @accountId1)";
+
+                public const string GetFriendPairs = @"
+                SELECT * FROM Friendship 
+                WHERE FriendsId = @friendsId";
+
                 public const string DeleteFriend = @"
                 DECLARE @accountId1 INT = @inputAccountId1;
                 DECLARE @accountId2 INT = @inputAccountId2;
@@ -486,6 +561,130 @@ namespace ResumeRocketQuery.DataLayer
                 
                 DELETE FROM Friendship
                 WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
+                //--------------------------------------------------MESSAGES--------------------------------------------------------
+                
+                public const string GetAlltalkedAccounts = @"
+                WITH RankedResults AS (
+                SELECT 
+                    a.AccountId,                    
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    e.EmailAddress,
+                    m.LatestMsgTime AS MsgTime,
+                    f.Status,
+                    ROW_NUMBER() OVER (PARTITION BY a.AccountId ORDER BY m.LatestMsgTime DESC) AS RowNum
+                FROM 
+                    (SELECT 
+                        CASE 
+                            WHEN SendId = @accountId THEN ReceiveId 
+                            ELSE SendId 
+                        END AS RelatedAccountId,
+                        MAX(MsgTime) AS LatestMsgTime
+                     FROM 
+                        Messages
+                     WHERE 
+                        SendId = @accountId OR ReceiveId = @accountId
+                     GROUP BY 
+                        CASE 
+                            WHEN SendId = @accountId THEN ReceiveId 
+                            ELSE SendId 
+                        END
+                    ) AS m
+                JOIN 
+                    Accounts AS a ON m.RelatedAccountId = a.AccountId
+                LEFT JOIN 
+                    EmailAddresses AS e ON a.AccountId = e.AccountId
+                LEFT JOIN 
+                    Friendship AS f ON 
+                    (f.AccountId1 = @accountId AND f.AccountId2 = a.AccountId) 
+                    OR (f.AccountId1 = a.AccountId AND f.AccountId2 = @accountId)
+                )
+                SELECT 
+                    AccountId,
+                    FirstName,
+                    LastName,
+                    ProfilePhotoLink,
+                    EmailAddress,
+                    MsgTime,
+                    Status
+                FROM 
+                    RankedResults
+                WHERE 
+                    RowNum = 1
+                ORDER BY 
+                    MsgTime DESC;
+                ";
+
+                public const string AddMsgByFId = @"
+                INSERT INTO Messages (FriendId, SendId, ReceiveId, MsgContent, MsgTime, MsgStatus)
+                SELECT FriendsId, AccountId1, AccountId2, @newMsg, CURRENT_TIMESTAMP, 'sending'
+                FROM Friendship
+                WHERE FriendsId = @fId;
+                SELECT TOP (100) * FROM Messages 
+                WHERE FriendId = @fId 
+                ORDER BY MsgTime DESC";
+
+                public const string AddMsgByAId = @"
+                INSERT INTO Messages (FriendId, SendId, ReceiveId, MsgContent, MsgTime, MsgStatus)
+                VALUES (@fId, @sId, @rId, @content, CURRENT_TIMESTAMP, @status);
+                SELECT TOP(100) * FROM Messages
+                WHERE FriendId = @fId
+                ORDER BY MsgTime DESC";
+
+                public const string UpdateMsgStatus = @"
+                UPDATE Messages
+                SET MsgStatus = @status
+                OUTPUT INSERTED.*                
+                WHERE (MsgId = @msgId);";
+
+                public const string DeleteMsg = @"
+                DELETE FROM Messages
+                WHERE MsgId = @msgId;
+                ";
+                public const string GetMsgbyMsgId = @"
+                SELECT * From Messages
+                WHERE MsgId = @msgId
+                ";
+
+                public const string GetAllMsgContent = @"
+                SELECT * FROM (
+                    SELECT TOP(200) * 
+                    FROM Messages 
+                    WHERE (SendId = @aId1 AND ReceiveId = @aId2) 
+                       OR (SendId = @aId2 AND ReceiveId = @aId1)
+                    ORDER BY MsgTime DESC
+                ) AS LatestMessages
+                ORDER BY MsgTime ASC;";
+
+                public const string GetRecentMsgContent = @"
+                SELECT TOP(@num) * FROM Messages WHERE FriendId = @fId";
+
+                public const string AddMessageEntity = @"
+                INSERT INTO Messages (SendId, ReceiveId, MsgContent, MsgStatus, MsgTime)
+                VALUES(@sendId, @receiveId, @text, @status, CURRENT_TIMESTAMP)
+                SELECT SCOPE_IDENTITY();
+                ";
+
+                public const string GetMessageIntityByFId = @"
+                SELECT * FROM Messages
+                WHERE FriendId = @friendId";
+
+                public const string GetMessageEntityByAId = @"
+                DECLARE @accountId1 INT = @inputAccountId1;
+                DECLARE @accountId2 INT = @inputAccountId2;
+
+                IF @accountId1 > @accountId2
+                BEGIN
+                    DECLARE @Temp INT = @accountId1;
+                    SET @accountId1 = @accountId2;
+                    SET @accountId2 = @Temp;
+                END                 
+                
+                SELECT * FROM Messages
+                WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2";
+
+                //public const string UpdateMessageContent = @"";
 
             }
         }

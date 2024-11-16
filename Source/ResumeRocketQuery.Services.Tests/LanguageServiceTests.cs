@@ -35,7 +35,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Title = Expect.Any<string>()
                 };
 
-                var actual = await _systemUnderTest.CaptureJobPostingAsync("https://www.metacareers.com/jobs/788246929742797/");
+                var actual = await _systemUnderTest.CaptureJobPostingAsync("https://www.metacareers.com/jobs/1604078213531024/");
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }

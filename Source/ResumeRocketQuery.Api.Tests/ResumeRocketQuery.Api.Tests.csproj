@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Samples\SampleCareer.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Samples\Tyler DeBruin Resume.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

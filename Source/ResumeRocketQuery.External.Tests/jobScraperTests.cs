@@ -46,7 +46,7 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.True(result);
             }
             [Theory]
-            [InlineData("https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ")]
+            [InlineData("https://www.metacareers.com/resume/?req=a1KDp00000E2LnpMAF")]
             public async Task TestFindTextInputField(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);
@@ -55,7 +55,7 @@ namespace ResumeRocketQuery.Repository.Tests
             }
 
             [Theory]
-            [InlineData("https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ")]
+            [InlineData("https://www.metacareers.com/resume/?req=a1KDp00000E2LnpMAF")]
             public async Task TestFindCheckBox(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);
@@ -79,7 +79,7 @@ namespace ResumeRocketQuery.Repository.Tests
             //}
 
             [Theory]
-            [InlineData("https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ")]
+            [InlineData("https://www.metacareers.com/resume/?req=a1KDp00000E2LnpMAF")]
             public async Task TestAutoFilledTextBox(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);

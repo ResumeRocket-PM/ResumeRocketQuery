@@ -56,12 +56,16 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IPortfolioService, PortfolioService>();
             services.AddSingleton<IProfileService, ProfileService>();
             services.AddSingleton<IPdfService, PdfService>();
+            services.AddSingleton<IChatService, ChatService>();
+            services.AddSingleton<IJobService, JobService>();
             services.AddSingleton<IApplicationService, ApplicationService>();
             services.AddSingleton<ISearchService, SearchService>();
             services.AddSingleton<IProfileDataLayer, ProfileDataLayer>();
             services.AddSingleton<IChatDateLayer, ChatDataLayer>();
             services.AddSingleton<IServiceResponseBuilder, ServiceResponseBuilder>();
             services.AddSingleton<IResumeRocketQueryUserBuilder, ResumeRocketQueryUserBuilder>();
+            services.AddSingleton<ILlamaClient, LlamaClient>();
+            services.AddSingleton<IExtensionService, ExtensionService>();
 
             ConfigureJwtAuthentication(services);
             ConfigureMiddlewareServices(services);
