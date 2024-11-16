@@ -39,18 +39,21 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpPost]
-        [Route("requestFriend")]
-        public async Task<ServiceResponseGeneric<int>> requestFriends([FromBody] FriendsRequest request)
+        [Route("requestFriend/{theyId}")]
+        public async Task<ServiceResponseGeneric<Friends>> requestFriends([FromRoute] int theyId)
         {
-            var result = await _chatService.RequestNewFriends(request.requestId, request.acceptId, request.acceptReason);
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+            var result = await _chatService.RequestNewFriends(user.AccountId, theyId);
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
         [HttpPost]
-        [Route("respondNewFriend/{FriendsId}/{newStatus}")]
-        public async Task<ServiceResponseGeneric<Friends>> ReplyFriendRequest([FromRoute] int FriendsId, [FromRoute] string newStatus)
+        [Route("respondNewFriend/{theyId}/{respond}")]
+        public async Task<ServiceResponseGeneric<Friends>> ReplyFriendRequest([FromRoute] int theyId, [FromRoute] string respond)
         {
-            var result = await _chatService.RespondNewFriends(FriendsId, newStatus);
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var result = await _chatService.RespondNewFriends(user.AccountId, theyId, respond);
 
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }

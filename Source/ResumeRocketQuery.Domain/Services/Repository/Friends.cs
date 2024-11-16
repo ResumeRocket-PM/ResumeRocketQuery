@@ -14,5 +14,10 @@ namespace ResumeRocketQuery.Domain.Services.Repository
         public string Status { get; set; }
         public string CreatedTime {  get; set; }
 
+        /// <summary>
+        /// this is for some querys that return a query result
+        /// to say if the query is executed success or not
+        /// </summary>
+        public string Result { get; set; }
     }
 }

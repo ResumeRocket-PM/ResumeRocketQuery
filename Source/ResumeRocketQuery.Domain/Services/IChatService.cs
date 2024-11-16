@@ -9,8 +9,8 @@ namespace ResumeRocketQuery.Domain.Services
 {
     public interface IChatService
     {
-        Task<int> RequestNewFriends(int myId, int newFId, string requestMsg);
-        Task<Friends> RespondNewFriends(int FId, string updateStatus);
+        Task<Friends> RequestNewFriends(int myId, int theyId);
+        Task<Friends> RespondNewFriends(int myId, int theyId, string respondRequest);
         Task<List<FriendInfo>> ShowFriendsListWithStatus(int myId, string status);
         Task<string> SendMsg(int sendId, int receiveId, string newMsg);
         Task<List<Message>> GetMessageHistory(int myId, int theyId);

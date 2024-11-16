@@ -31,74 +31,52 @@ namespace ResumeRocketQuery.DataLayer
         }
 
 
-        public async Task<int> AddFriendPairs(int myId, int newFriendId, string myStatus = "pending", string requestMsg = "")
+        public async Task<Friends> AddFriendPairs(int myId, int theyId, string myStatus = "pending")
         {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            var friends = await GetFriendEntityByAccount(myId, theyId);
+            if (friends.Count == 0)
             {
-
-                try
+                using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
                 {
-                    // check if there is friend pair
-                    // if there is no friend pair,
-                    // just added, and set the status as pending, return friendId
-                    var FriendshipResult = await connection.ExecuteScalarAsync<int>(
+
+                    var result = await connection.QueryFirstAsync<Friends>(
                                 DataLayerConstants.StoredProcedures.Chat.AddNewFriends,
                                 new
                                 {
-                                    inputId1 = myId,
-                                    inputId2 = newFriendId,
-                                    status = myStatus
+                                    accountId1 = myId,
+                                    accountId2 = theyId,
+                                    status1 = myStatus,
+                                    status2 = "unaccept"
                                 },
                                 commandType: CommandType.Text);
-
-                    // add the request message into the Messages Table
-                    if (requestMsg.Length > 0)
-                    {
-                        var messageResult = await connection.QueryAsync<Message>(
-                                DataLayerConstants.StoredProcedures.Chat.AddMsgByAId,
-                                new
-                                {
-                                    fId = FriendshipResult,
-                                    sId = myId,
-                                    rId = newFriendId,
-                                    content = requestMsg,
-                                    status = myStatus
-                                },
-                                commandType: CommandType.Text);
-                    }
-
-                    return FriendshipResult;
-
-                    // adding in the message as well
+                    return result;
                 }
-                catch (SqlException)
+            }
+            else
+            {
+                if (friends[0].Status == "unaccept") 
                 {
-                    // if friend pair exist, and the friend status is pending/block
-                    // pending: return friendId
-
-                    // block: do nothing
-
-                    Friends existFriends = await GetFriendEntityByAccount(myId, newFriendId);
-
-                    if (existFriends != null)
-                    {
-                        return existFriends.FriendsId;
-                    }
-                    else
-                    {
-                        return -1;
-                    }
+                    var result = await UpdateFriendPairStatus(myId, theyId, "friends", "friends");
+                    return result;
+                }
+                else if (friends[0].Status != "pending" && friends[0].Status != "friends")
+                {
+                    var result = await UpdateFriendPairStatus(myId, theyId, "pending", "unaccept");
+                    return result;
 
                 }
-
+                else
+                {
+                    return friends[0];
+                }
             }
         }
         
-        public async Task<Friends> GetFriendEntityByAccount(int AId1, int AId2)
+        public async Task<List<Friends>> GetFriendEntityByAccount(int AId1, int AId2)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-                var result = await connection.QueryFirstOrDefaultAsync<Friends>(
+                var result = await connection.QueryAsync<Friends>(
                                         DataLayerConstants.StoredProcedures.Chat.GetFriendsByAccount,
                                         new
                                         {
@@ -107,28 +85,7 @@ namespace ResumeRocketQuery.DataLayer
                                         },
                                         commandType: CommandType.Text);
 
-                return result; 
-            }
-        }
-
-        /// <summary>
-        /// get the specific entity from Friendship table by its friendsId
-        /// </summary>
-        /// <param name="friendId"></param>
-        /// <returns></returns>
-        public async Task<Friends> GetFriendEntityByFriendId(int friendId)
-        {
-            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
-            {
-                var result = await connection.QueryFirstOrDefaultAsync<Friends>(
-                                        DataLayerConstants.StoredProcedures.Chat.GetFriendPairs,
-                                        new
-                                        {
-                                            friendsId = friendId
-                                        },
-                                        commandType: CommandType.Text);
-
-                return result;
+                return result.ToList(); 
             }
         }
 
@@ -138,25 +95,44 @@ namespace ResumeRocketQuery.DataLayer
         /// <param name="friendId"></param>
         /// <param name="newStatus"></param>
         /// <returns></returns>
-        public async Task<Friends> UpdateFriendPairStatus(int friendId, string newStatus)
+        public async Task<Friends> UpdateFriendPairStatus(int AId1, int AId2, string newStatus1, string newStatus2)
         {
             // get the raw of friend pairs, and set the status as the value of @status
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
-
-                var result = await connection.QueryFirstOrDefaultAsync<Friends>(
-                    DataLayerConstants.StoredProcedures.Chat.UpdateFriendStatus,
-                    new
-                    {
-                        friendsId = friendId,
-                        status = newStatus
-                    },
-                    commandType: CommandType.Text);
-
+                var result = await connection.QueryFirstAsync<Friends>(
+                                        DataLayerConstants.StoredProcedures.Chat.UpdateFriendsStatus,
+                                        new
+                                        {
+                                            accountId1 = AId1,
+                                            accountId2 = AId2,
+                                            status1 = newStatus1,
+                                            status2 = newStatus2
+                                        },
+                                        commandType: CommandType.Text);
+                
                 return result;
-
+                
             }
         }
+        
+        //public async Task<Friends> GetFriendEntityByFriendId(int friendId)
+        //{
+        //    using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+        //    {
+        //        var result = await connection.QueryFirstOrDefaultAsync<Friends>(
+        //                                DataLayerConstants.StoredProcedures.Chat.GetFriendPairs,
+        //                                new
+        //                                {
+        //                                    friendsId = friendId
+        //                                },
+        //                                commandType: CommandType.Text);
+
+        //        return result;
+        //    }
+        //}
+
+        
 
         /// <summary>
         /// delete the Friendship entity from the Friendship table
@@ -202,7 +178,7 @@ namespace ResumeRocketQuery.DataLayer
                             new
                             {
                                 accountId = myId,
-                                status = fStatus
+                                status = $"%{fStatus}%"
                             },
                             commandType: CommandType.Text);
 
@@ -311,7 +287,7 @@ namespace ResumeRocketQuery.DataLayer
                 }
                 else // check if the friends status is block 
                 {
-                    bool isBlock = FriendsTuple[0].Status == "block";
+                    bool isBlock = (FriendsTuple[0].Status == "blocking") || (FriendsTuple[0].Status == "blocked");
                     if (isBlock)
                     {
                         return "block friends cannot send messages";
