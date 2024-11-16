@@ -56,34 +56,43 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             Assert.IsType<int>(results);
         }
 
-        //[Theory]
-        //[InlineData(typeof(ChatDataLayer))]
-        //public async Task Check_Stored_Friends_Pairs_Duplicate_Async(Type storageType)
-        //{
-        //    var systemUnderTest = GetSystemUnderTest(storageType);
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_add_new_Friends_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
 
-        //    var secondStore = await systemUnderTest.AddFriendPairs(1438, 1439, "pending");
+            var secondStore = await systemUnderTest.AddFriendPairs(7041, 1439, "pending");
 
-        //    Assert.Equal(1, secondStore);
-        //    //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
-        //}
+            Assert.NotNull(secondStore);
+            // Assert.Equal(1, secondStore);
+            // var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+        }
 
-        //[Theory]
-        //[InlineData(typeof(ChatDataLayer))]
-        //public async Task GetFriendsByFId(Type storageType)
-        //{
-        //    var systemUnderTest = GetSystemUnderTest(storageType);
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_respond_New_Friend_Request_Async(Type storagetype)
+        {
+            var systemUnderTest = GetSystemUnderTest(storagetype);
+            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
+            {
+                AccountAlias = Guid.NewGuid().ToString(),
+                FirstName = $"{Guid.NewGuid().ToString()}_YY_Test",
+                LastName = $"{Guid.NewGuid().ToString()}_YY_Test",
+                ProfilePhotoLink = Guid.NewGuid().ToString(),
+                Title = Guid.NewGuid().ToString(),
+                StateLocation = Guid.NewGuid().ToString(),
+                PortfolioLink = Guid.NewGuid().ToString(),
+            });
 
-        //    var friendPair = await systemUnderTest.GetFriendEntityByFriendId(2);
+            var requestF = await systemUnderTest.AddFriendPairs(7041, accountId, "pending");
+            Assert.NotNull(requestF);
 
-        //    Assert.Equal(1438, friendPair.AccountId1);
-        //    Assert.Equal(1440, friendPair.AccountId2);
-
-        //    // 
-        //    var nan = await systemUnderTest.GetFriendEntityByFriendId(-1);
-        //    Assert.Null(nan);
-        //    //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
-        //}
+            var result = await systemUnderTest.UpdateFriendPairStatus(accountId, 7041, "friends", "friends");
+            Assert.NotNull(result);
+            Assert.Equal("friends", result.Status);
+            //var resultsdict = await systemundertest.allmyfriendpairs(1438, "friends");
+        }
 
         [Theory]
         [InlineData(typeof(ChatDataLayer))]
