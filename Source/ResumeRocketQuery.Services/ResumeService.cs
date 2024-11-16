@@ -353,11 +353,11 @@ namespace ResumeRocketQuery.Services
         }
 
 
-        public async Task ApplyResumeSuggestion(int resumeChangeId)
+        public async Task ApplyResumeSuggestion(int resumeChangeId, bool accepted)
         {
             await _resumeDataLayer.UpdateResumeChangeAsync(new ResumeChangesStorage
             {
-                Accepted = true,
+                Accepted = accepted,
                 ResumeChangeId = resumeChangeId
             });
         }
@@ -370,17 +370,21 @@ namespace ResumeRocketQuery.Services
 
             var acceptedSuggestions = resumeSuggestions.Where(x => x.Accepted).ToList();
 
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(resumeHtml);
 
             foreach (var acceptedSuggestion in acceptedSuggestions)
             {
-                var div = htmlDoc.GetElementbyId(acceptedSuggestion.HtmlID);
+                var elements = htmlDoc.DocumentNode.SelectNodes($"//*[@class='{acceptedSuggestion.HtmlID}']");
 
-                if (div != null)
+                if (elements != null)
                 {
-                    div.InnerHtml = acceptedSuggestion.ModifiedText;
+                    foreach (var element in elements)
+                    {
+                        element.InnerHtml = acceptedSuggestion.ModifiedText;
+                    }
                 }
             }
 

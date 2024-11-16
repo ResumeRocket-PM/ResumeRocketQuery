@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.Services;
 
-public interface IJobService
+public interface IApplicationService
 {
     Task<int> CreateJobResumeAsync(Job job);
     Task<List<ApplicationResult>> GetJobPostings(int accountId);

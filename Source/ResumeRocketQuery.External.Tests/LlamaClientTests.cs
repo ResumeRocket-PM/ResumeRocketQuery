@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +16,7 @@ namespace ResumeRocketQuery.External.Tests
 
         public LlamaClientTests()
         {
-            var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+            var serviceProvider = new ResumeRocketQueryServiceProvider().Create();
 
             _systemUnderTest = serviceProvider.GetService<ILlamaClient>();
         }
@@ -24,9 +26,45 @@ namespace ResumeRocketQuery.External.Tests
             [Fact]
             public async Task WHEN_Convert_is_called_THEN_response_is_NOT_NULL()
             {
-                var result = await _systemUnderTest.CreateMessage("Hello, can you tell me what a json object is?");
-
+                var result = await _systemUnderTest.CreateMessage("Hello, can you tell me what a json object is?", "Here is an example: {this is an object}");
                 Assert.NotNull(result);
+            }
+        }
+
+        public class GetJobPosting : LlamaClientTests
+        {
+            [Fact]
+            public async Task WHEN_GetJobPosting_is_called_THEN_response_is_NOT_NULL()
+            {
+                using (var stream = new FileStream(@"./Samples/Meta/meta-swe.html", FileMode.Open, FileAccess.Read))
+                {
+                    var result = await _systemUnderTest.JobDetails(stream, "meta");
+                    Assert.NotNull(result);
+                }
+                 using (var stream = new FileStream(@"./Samples/Indeed/indeed-swe.html", FileMode.Open, FileAccess.Read))
+                {
+                    var result = await _systemUnderTest.JobDetails(stream, "indeed");
+                    Assert.NotNull(result);
+                }
+                 using (var stream = new FileStream(@"./Samples/LinkedIn/linkedin-de.html", FileMode.Open, FileAccess.Read))
+                {
+                    var result = await _systemUnderTest.JobDetails(stream, "linkedin");
+                    Assert.NotNull(result);
+                }
+            }
+        }
+
+        public class ParseJobPosting : LlamaClientTests
+        {
+            [Fact]
+            public async Task WHEN_ParseJobPosting_is_called_THEN_response_is_NOT_NULL()
+            {
+                using (var stream = new FileStream(@"./Samples/Meta/meta-swe.html", FileMode.Open, FileAccess.Read))
+                {
+                    var result = await _systemUnderTest.JobDetails(stream, "meta");
+                    result = await _systemUnderTest.ParseJobPosting(result);
+                    Assert.NotNull(result);
+                }
             }
         }
     }

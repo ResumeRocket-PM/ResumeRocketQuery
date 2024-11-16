@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Text;
 
 namespace ResumeRocketQuery.Repository.Tests
 {

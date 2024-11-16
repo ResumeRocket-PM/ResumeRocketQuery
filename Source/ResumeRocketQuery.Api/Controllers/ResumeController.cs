@@ -61,9 +61,9 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpPut]
         [Route("{resumeId}/suggestions/{resumeChangeId}")]
-        public async Task<ServiceResponse> ApplyResumeSuggestion([FromRoute] int resumeChangeId)
+        public async Task<ServiceResponse> ApplyResumeSuggestion([FromRoute] int resumeChangeId, ResumeSuggestionsUpdateRequest resumeSuggestionsUpdateRequest)
         {
-            await _resumeService.ApplyResumeSuggestion(resumeChangeId);
+            await _resumeService.ApplyResumeSuggestion(resumeChangeId, resumeSuggestionsUpdateRequest.Accepted);
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }

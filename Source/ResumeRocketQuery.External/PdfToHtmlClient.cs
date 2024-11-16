@@ -49,7 +49,7 @@ namespace ResumeRocketQuery.External
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(html);
 
-            foreach (var tag in new[]{ "style", "link", "script", "img", "head", "meta" })
+            foreach (var tag in new[]{ "style", "link", "script", "img", "head", "meta"  })
             {
                 var nodes = htmlDoc.DocumentNode.Descendants(tag).ToList();
 
@@ -63,6 +63,7 @@ namespace ResumeRocketQuery.External
 
             return new MemoryStream(byteArray);
         }
+
 
         public async Task<string> StripText(Stream htmlsStream)
         {

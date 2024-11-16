@@ -22,13 +22,13 @@ namespace ResumeRocketQuery.Api.Controllers
     public class JobController : ControllerBase
     {
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
-        private readonly IJobService _jobService;
+        private readonly IApplicationService _applicationService;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
 
-        public JobController(IServiceResponseBuilder serviceResponseBuilder, IJobService jobService, IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
+        public JobController(IServiceResponseBuilder serviceResponseBuilder, IApplicationService applicationService, IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
         {
             this._serviceResponseBuilder = serviceResponseBuilder;
-            _jobService = jobService;
+            _applicationService = applicationService;
             _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
         }
 
@@ -40,7 +40,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("postings/{applicationId}")]
         public async Task<ServiceResponseGeneric<JobPostingResponse>> GetById(int applicationId)
         {
-            var resumeResult = await _jobService.GetApplication(applicationId);
+            var resumeResult = await _applicationService.GetApplication(applicationId);
 
             if (resumeResult != null)
             {
@@ -69,7 +69,7 @@ namespace ResumeRocketQuery.Api.Controllers
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            var resumeResult = await _jobService.GetJobPostings(account.AccountId);
+            var resumeResult = await _applicationService.GetJobPostings(account.AccountId);
 
             var result = resumeResult.Select(x => new JobPostingResponse
             {
@@ -90,7 +90,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("postings/{resumeId}")]
         public async Task<ServiceResponse> UpdateStaus(int resumeId, string status)
         {
-            await _jobService.UpdateApplication(resumeId, status);
+            await _applicationService.UpdateApplication(resumeId, status);
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
@@ -101,7 +101,7 @@ namespace ResumeRocketQuery.Api.Controllers
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            var applicationId = await _jobService.CreateJobAsync(new ApplicationRequest
+            var applicationId = await _applicationService.CreateJobAsync(new ApplicationRequest
             {
                 JobHtml = applicationRequest.Html,
                 JobUrl = applicationRequest.Url,
@@ -131,7 +131,7 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var createRequest = JsonConvert.DeserializeObject<CreateJobPostingRequest>(data);
 
-            await _jobService.CreateJobResumeAsync(new Job
+            await _applicationService.CreateJobResumeAsync(new Job
             {
                 Resume = resultResume,
                 JobUrl = createRequest.Url,

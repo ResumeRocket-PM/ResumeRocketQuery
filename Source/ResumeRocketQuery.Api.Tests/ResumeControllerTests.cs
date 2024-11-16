@@ -83,7 +83,10 @@ namespace ResumeRocketQuery.Api.Tests
                         }
                     };
 
-                    var actual = await _restRequestClient.SendRequest<object>($"{selfHost.Url}/api/resume/{resumeId}/suggestions/{resumeChangeId}", HttpMethod.Put, null, headers);
+                    var actual = await _restRequestClient.SendRequest<object>($"{selfHost.Url}/api/resume/{resumeId}/suggestions/{resumeChangeId}", HttpMethod.Put, new ResumeSuggestionsUpdateRequest
+                    {
+                        Accepted = true
+                    }, headers);
 
                     expected.ToExpectedObject().ShouldMatch(actual);
                 }
@@ -144,7 +147,7 @@ namespace ResumeRocketQuery.Api.Tests
                         },
                         Result = new
                         {
-                            ResumeHTML = $"<div id=\"{suggestedChangeId}\">Professional Job Engineer</div>",
+                            ResumeHTML = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
                             ResumeId = resumeId,
                             ResumeSuggestions = new[]
                             {

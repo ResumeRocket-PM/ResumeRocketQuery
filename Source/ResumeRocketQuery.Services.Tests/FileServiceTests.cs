@@ -1,129 +1,51 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
-using ExpectedObjects;
-using ResumeRocketQuery.Api.Tests.Helpers;
-using ResumeRocketQuery.Domain.Api.Response;
 using ResumeRocketQuery.Domain.Services;
-using Microsoft.Extensions.DependencyInjection;
 using ResumeRocketQuery.Tests.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using System.IO;
+using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.External;
 
-namespace ResumeRocketQuery.Api.Tests
+namespace ResumeRocketQuery.Services.Tests
 {
-    [Collection("External")]
-    public class JobControllerTests
+    public class FileServiceTests
     {
-        private readonly RestRequestClient _restRequestClient;
+        private readonly IFileService _systemUnderTest;
+        private readonly IPdfToHtmlClient _pdfToHtmlClient;
 
-        public JobControllerTests()
+        public FileServiceTests()
         {
-            _restRequestClient = new RestRequestClient();
+            var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
+
+            _systemUnderTest = serviceProvider.GetService<IFileService>();
+            _pdfToHtmlClient = serviceProvider.GetService<IPdfToHtmlClient>();
         }
 
-        public class Post : JobControllerTests
-        {
-            [Fact]
-            public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_endpoint()
-            {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
-                {
-                    var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
-
-                    var email = $"{Guid.NewGuid().ToString()}@testemail.com";
-                    var password = "testPassword1";
-
-                    var createAccountResponse = await accountService.CreateAccountAsync(new CreateAccountRequest
-                    {
-                        EmailAddress = email, 
-                        Password = password
-                    });
-
-                    var resumeService = selfHost.ServiceProvider.GetService<IResumeService>();
-
-                    await resumeService.CreatePrimaryResume(new ResumeRequest
-                    {
-                        AccountId = createAccountResponse.AccountId,
-                        Pdf = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
-                    });
-
-                    var expected = new
-                    {
-                        Succeeded = true,
-                        ResponseMetadata = new
-                        {
-                            HttpStatusCode = 201
-                        },
-                        Result = Expect.Any<int>()
-                    };
-
-                    var resource = $"{selfHost.Url}/api/job/extension/postings";
-
-                    var headers = new Dictionary<string, string>
-                    {
-                        {"Authorization", $"Bearer {createAccountResponse.JsonWebToken}"}
-                    };
-
-                    var actual = await _restRequestClient.SendRequest<int>(resource,
-                        HttpMethod.Post,
-                        new CreateApplicationRequest
-                        {
-                            Url = "https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ",
-                            Html = File.ReadAllText("./Samples/SampleCareer.html")
-                        }, headers);
-
-                    expected.ToExpectedObject().ShouldMatch(actual);
-                }
-            }
-        }
-
-        public class Get : JobControllerTests
+        public class ConvertHtml : FileServiceTests
         {
             [Fact]
-            public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_endpoint()
+            public async Task WHEN_ConvertHtml_is_called_THEN_resuume_stored_on_account()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
-                {
-                    var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
+                using var memoryStream = new MemoryStream();
 
-                    var email = $"{Guid.NewGuid().ToString()}@testemail.com";
-                    var password = "testPassword1";
+                var pdfBytes = File.ReadAllBytes("./Samples/Tyler DeBruin Resume.pdf");
 
-                    var createAccountResponse = await accountService.CreateAccountAsync(new CreateAccountRequest
-                    {
-                        EmailAddress = email,
-                        Password = password
-                    });
+                await memoryStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
 
-                    var expected = new
-                    {
-                        Succeeded = true,
-                        ResponseMetadata = new
-                        {
-                            HttpStatusCode = 201
-                        },
-                    };
+                memoryStream.Position = 0;
 
-                    var resource = $"{selfHost.Url}/api/job/postings";
+                //byte[] byteArray = memoryStream.ToArray();
 
-                    var headers = new Dictionary<string, string>
-                    {
-                        {"Authorization", $"Bearer {createAccountResponse.JsonWebToken}"}
-                    };
+                //string base64String = Convert.ToBase64String(byteArray);
 
-                     var actual = await _restRequestClient.SendRequest<CreateJobPostingResponse>(resource, 
-                         HttpMethod.Post, 
-                         new CreateJobPostingRequest
-                         {
-                             Url = "https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ"
-                         }, headers, fileUpload: "./Samples/Tyler DeBruin Resume.pdf");
+                var accountDetails = await _systemUnderTest.ConvertHtml(memoryStream);
 
-                    expected.ToExpectedObject().ShouldMatch(actual);
-                }
             }
+
         }
+
 
         private string GetResumeBytes()
         {

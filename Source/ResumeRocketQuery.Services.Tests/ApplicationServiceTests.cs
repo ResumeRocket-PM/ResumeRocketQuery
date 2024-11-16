@@ -6,24 +6,27 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Collections.Generic;
+using Moq;
+using ResumeRocketQuery.Domain.External;
 
 namespace ResumeRocketQuery.Services.Tests
 {
     [Collection("External")]
-    public class JobServiceTests
+    public class ApplicationServiceTests
     {
-        private readonly IJobService _systemUnderTest;
+        private readonly IApplicationService _systemUnderTest;
         private readonly IAccountService _accountService;
 
-        public JobServiceTests()
+        public ApplicationServiceTests()
         {
             var serviceProvider = (new ResumeRocketQueryServiceProvider()).Create();
 
-            _systemUnderTest = serviceProvider.GetService<IJobService>();
+            _systemUnderTest = serviceProvider.GetService<IApplicationService>();
             _accountService = serviceProvider.GetService<IAccountService>();
         }
 
-        public class CaptureJobPostingAsync : JobServiceTests
+
+        public class CaptureApplicationPostingAsync : ApplicationServiceTests
         {
             [Fact]
             public async Task WHEN_CaptureJobPostingAsync_is_called_THEN_resume_is_persisted()
@@ -34,7 +37,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
+                var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
                 var resumeId = await  _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -68,7 +71,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
+                var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -103,7 +106,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -125,7 +128,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
+                var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
                 var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -140,7 +143,7 @@ namespace ResumeRocketQuery.Services.Tests
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
-                    Position = "Solutions Architect",
+                    Position = "Software Engineer, Machine Learning",
                     ResumeID = resumeId,
                     Status = "Pending"
                 };
@@ -152,7 +155,7 @@ namespace ResumeRocketQuery.Services.Tests
             }
         }
 
-        public class GetResumes : JobServiceTests
+        public class GetResumes : ApplicationServiceTests
         {
             [Fact]
             public async Task WHEN_CaptureJobPostingAsync_is_called_THEN_resume_is_persisted()
@@ -163,7 +166,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/788246929742797/";
+                var jobUrl = "https://www.metacareers.com/jobs/757328535991512/";
 
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
@@ -217,7 +220,7 @@ namespace ResumeRocketQuery.Services.Tests
                     Password = Guid.NewGuid().ToString()
                 });
 
-                var jobUrl = "https://www.metacareers.com/jobs/1604078213531024/";
+                var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
                 var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },

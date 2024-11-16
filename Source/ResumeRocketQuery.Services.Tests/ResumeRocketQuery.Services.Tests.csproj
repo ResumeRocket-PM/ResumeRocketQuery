@@ -38,6 +38,9 @@
     <None Update="Samples\studentAthleteResume.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Samples\Tyler DeBruin Resume.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

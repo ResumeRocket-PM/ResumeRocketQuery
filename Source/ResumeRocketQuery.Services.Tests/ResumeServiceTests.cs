@@ -6,9 +6,13 @@ using ResumeRocketQuery.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 using Sprache;
 using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.External;
+using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 
 namespace ResumeRocketQuery.Services.Tests
 {
@@ -17,6 +21,8 @@ namespace ResumeRocketQuery.Services.Tests
         private readonly IResumeService _systemUnderTest;
         private readonly IAccountService _accountService;
         private readonly IResumeDataLayer _resumeDataLayer;
+        private readonly IPdfToHtmlClient _pdfToHtmlClient;
+        private readonly IApplicationService _applicationService;
 
         public ResumeServiceTests()
         {
@@ -25,6 +31,9 @@ namespace ResumeRocketQuery.Services.Tests
             _systemUnderTest = serviceProvider.GetService<IResumeService>();
             _accountService = serviceProvider.GetService<IAccountService>();
             _resumeDataLayer = serviceProvider.GetService<IResumeDataLayer>();
+            _pdfToHtmlClient = serviceProvider.GetService<IPdfToHtmlClient>();
+
+            _applicationService = serviceProvider.GetService<IApplicationService>();
         }
 
         public class CreatePrimaryResume : ResumeServiceTests
@@ -207,7 +216,7 @@ namespace ResumeRocketQuery.Services.Tests
                     OriginalText = "Professional Job Engineer",
                 });
 
-                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId);
+                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId, true);
 
 
                 var expected = new List<ResumeChangesStorage>
@@ -230,8 +239,95 @@ namespace ResumeRocketQuery.Services.Tests
             }
         }
 
+
         public class GetPerfectResume : ResumeServiceTests
         {
+            [Theory]
+            [InlineData(1482)]
+            public async Task GIVEN_accountId_WHEN_GetPerfectResume_then_resume_has_modifications_applied(int accountId)
+            {
+                using var memoryStream = new MemoryStream();
+
+                var pdfBytes = File.ReadAllBytes("./Samples/Tyler DeBruin Resume.pdf");
+
+                await memoryStream.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+
+                memoryStream.Position = 0;
+
+                byte[] byteArray = memoryStream.ToArray();
+
+                string base64String = Convert.ToBase64String(byteArray);
+
+                var applicationId = await _applicationService.CreateJobResumeAsync(new Job
+                {
+                    JobUrl = "https://www.metacareers.com/jobs/1145976100026066/",
+                    AccountId = accountId,
+                    Resume = new Dictionary<string, string>
+                        { { "FileBytes", base64String }, { "FileName", "testing.pdf" } },
+                });
+
+                var application = await _applicationService.GetApplication(applicationId);
+
+                var expected = new
+                {
+                    ResumeHTML = Expect.Any<string>(),
+                    ResumeId = Expect.Any<int>(),
+                    ResumeSuggestions = new[]
+                    {
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        },
+                        new
+                        {
+                            ResumeChangeId = Expect.Any<int>(),
+                            Accepted = true,
+                            ExplanationString = Expect.Any<string>(),
+                            HtmlID = Expect.Any<string>(),
+                            ModifiedText = Expect.Any<string>(),
+                            OriginalText = Expect.Any<string>(),
+                        }
+                    }
+                };
+
+                var actual = await _systemUnderTest.GetPerfectResume(application.ResumeContentId.Value);
+
+                expected.ToExpectedObject().ShouldMatch(actual);
+
+            }
+
             [Fact]
             public async Task GIVEN_change_applied_WHEN_GetPerfectResume_is_called_THEN_resuume_storage_updated_correctly()
             {
@@ -261,12 +357,12 @@ namespace ResumeRocketQuery.Services.Tests
                     OriginalText = "Sample Resume Text",
                 });
 
-                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId);
+                await _systemUnderTest.ApplyResumeSuggestion(resumeChangeId, true);
 
 
                 var expected = new GetResumeResult
                 {
-                    ResumeHTML = $"<div id=\"{suggestedChangeId}\">Professional Job Engineer</div>",
+                    ResumeHTML = $"<div id=\"{suggestedChangeId}\">Sample Resume Text</div>",
                     ResumeId = resumeId,
                     ResumeSuggestions = new List<ResumeSuggestions>()
                     {

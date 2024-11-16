@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
+using Microsoft.OpenApi.Validations.Rules;
 
 namespace ResumeRocketQuery.Repository.Tests
 {
@@ -25,7 +26,8 @@ namespace ResumeRocketQuery.Repository.Tests
 
         public class SendMessageAsync : OpenAiClientTests
         {
-            [Fact]
+            // [Fact]
+            [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_THEN_response_is_NOT_NULL()
             {
                 var response = await _systemUnderTest.SendMessageAsync(
@@ -40,7 +42,8 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.True(response != null);
             }
 
-            [Fact]
+            // [Fact]
+            [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_on_true_THEN_returned_true()
             {
                 var response = await _systemUnderTest.SendMessageAsync(
@@ -53,7 +56,8 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.Equal("true", response.ToLower());
             }
 
-            [Fact]
+            // [Fact]
+            [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_in_succession_THEN_chat_history_logged()
             {
                 List<string> prompts = new List<string>();
@@ -73,7 +77,8 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.Equal("10", response.ToLower());
             }
 
-            [Fact]
+            // [Fact]
+            [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_on_false_THEN_returned_false()
             {
                 var response = await _systemUnderTest.SendMessageAsync(
@@ -86,7 +91,8 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.Equal("false", response.ToLower());
             }
 
-            [Fact]
+            // [Fact]
+            [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_on_marketstar_page_source_THEN_assert_keywords()
             {
                 var jobPosting = File.ReadAllText(@"./Samples/MarketStar/MarketStar.html");
@@ -106,7 +112,8 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.Equal(10, jsonResult.Count);
             }
 
-            [Fact]
+            // [Fact]
+            [Fact(Skip = "Skipping to conserve API credits")]
             public static void WHEN_JSON()
             {
                 string json =
