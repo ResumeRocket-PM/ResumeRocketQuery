@@ -35,7 +35,7 @@ namespace ResumeRocketQuery.Services
         }
 
         // accept/reject friends
-        public async Task<Friends> RespondNewFriends(int meId, int theyId, string updateStatus)
+        public async Task<Friends> RespondFriendsNewStatus(int meId, int theyId, string updateStatus)
         {
             if (updateStatus == "accept")
             {
@@ -43,9 +43,14 @@ namespace ResumeRocketQuery.Services
                 return result;
 
             }
-            else if (updateStatus == "blocking")
+            else if (updateStatus == "unblock")
             {
                 var result = await _chatDataLayer.UpdateFriendPairStatus(meId, theyId, "unfriends", "unfriends");
+                return result;
+            }
+            else if (updateStatus == "blocking")
+            {
+                var result = await _chatDataLayer.UpdateFriendPairStatus(meId, theyId, "blocking", "blocked");
                 return result;
             }
             else
@@ -55,6 +60,11 @@ namespace ResumeRocketQuery.Services
             }
         }
 
+        public async Task<bool> DeleteFriends(int myId, int theyId)
+        {
+            var result = await _chatDataLayer.DeleteFriendPairs(myId, theyId);
+            return result;
+        }
         /// <summary>
         /// this search function can take the input as protofilo link, Name, and email
         /// </summary>

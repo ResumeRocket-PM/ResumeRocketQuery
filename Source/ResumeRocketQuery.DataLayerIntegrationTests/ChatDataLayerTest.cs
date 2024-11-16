@@ -142,8 +142,13 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
                 PortfolioLink = Guid.NewGuid().ToString(),
             });
 
+            // delete the pair that is not exist 
+            var deleteResultF = await systemUnderTest.deleteFriendPairs(7041, accountId);
+            Assert.False(deleteResultF);
 
-            var fId = await systemUnderTest.AddFriendPairs(1438, accountId, "pending");
+            var added = await systemUnderTest.AddFriendPairs(7041, accountId, "pending");
+            var deleteResultS = await systemUnderTest.deleteFriendPairs(7041, accountId);
+            Assert.True(deleteResultS);
             //var acceptFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "friends");
 
             //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");

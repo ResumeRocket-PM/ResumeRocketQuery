@@ -466,6 +466,12 @@ namespace ResumeRocketQuery.DataLayer
                 ;
                 ";
 
+                public const string DeleteFriendsPair = @"
+                DELETE FROM Friendship
+                OUTPUT DELETED.AccountId1, DELETED.AccountId2
+                WHERE (AccountId1 = @accountId1 AND AccountId2 = @accountId2)
+                   OR (AccountId1 = @accountId2 AND AccountId2 = @accountId1);
+                ";
                 public const string FindAllFrinedsByAccountId = @"
                 SELECT DISTINCT
                 Accounts.AccountId,

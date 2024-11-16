@@ -140,22 +140,30 @@ namespace ResumeRocketQuery.DataLayer
         /// <param name="myId"></param>
         /// <param name="friendId"></param>
         /// <returns></returns>
-        public async Task<Friends> deleteFriendPairs(int myId, int friendId)
+        public async Task<bool> DeleteFriendPairs(int myId, int theyId)
         {
             // get the raw of friend pairs, and set the status as the value of @status
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
             {
 
                 var result = await connection.QueryFirstOrDefaultAsync<Friends>(
-                    DataLayerConstants.StoredProcedures.Chat.UpdateFriendStatus,
+                    DataLayerConstants.StoredProcedures.Chat.DeleteFriendsPair,
                     new
                     {
-                        inputAccountId1 = myId,
-                        inputAccountId2 = friendId,
+                        accountId1 = myId,
+                        accountId2 = theyId,
                     },
                     commandType: CommandType.Text);
 
-                return result;
+                if (result != null)
+                {
+                    return true;
+
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 

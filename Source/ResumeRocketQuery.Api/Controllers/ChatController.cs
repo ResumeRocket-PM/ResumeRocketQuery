@@ -48,12 +48,23 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpPost]
-        [Route("respondNewFriend/{theyId}/{respond}")]
-        public async Task<ServiceResponseGeneric<Friends>> ReplyFriendRequest([FromRoute] int theyId, [FromRoute] string respond)
+        [Route("newStatus/{theyId}/{respond}")]
+        public async Task<ServiceResponseGeneric<Friends>> PersonNewStatus([FromRoute] int theyId, [FromRoute] string respond)
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            var result = await _chatService.RespondNewFriends(user.AccountId, theyId, respond);
+            var result = await _chatService.RespondFriendsNewStatus(user.AccountId, theyId, respond);
+
+            return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Route("delete/{theyId}")]
+        public async Task<ServiceResponseGeneric<bool>> DeleteFriends([FromRoute] int theyId)
+        {
+            var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
+
+            var result = await _chatService.DeleteFriends(user.AccountId, theyId);
 
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }

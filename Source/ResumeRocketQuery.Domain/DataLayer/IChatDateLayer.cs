@@ -17,7 +17,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<List<Friends>> GetFriendEntityByAccount(int AId1, int AId2);
         //Task<Friends> GetFriendEntityByFriendId(int friendId);
         Task<Friends> UpdateFriendPairStatus(int AId1, int AId2, string newStatus1, string newStatus2);
-        Task<Friends> deleteFriendPairs(int myId, int friendId);
+        Task<bool> DeleteFriendPairs(int myId, int theyId);
         Task<List<FriendInfo>> AllMyFriendPairs(int myId, string fStatus);
         Task<List<FriendInfo>> SearchUsers(string nameOrEmail, int meId);
 
