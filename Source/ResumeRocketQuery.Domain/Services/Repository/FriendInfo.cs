@@ -16,6 +16,6 @@ namespace ResumeRocketQuery.Domain.Services.Repository
         public string PortfolioLink { get; set;}
         public string EmailAddress { get; set; }
         public string CreatedTime { get; set; }
-
+        public string Status { get; set; }
     }
 }

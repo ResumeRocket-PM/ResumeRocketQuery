@@ -15,6 +15,7 @@ namespace ResumeRocketQuery.Domain.Services
         Task<string> SendMsg(int sendId, int receiveId, string newMsg);
         Task<List<Message>> GetMessageHistory(int myId, int theyId);
         Task<List<FriendInfo>> GetTalkedPeople(int acccountId);
+        Task<List<FriendInfo>> searchUserAccount(int meId, string searchInput);
 
     }
 }

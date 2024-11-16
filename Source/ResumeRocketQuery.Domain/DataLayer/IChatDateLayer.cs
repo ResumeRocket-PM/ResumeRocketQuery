@@ -19,6 +19,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         Task<Friends> UpdateFriendPairStatus(int friendId, string newStatus);
         Task<Friends> deleteFriendPairs(int myId, int friendId);
         Task<List<FriendInfo>> AllMyFriendPairs(int myId, string fStatus);
+        Task<List<FriendInfo>> SearchUsers(string nameOrEmail, int meId);
 
         // Messages
         Task<string> AddNewMessage(int sendId, int receiveId, string newMsg);

@@ -211,6 +211,23 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             Assert.NotNull(blockMsg);
             Assert.Equal("block friends cannot send messages", blockMsg);
         }
+        [Theory]
+        [InlineData(typeof(ChatDataLayer))]
+        public async Task Check_Search_User_Async(Type storageType)
+        {
+            var systemUnderTest = GetSystemUnderTest(storageType);
 
+            var NameSearchResult = await systemUnderTest.SearchUsers("Mia Thromas", 7041);
+
+            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
+            Assert.NotNull(NameSearchResult);
+
+            // send msg to block people
+            var EmailSearchResult = await systemUnderTest.SearchUsers("Michael_Johnston36@hotmail.com", 7041);
+            Assert.NotNull(EmailSearchResult);
+
+            var FriendsSearchResult = await systemUnderTest.SearchUsers("", 7041);
+
+        }
     }
 }

@@ -30,15 +30,7 @@ namespace ResumeRocketQuery.DataLayer
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
         }
 
-        /// <summary>
-        /// add the new friend pairs int to Friendship table in Database
-        /// the Frinedship pairs(AccountId1 and AccountId2) shhould be unique
-        /// and the AccountId1(Int) should be less than AccountId2(Int) 
-        /// 
-        /// </summary>
-        /// <param name="myId"></param>
-        /// <param name="newFriendId"></param>
-        /// <returns></returns>
+
         public async Task<int> AddFriendPairs(int myId, int newFriendId, string myStatus = "pending", string requestMsg = "")
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
@@ -191,7 +183,14 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
-        // show friend list
+        /// <summary>
+        /// this should return all entities in Friendship table
+        /// that is related to the myId, based on the given status(fStatus), 
+        /// it will shows different result from Friendship table
+        /// </summary>
+        /// <param name="myId"></param>
+        /// <param name="fStatus"></param>
+        /// <returns></returns>
         public async Task<List<FriendInfo>> AllMyFriendPairs(int myId, string fStatus)
         {
             // find all the AccountId1 or AccountId2 that is same with the @myId
@@ -213,8 +212,75 @@ namespace ResumeRocketQuery.DataLayer
 
         }
 
+        /// <summary>
+        /// searched other user based on the searchInput value
+        /// this function could deal with the value:
+        /// (1) Name, (2) email, (3) PortfolioLink
+        /// 
+        /// </summary>
+        /// <param name="searchInput"></param>
+        /// <param name="meId"></param>
+        /// <returns></returns>
+        public async Task<List<FriendInfo>> SearchUsers(string searchInput, int meId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                if (searchInput.Contains('@'))
+                {
+                    var result = await connection.QueryAsync<FriendInfo>(
+                            DataLayerConstants.StoredProcedures.Chat.SearchUserByEmail,
+                            new
+                            {
+                                email = $"%{searchInput}%",
+                                myId = meId
+                            },
+                            commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+                else if (searchInput.Contains("https"))
+                {
+                    var result = await connection.QueryAsync<FriendInfo>(
+                            DataLayerConstants.StoredProcedures.Chat.SearchUserByPortfolio,
+                            new
+                            {
+                                userName = searchInput,
+                                myId = meId
+                            },
+                            commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+                else // search by name
+                {
+                    string[] fullName = searchInput.Split(' ');
+                    var firstName = fullName[0];
+                    var lastName = fullName.Length == 1 ? fullName[0] : fullName[1];
+                    var result = await connection.QueryAsync<FriendInfo>(
+                                DataLayerConstants.StoredProcedures.Chat.SearchUserByName,
+                                new
+                                {
+                                    fName = $"%{firstName}%",
+                                    lName = $"%{lastName}%",
+                                    myId = meId
+                                },
+                                commandType: CommandType.Text);
+
+                    return result.ToList();
+                }
+                
+
+            }
+        }
 //_______________________________________________Messages_____________________________________________________
-        // add new messages and show the top 10 latest messages recording
+        /// <summary>
+        /// add new message in the Database by given sendId(sId), rId(receiveId), Msg content(newMsg)
+        /// 
+        /// </summary>
+        /// <param name="sId"></param>
+        /// <param name="rId"></param>
+        /// <param name="newMsg"></param>
+        /// <returns></returns>
         public async Task<string> AddNewMessage(int sId, int rId, string newMsg)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))

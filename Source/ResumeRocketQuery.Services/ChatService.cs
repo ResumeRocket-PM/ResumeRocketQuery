@@ -42,6 +42,18 @@ namespace ResumeRocketQuery.Services
         }
 
         /// <summary>
+        /// this search function can take the input as protofilo link, Name, and email
+        /// </summary>
+        /// <param name="meId"></param>
+        /// <param name="searchInput"></param>
+        /// <returns></returns>
+        public async Task<List<FriendInfo>> searchUserAccount(int meId, string searchInput)
+        {
+            var result = await _chatDataLayer.SearchUsers(searchInput, meId);
+            return result;
+        }
+
+        /// <summary>
         /// show all of my friends in different status
         /// the status should be in three different value:
         /// (1): friends

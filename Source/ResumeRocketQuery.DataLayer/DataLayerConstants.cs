@@ -447,8 +447,8 @@ namespace ResumeRocketQuery.DataLayer
                 Accounts.ProfilePhotoLink, 
                 Accounts.PortfolioLink, 
                 EmailAddresses.EmailAddress,
-                Friendship.CreatedTime 
-
+                Friendship.CreatedTime, 
+                Friendship.Status
                 FROM 
                     Accounts
                 LEFT JOIN 
@@ -463,14 +463,7 @@ namespace ResumeRocketQuery.DataLayer
                         Friendship.AccountId1 = @accountId OR Friendship.AccountId2 = @accountId
                     );
                 ";
-                /// <summary>
-                /// to prevent the duplicate of AccountId1 and AccountId2 pairs
-                /// this will make sure that the lower value of AccountId would be AccountId1
-                /// for the added pairs
-                /// 
-                /// So that the database would not able to add the pairs duplicate even thoug
-                /// the AccountId1 and AccountId2 are in different order
-                /// </summary>
+                
                 public const string AddNewFriends = @"
                 DECLARE @accountId1 INT = @inputId1;
                 DECLARE @accountId2 INT = @inputId2;
@@ -485,7 +478,61 @@ namespace ResumeRocketQuery.DataLayer
                 INSERT INTO Friendship (AccountId1, AccountId2, Status, CreatedTime)
                 VALUES (@accountId1, @accountId2, @status, CURRENT_TIMESTAMP);
                 SELECT SCOPE_IDENTITY()";
+
+                public const string SearchUserByName = @"
+                SELECT DISTINCT 
+                    a.AccountId, 
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    a.PortfolioLink,
+                    e.EmailAddress, 
+                    f.Status
+                FROM Accounts a
+                    LEFT JOIN EmailAddresses e ON a.AccountId = e.AccountId
+                    LEFT JOIN Friendship f ON (
+                        (f.AccountId1 = a.AccountId AND f.AccountId2 = 7041) 
+                        OR (f.AccountId1 = 7041 AND f.AccountId2 = a.AccountId)
+                    )
+                WHERE a.FirstName LIKE @fName OR a.LastName LIKE @lName
+                ";
                 
+                public const string SearchUserByEmail = @"
+                SELECT 
+                    a.AccountId, 
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    a.PortfolioLink,
+                    e.EmailAddress, 
+                    f.Status
+                FROM Accounts a
+                JOIN EmailAddresses e ON a.AccountId = e.AccountId
+                LEFT JOIN Friendship f ON (
+                    (f.AccountId1 = a.AccountId AND f.AccountId2 = @myId) 
+                    OR (f.AccountId1 = @myId AND f.AccountId2 = a.AccountId)
+                )
+                WHERE e.EmailAddress LIKE @email
+                ";
+
+                public const string SearchUserByPortfolio = @"
+                SELECT DISTINCT 
+                    a.AccountId, 
+                    a.FirstName,
+                    a.LastName,
+                    a.ProfilePhotoLink,
+                    a.PortfolioLink,
+                    e.EmailAddress, 
+                    f.Status
+                FROM Accounts a
+                    LEFT JOIN EmailAddresses e ON a.AccountId = e.AccountId
+                    LEFT JOIN Friendship f ON (
+                        (f.AccountId1 = a.AccountId AND f.AccountId2 = 7041) 
+                        OR (f.AccountId1 = 7041 AND f.AccountId2 = a.AccountId)
+                    )
+                WHERE a.PortfolioLink = @pLink
+                ";
+
                 public const string UpdateFriendStatus = @"
                 UPDATE Friendship
                 SET Status = @status, CreatedTime = CURRENT_TIMESTAMP
@@ -515,14 +562,18 @@ namespace ResumeRocketQuery.DataLayer
                 DELETE FROM Friendship
                 WHERE AccountId1 = @accountId1 and AccountId2 = @accountId2;";
                 //--------------------------------------------------MESSAGES--------------------------------------------------------
+                
                 public const string GetAlltalkedAccounts = @"
+                WITH RankedResults AS (
                 SELECT 
                     a.AccountId,                    
                     a.FirstName,
                     a.LastName,
                     a.ProfilePhotoLink,
                     e.EmailAddress,
-                    m.LatestMsgTime AS MsgTime
+                    m.LatestMsgTime AS MsgTime,
+                    f.Status,
+                    ROW_NUMBER() OVER (PARTITION BY a.AccountId ORDER BY m.LatestMsgTime DESC) AS RowNum
                 FROM 
                     (SELECT 
                         CASE 
@@ -544,9 +595,25 @@ namespace ResumeRocketQuery.DataLayer
                     Accounts AS a ON m.RelatedAccountId = a.AccountId
                 LEFT JOIN 
                     EmailAddresses AS e ON a.AccountId = e.AccountId
+                LEFT JOIN 
+                    Friendship AS f ON 
+                    (f.AccountId1 = @accountId AND f.AccountId2 = a.AccountId) 
+                    OR (f.AccountId1 = a.AccountId AND f.AccountId2 = @accountId)
+                )
+                SELECT 
+                    AccountId,
+                    FirstName,
+                    LastName,
+                    ProfilePhotoLink,
+                    EmailAddress,
+                    MsgTime,
+                    Status
+                FROM 
+                    RankedResults
+                WHERE 
+                    RowNum = 1
                 ORDER BY 
-                    m.LatestMsgTime DESC;
-
+                    MsgTime DESC;
                 ";
 
                 public const string AddMsgByFId = @"
