@@ -5,4 +5,5 @@ namespace ResumeRocketQuery.Domain.Services;
 public interface IExtensionService
 {
     Task<bool> IsJobApplication(string html);
+    Task<string> CreateHtmlQueryForEmbeddingButton(string html);
 }

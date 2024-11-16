@@ -20,7 +20,7 @@ namespace ResumeRocketQuery.Services.Tests
             _systemUnderTest = serviceProvider.GetService<IExtensionService>();
         }
 
-        public class CreateAccountAsync : ExtensionServiceTest
+        public class IsJobApplication : ExtensionServiceTest
         {
             [Fact]
             public async Task GIVEN_valid_job_html_is_passed_THEN_result_is_correct()
@@ -41,5 +41,15 @@ namespace ResumeRocketQuery.Services.Tests
             }
         }
 
+        public class CreateHtmlQueryForEmbeddingButton : ExtensionServiceTest
+        {
+            [Fact]
+            public async Task GIVEN_valid_job_html_is_passed_THEN_result_is_correct()
+            {
+                var actual = await _systemUnderTest.CreateHtmlQueryForEmbeddingButton(File.ReadAllText("./Samples/DigitalMarketing-Posting.html"));
+
+                Assert.NotNull(actual);
+            }
+        }
     }
 }
