@@ -80,8 +80,8 @@ namespace ResumeRocketQuery.DataLayer
                                         DataLayerConstants.StoredProcedures.Chat.GetFriendsByAccount,
                                         new
                                         {
-                                            inputId1 = AId1,
-                                            inputId2 = AId2,
+                                            accountId1 = AId1,
+                                            accountId2 = AId2,
                                         },
                                         commandType: CommandType.Text);
 

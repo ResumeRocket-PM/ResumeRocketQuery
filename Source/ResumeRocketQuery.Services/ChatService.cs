@@ -43,6 +43,11 @@ namespace ResumeRocketQuery.Services
                 return result;
 
             }
+            else if (updateStatus == "blocking")
+            {
+                var result = await _chatDataLayer.UpdateFriendPairStatus(meId, theyId, "unfriends", "unfriends");
+                return result;
+            }
             else
             {
                 var result = await _chatDataLayer.UpdateFriendPairStatus(meId, theyId, "reject", "pending");
