@@ -24,7 +24,7 @@ namespace ResumeRocketQuery.Services
 
         public ResumeService(IPdfToHtmlClient pdfToHtmlClient, 
             IResumeDataLayer resumeDataLayer, 
-            IAccountService accountService, 
+            IAccountService accountService,
             IOpenAiClient openAiClient)
         {
             _PdfToHtmlClient = pdfToHtmlClient;
@@ -362,11 +362,14 @@ namespace ResumeRocketQuery.Services
             });
         }
 
-        public async Task<GetResumeResult> GetPerfectResume(int resumeId)
+        public async Task<GetResumeResult> GetPerfectResume(int resumeId, int applicationId)
         {
+
+
             var resumeHtml = await GetResume(resumeId);
 
-            var resumeSuggestions = await _resumeDataLayer.SelectResumeChangesAsync(resumeId);
+            //var resumeSuggestions = await _resumeDataLayer.SelectResumeChangesAsync(resumeId);
+            var resumeSuggestions = await _resumeDataLayer.SelectResumeSuggestionsByApplicationId(applicationId);   
 
             var acceptedSuggestions = resumeSuggestions.Where(x => x.Accepted).ToList();
 

@@ -244,6 +244,20 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE 
                         ResumeId = @ResumeId;";
 
+                public const string SelectResumeSuggestionsByApplicationId = @"
+                    SELECT 
+                        ResumeChangeId,
+                        ResumeId,
+                        OriginalText,
+                        ModifiedText,
+                        ExplanationString,
+                        Accepted,
+                        HtmlID
+                    FROM 
+                        ResumeChange
+                    WHERE 
+                        ApplicationId = @ApplicationId;";
+
                 public const string InsertResumeChanges = @"
                     INSERT INTO ResumeChange (
                         ResumeId, 
@@ -251,14 +265,16 @@ namespace ResumeRocketQuery.DataLayer
                         ModifiedText, 
                         ExplanationString, 
                         Accepted, 
-                        HtmlID
+                        HtmlID,
+                        ApplicationId
                     ) VALUES (
                         @ResumeId, 
                         @OriginalText, 
                         @ModifiedText, 
                         @ExplanationString, 
                         @Accepted, 
-                        @HtmlID
+                        @HtmlID,
+                        @ApplicationId
                     );
                     SELECT SCOPE_IDENTITY();
                     ";

@@ -42,30 +42,48 @@ namespace ResumeRocketQuery.Services
             //Take the HTML from the Posting, Pass
             var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml, applicationRequest.JobUrl);
 
-            var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
+            //var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
 
-            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+            //var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
-            string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
+            //string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
 
-            try {
-                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
-            }
-            catch (Exception e) {
-                Debug.WriteLine("Error parsing returned JSON", e);
-                throw;
-            }
+            //try
+            //{
+            //    // Remove any potential code block markers (```json at the beginning and ``` at the end)
+            //    string cleanedResponse = response.Trim();
 
-            var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
-            {
-                AccountId = applicationRequest.AccountId,
-                Resume = primaryResume,
-                OriginalResumeID = null,
-                OriginalResume = true,
-                Version = 1,
-                InsertDate = DateTime.Now,
-                UpdateDate = DateTime.Now
-            });
+            //    if (cleanedResponse.StartsWith("```json"))
+            //    {
+            //        cleanedResponse = cleanedResponse.Substring(7).Trim();  // Remove ```json
+            //    }
+
+            //    if (cleanedResponse.EndsWith("```"))
+            //    {
+            //        cleanedResponse = cleanedResponse.Substring(0, cleanedResponse.Length - 3).Trim();  // Remove ```
+            //    }
+
+            //    // Now attempt deserialization with the cleaned response
+            //    var jsonResult = JsonConvert.DeserializeObject<List<Change>>(cleanedResponse);
+            //}
+            //catch (Exception e)
+            //{
+            //    Debug.WriteLine("Error parsing returned JSON", e);
+            //    throw;
+            //}
+
+            //var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            //{
+            //    AccountId = applicationRequest.AccountId,
+            //    Resume = primaryResume,
+            //    OriginalResumeID = null,
+            //    OriginalResume = true,
+            //    Version = 1,
+            //    InsertDate = DateTime.Now,
+            //    UpdateDate = DateTime.Now
+            //});
+
+            string resumeHtml = await _resumeService.GetResume(applicationRequest.ResumeId);
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
             {
@@ -75,8 +93,11 @@ namespace ResumeRocketQuery.Services
                 CompanyName = jobResult.CompanyName,
                 Position = jobResult.Title,
                 Status = "Pending",
-                ResumeId = originalResumeId
+                ResumeId = applicationRequest.ResumeId
             });
+
+            await CreateSuggestionsFromResumeHtmlAsync(applicationRequest.AccountId, applicationRequest.JobUrl, applicationRequest.JobHtml, result);
+
 
             return result;
         }
@@ -153,6 +174,51 @@ namespace ResumeRocketQuery.Services
             });
 
             return result;
+        }
+
+
+        public async Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int applicationId)
+        {
+            JobResult jobResult = await _languageService.CaptureJobPostingAsync(jobUrl);
+
+            // Convert resumeHtml (string) to a Stream
+            var resumeHtmlStream = new MemoryStream(Encoding.UTF8.GetBytes(resumeHtml));
+
+            var cleanedHtmlStream = await _pdfToHtmlClient.StripHtmlElements(resumeHtmlStream);
+
+            string cleanedHtml = null;
+            using (StreamReader reader = new StreamReader(cleanedHtmlStream))
+            {
+                cleanedHtml = reader.ReadToEnd();
+            }
+
+            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
+            string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
+
+            string originalHtml = null;
+
+            resumeHtmlStream.Position = 0;
+
+            using (StreamReader reader = new StreamReader(resumeHtmlStream))
+            {
+                originalHtml = reader.ReadToEnd();
+            }
+
+            var changes = ParseResult(response);
+
+            foreach (var change in changes)
+            {
+                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ApplicationId = applicationId,
+                    Accepted = true,
+                    ExplanationString = change.Explanation,
+                    HtmlID = change.DivClass,
+                    ModifiedText = change.ModifiedText,
+                    OriginalText = change.OriginalText,
+                });
+            }
         }
 
         private string GeneratePrompt(string description, List<string> keywords)
@@ -248,27 +314,27 @@ namespace ResumeRocketQuery.Services
         private async Task<ApplicationResult> ConvertApplication(Application x)
         {
             var resumeContent = "";
-            int? resumeId = null;
+            //int? resumeId = null;
 
-            if (x.ResumeId.HasValue)
-            {
-                var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
+            //if (x.ResumeId.HasValue)
+            //{
+            //    var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
 
-                resumeContent = resumeResult.Resume;
-                resumeId = resumeResult.ResumeId;
-            }
+            //    resumeContent = resumeResult.Resume;
+            //    resumeId = resumeResult.ResumeId;
+            //}
 
             return new ApplicationResult
             {
+                ApplicationId = x.ApplicationId,
                 CompanyName = x.CompanyName,
                 AccountID = x.AccountId,
                 ApplyDate = x.ApplyDate,
                 JobUrl = x.JobPostingUrl,
                 Position = x.Position,
-                ResumeID = x.ApplicationId,
                 Status = x.Status,
                 ResumeContent = resumeContent,
-                ResumeContentId = resumeId
+                ResumeContentId = x.ResumeId
             };
         }
 
@@ -287,5 +353,7 @@ namespace ResumeRocketQuery.Services
 
             return result;
         }
+
+
     }
 }

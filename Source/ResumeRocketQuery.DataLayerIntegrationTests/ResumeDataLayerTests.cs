@@ -277,6 +277,7 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             var resumeChange = new ResumeChangesStorage
             {
+                ApplicationId = 1,
                 ResumeId = resumeId,
                 OriginalText = "Original text",
                 ModifiedText = "Modified text",

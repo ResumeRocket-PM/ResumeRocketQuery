@@ -25,7 +25,11 @@ namespace ResumeRocketQuery.Api.Controllers
         private readonly IApplicationService _applicationService;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
 
-        public JobController(IServiceResponseBuilder serviceResponseBuilder, IApplicationService applicationService, IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
+        public JobController(
+            IServiceResponseBuilder serviceResponseBuilder, 
+            IApplicationService applicationService,
+            IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder
+            )
         {
             this._serviceResponseBuilder = serviceResponseBuilder;
             _applicationService = applicationService;
@@ -52,7 +56,6 @@ namespace ResumeRocketQuery.Api.Controllers
                     JobUrl = resumeResult.JobUrl,
                     Position = resumeResult.Position,
                     ResumeContent = resumeResult.ResumeContent,
-                    ResumeID = resumeResult.ResumeID,
                     Status = resumeResult.Status,
                     ResumeContentId = resumeResult.ResumeContentId
                 };
@@ -73,13 +76,14 @@ namespace ResumeRocketQuery.Api.Controllers
 
             var result = resumeResult.Select(x => new JobPostingResponse
             {
+                ApplicationId = x.ApplicationId,
                 AccountID = x.AccountID,
                 ApplyDate = x.ApplyDate,
                 CompanyName = x.CompanyName,
                 JobUrl = x.JobUrl,
                 Position = x.Position,
-                ResumeContent = x.ResumeContent,
-                ResumeID = x.ResumeID,
+                //ResumeContent = x.ResumeContent,
+                ResumeContentId = x.ResumeContentId,
                 Status = x.Status,
             }).ToList();
 
@@ -96,8 +100,8 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpPost]
-        [Route("extension/postings")]
-        public async Task<ServiceResponseGeneric<int>> CreateJobPosting([FromBody] CreateApplicationRequest applicationRequest)
+        [Route("extension/postings/{resumeId}")]
+        public async Task<ServiceResponseGeneric<int>> CreateJobPosting([FromBody] CreateApplicationRequest applicationRequest, [FromRoute] int resumeId)
         {
             var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
@@ -105,8 +109,13 @@ namespace ResumeRocketQuery.Api.Controllers
             {
                 JobHtml = applicationRequest.Html,
                 JobUrl = applicationRequest.Url,
-                AccountId = account.AccountId
+                AccountId = account.AccountId,
+                ResumeId = resumeId
             });
+
+            //string resumeHtml = await _resumeService.GetResume(resumeId);
+
+            //await _applicationService.CreateJobResumeFromHtmlAsync(account.AccountId, applicationRequest.Url, resumeHtml);
 
             return _serviceResponseBuilder.BuildServiceResponse(applicationId, HttpStatusCode.Created);
         }

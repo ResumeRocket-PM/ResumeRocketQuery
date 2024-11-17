@@ -25,15 +25,18 @@ namespace ResumeRocketQuery.Api.Controllers
     public class ResumeController : ControllerBase
     {
         private readonly IResumeService _resumeService;
+        private readonly IApplicationService _applicationService;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
         
         public ResumeController(IServiceResponseBuilder serviceResponseBuilder, 
             IResumeService resumeService,
+            IApplicationService applicationService,
             IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
         {
             _serviceResponseBuilder = serviceResponseBuilder;
             _resumeService = resumeService;
+            _applicationService = applicationService;
             _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
         }
 
@@ -51,10 +54,14 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{resumeId}/suggestions")]
-        public async Task<ServiceResponseGeneric<GetResumeResult>> GetPerfectResume([FromRoute] int resumeId)
+        [Route("{applicationId}/suggestions")]
+        public async Task<ServiceResponseGeneric<GetResumeResult>> GetPerfectResume([FromRoute] int applicationId)
         {
-            var result = await _resumeService.GetPerfectResume(resumeId);
+            var application = await _applicationService.GetApplication(applicationId);
+
+            var resumeId = application.ResumeContentId;
+
+            var result = await _resumeService.GetPerfectResume(resumeId, applicationId);
 
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }

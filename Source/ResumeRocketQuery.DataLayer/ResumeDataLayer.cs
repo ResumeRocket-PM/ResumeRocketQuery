@@ -133,6 +133,19 @@ namespace ResumeRocketQuery.DataLayer
             }
         }
 
+        public async Task<List<ResumeChangesStorage>> SelectResumeSuggestionsByApplicationId(int applicationId)
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryAsync<ResumeChangesStorage>(
+                                       DataLayerConstants.StoredProcedures.Resume.SelectResumeSuggestionsByApplicationId,
+                                                          new { ApplicationId = applicationId},
+                                                                             commandType: CommandType.Text);
+
+                return result.ToList();
+            }
+        }   
+
         public async Task<int> InsertResumeChangeAsync(ResumeChangesStorage resumeChangesStorage)
         {
             using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
@@ -147,6 +160,7 @@ namespace ResumeRocketQuery.DataLayer
                         ExplanationString = resumeChangesStorage.ExplanationString,
                         Accepted = resumeChangesStorage.Accepted,
                         HtmlID = resumeChangesStorage.HtmlID,
+                        ApplicationId = resumeChangesStorage.ApplicationId
                     },
                     commandType: CommandType.Text);
             }
