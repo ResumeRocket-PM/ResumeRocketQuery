@@ -81,7 +81,6 @@ namespace ResumeRocketQuery.External
 
             alphanumericText = Regex.Replace(alphanumericText, @"\s+", " "); 
 
-
             return alphanumericText;
         }
 
