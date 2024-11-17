@@ -9,7 +9,6 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Text;
 
 namespace ResumeRocketQuery.Services
 {
@@ -43,10 +42,12 @@ namespace ResumeRocketQuery.Services
             var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml, applicationRequest.JobUrl);
 
             var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
+            var text = GetResumeText(primaryResume);
+            if (text == null || text == "")
+                throw new Exception("Error extracting text from PDF");
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
-
-            string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
+            string response = await _openAiClient.SendMessageAsync(prompt, text);
 
             try {
                 var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
@@ -91,14 +92,14 @@ namespace ResumeRocketQuery.Services
             
             // Take the Text of the Resume
             var htmlStream = await _pdfToHtmlClient.ConvertPdf(pdf);
-
-            var cleanedHtmlStream = await _pdfToHtmlClient.StripHtmlElements(htmlStream);
-
-            string cleanedHtml = null;
-            using (StreamReader reader = new StreamReader(cleanedHtmlStream))
+            string html = null;
+            using (StreamReader reader = new StreamReader(htmlStream))
             {
-                cleanedHtml = reader.ReadToEnd();
+                html = reader.ReadToEnd();
             }
+            var cleanedHtml = GetResumeText(html);
+            if (cleanedHtml == null || cleanedHtml == "")
+                throw new Exception("Error extracting text from PDF");
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
@@ -272,6 +273,12 @@ namespace ResumeRocketQuery.Services
             };
         }
 
+        private string GetResumeText(string html)
+        {
+            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
+            var text = new Regex("<.*?>").Replace(extract, "");
+            return text;
+        }
 
         private List<Change> ParseResult(string input)
         {
