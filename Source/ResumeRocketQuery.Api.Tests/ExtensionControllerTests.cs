@@ -55,7 +55,7 @@ namespace ResumeRocketQuery.Api.Tests
                         Succeeded = true,
                         ResponseMetadata = new
                         {
-                            HttpStatusCode = 201
+                            HttpStatusCode = 200
                         },
                         Result = true
                     };

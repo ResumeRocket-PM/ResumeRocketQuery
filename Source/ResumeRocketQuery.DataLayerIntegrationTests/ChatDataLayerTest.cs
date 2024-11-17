@@ -143,11 +143,11 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
             });
 
             // delete the pair that is not exist 
-            var deleteResultF = await systemUnderTest.deleteFriendPairs(7041, accountId);
+            var deleteResultF = await systemUnderTest.DeleteFriendPairs(7041, accountId);
             Assert.False(deleteResultF);
 
             var added = await systemUnderTest.AddFriendPairs(7041, accountId, "pending");
-            var deleteResultS = await systemUnderTest.deleteFriendPairs(7041, accountId);
+            var deleteResultS = await systemUnderTest.DeleteFriendPairs(7041, accountId);
             Assert.True(deleteResultS);
             //var acceptFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "friends");
 
