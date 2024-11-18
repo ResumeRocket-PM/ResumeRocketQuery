@@ -92,10 +92,12 @@ namespace ResumeRocketQuery.Services
             
             // Take the Text of the Resume
             var htmlStream = await _pdfToHtmlClient.ConvertPdf(pdf);
+            string originalHtml = null;
             string html = null;
             using (StreamReader reader = new StreamReader(htmlStream))
             {
-                html = reader.ReadToEnd();
+                originalHtml = reader.ReadToEnd();
+                html = originalHtml;
             }
             var cleanedHtml = GetResumeText(html);
             if (cleanedHtml == null || cleanedHtml == "")
@@ -104,15 +106,6 @@ namespace ResumeRocketQuery.Services
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
             string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
-
-            string originalHtml = null;
-
-            htmlStream.Position = 0;
-
-            using (StreamReader reader = new StreamReader(htmlStream))
-            {
-                originalHtml = reader.ReadToEnd();
-            }
 
             var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
@@ -166,13 +159,13 @@ namespace ResumeRocketQuery.Services
 
                     These updates should not falsify any information, meaning no additional skills, education, or work experience 
                     should be added. You are only allowed to reword items on the resume that are synonyms for items in the job posting
-                    to better match the job posting. Your suggestions should match the provided Json SSchema.
+                    to better match the job posting. Your suggestions should match the provided Json Schema.
 
                     You will fill out the Json schema from the suggested changes. 
                     1) Original Text should be the text from the resume that you are suggesting be changed. 
-                    2) Modified should be that suggested change.
+                    2) Modified should be that suggested change, these should not be longer than the original.
                     3) Explanation should be a reason for the change.
-                    4) DivClass should be the value of the class attribute of the div surrounding the text.
+                    4) DivClass should be the value of the class attribute of the div surrounding the text, if there is one otherwise null.
                     5) Your response should only be the result json object, and nothing more. 
                     6) If the fields do not appear in the resume, return a default value in the Json object being returned. 
 
