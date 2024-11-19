@@ -189,7 +189,7 @@ namespace ResumeRocketQuery.DataLayer
             public class Resume
             {
                 public const string InsertResume = @"
-                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, Version, InsertDate, UpdateDate)
+                    INSERT INTO Resumes (AccountId, Resume, OriginalResume, OriginalResumeId, [Version], InsertDate, UpdateDate)
                     VALUES (@AccountId, CONVERT(VARBINARY(max),@Resume), @OriginalResume, @OriginalResumeId, @Version, @InsertDate, @UpdateDate);
                     SELECT SCOPE_IDENTITY();";
 
@@ -199,20 +199,35 @@ namespace ResumeRocketQuery.DataLayer
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResume = @"
-                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
+                    SELECT ResumeId, AccountId, [Version], CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, [Version], InsertDate, UpdateDate
                     FROM Resumes
                     WHERE ResumeId = @ResumeId;";
 
                 public const string SelectResumeByAccount = @"
-                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
+                    SELECT ResumeId, AccountId, [Version], CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, [Version], InsertDate, UpdateDate
                     FROM Resumes
                     WHERE AccountId = @AccountId;";
 
+                public const string SelectOriginalResumeByResumeId = @"
+                        SELECT 
+                            OriginalResumeId
+                        FROM 
+                            Resumes
+                        WHERE 
+                            ResumeId = @ResumeId;
+                    ";
+
+                public const string SelectResumeVersions = @"
+                    SELECT ResumeId, AccountId, [Version], CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, [Version], InsertDate, UpdateDate
+                    FROM Resumes
+                    WHERE ResumeId = @ResumeId
+                    OR OriginalResumeId = @ResumeId;";
+
                 public const string SelectResumeByOriginal = @"
-                    SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
+                    SELECT ResumeId, AccountId, [Version], CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, [Version], InsertDate, UpdateDate
                     FROM Resumes
                     WHERE OriginalResumeId = @OriginalResumeId
-                    ORDER BY Version;";
+                    ORDER BY [Version];";
 
                 public const string DeleteResume = @"
                     DELETE FROM Resumes

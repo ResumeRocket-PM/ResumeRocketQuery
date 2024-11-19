@@ -331,6 +331,11 @@ namespace ResumeRocketQuery.Services
             }
         }
 
+        public async Task<int> GetOriginalResumeId(int resumeId) {
+            var result = await _resumeDataLayer.GetOriginalResumeIdAsync(resumeId);
+            return result.ResumeId;
+        }
+
         public async Task<List<ResumeStorage>> GetResumeHistory(int originalResumeId) {
             var result = await _resumeDataLayer.GetResumeHistoryAsync(originalResumeId);
             return result;

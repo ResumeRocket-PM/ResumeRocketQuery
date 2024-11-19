@@ -72,12 +72,16 @@ namespace ResumeRocketQuery.Api.Controllers
         /// <summary>
         ///     Retrieves the version history of a Resume
         /// </summary>
-        /// <param name="originalResumeId"></param>
+        /// <param name="resumeId"></param>
         /// <returns>A PDF Object</returns>
         [HttpGet]
-        [Route("{originalResumeId}/history")]
-        public async Task<ServiceResponseGeneric<List<ResumesResponseBody>>> History([FromRoute] int originalResumeId)
+        [Route("{resumeId}/history")]
+        public async Task<ServiceResponseGeneric<List<ResumesResponseBody>>> History([FromRoute] int resumeId)
         {
+            // TODO account for null case
+            var originalResumeId = await _resumeService.GetOriginalResumeId(resumeId);
+            if (originalResumeId == 0)
+                originalResumeId = resumeId;
             var resumeHistory = await _resumeService.GetResumeHistory(originalResumeId);
 
             var result = resumeHistory.Select(x => new ResumesResponseBody

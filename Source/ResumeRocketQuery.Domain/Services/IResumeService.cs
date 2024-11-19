@@ -14,6 +14,7 @@ namespace ResumeRocketQuery.Domain.Services
         Task<string> GetResume(int resumeId);
         Task<byte[]> GetResumePdf(int resumeId);
         Task<byte[]> GetResumePdfFromHtml(string html);
+        Task<int> GetOriginalResumeId(int resumeId);
         Task<List<ResumeStorage>> GetResumeHistory(int originalResumeId);
         Task<bool> UpdateResume(ResumeStorage resume);
         Task<List<ResumeStorage>> GetAccountResumes(int accountId);
