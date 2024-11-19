@@ -78,7 +78,6 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("{resumeId}/history")]
         public async Task<ServiceResponseGeneric<List<ResumesResponseBody>>> History([FromRoute] int resumeId)
         {
-            // TODO account for null case
             var originalResumeId = await _resumeService.GetOriginalResumeId(resumeId);
             if (originalResumeId == 0)
                 originalResumeId = resumeId;
