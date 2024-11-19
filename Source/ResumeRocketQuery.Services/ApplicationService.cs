@@ -9,7 +9,6 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Text;
 
 namespace ResumeRocketQuery.Services
 {
@@ -118,27 +117,20 @@ namespace ResumeRocketQuery.Services
             
             // Take the Text of the Resume
             var htmlStream = await _pdfToHtmlClient.ConvertPdf(pdf);
-
-            var cleanedHtmlStream = await _pdfToHtmlClient.StripHtmlElements(htmlStream);
-
-            string cleanedHtml = null;
-            using (StreamReader reader = new StreamReader(cleanedHtmlStream))
+            string originalHtml = null;
+            string html = null;
+            using (StreamReader reader = new StreamReader(htmlStream))
             {
-                cleanedHtml = reader.ReadToEnd();
+                originalHtml = reader.ReadToEnd();
+                html = originalHtml;
             }
+            var cleanedHtml = GetResumeText(html);
+            if (cleanedHtml == null || cleanedHtml == "")
+                throw new Exception("Error extracting text from PDF");
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
             string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
-
-            string originalHtml = null;
-
-            htmlStream.Position = 0;
-
-            using (StreamReader reader = new StreamReader(htmlStream))
-            {
-                originalHtml = reader.ReadToEnd();
-            }
 
             var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
@@ -242,12 +234,11 @@ namespace ResumeRocketQuery.Services
 
                     You will fill out the Json schema from the suggested changes. 
                     1) Original Text should be the text from the resume that you are suggesting be changed. 
-                    2) The Original Text must not end in the middle of its containing div, select text within multiple divs if necessary.
-                    3) Modified should be that suggested change, these should not be longer than the original.
-                    4) Explanation should be a reason for the change.
-                    5) DivClass should be the value of the class attribute of the div surrounding the text.
-                    6) Your response should only be the result json object, and nothing more. 
-                    7) If the fields do not appear in the resume, return a default value in the Json object being returned. 
+                    2) Modified should be that suggested change, these should not be longer than the original.
+                    3) Explanation should be a reason for the change.
+                    4) DivClass should be the value of the class attribute of the div surrounding the text, if there is one otherwise null.
+                    5) Your response should only be the result json object, and nothing more. 
+                    6) If the fields do not appear in the resume, return a default value in the Json object being returned. 
 
                     Job Description:
                     ```
@@ -346,6 +337,12 @@ namespace ResumeRocketQuery.Services
             };
         }
 
+        private string GetResumeText(string html)
+        {
+            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
+            var text = new Regex("<.*?>").Replace(extract, "");
+            return text;
+        }
 
         private List<Change> ParseResult(string input)
         {
