@@ -364,8 +364,6 @@ namespace ResumeRocketQuery.Services
 
         public async Task<GetResumeResult> GetPerfectResume(int resumeId, int applicationId)
         {
-
-
             var resumeHtml = await GetResume(resumeId);
 
             //var resumeSuggestions = await _resumeDataLayer.SelectResumeChangesAsync(resumeId);

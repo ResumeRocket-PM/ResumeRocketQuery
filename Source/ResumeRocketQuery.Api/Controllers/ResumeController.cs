@@ -136,7 +136,8 @@ namespace ResumeRocketQuery.Api.Controllers
             await _resumeService.CreatePrimaryResume(new ResumeRequest
             {
                 AccountId = user.AccountId,
-                Pdf = resultResume
+                Pdf = resultResume,
+                OriginalResume = true
             });
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);

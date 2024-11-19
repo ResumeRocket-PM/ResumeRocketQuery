@@ -96,7 +96,13 @@ namespace ResumeRocketQuery.Services
                 ResumeId = applicationRequest.ResumeId
             });
 
-            await CreateSuggestionsFromResumeHtmlAsync(applicationRequest.AccountId, applicationRequest.JobUrl, applicationRequest.JobHtml, result);
+            await CreateSuggestionsFromResumeHtmlAsync(
+                applicationRequest.AccountId, 
+                applicationRequest.JobUrl, 
+                resumeHtml,
+                applicationRequest.ResumeId,
+                result
+            );
 
 
             return result;
@@ -177,7 +183,7 @@ namespace ResumeRocketQuery.Services
         }
 
 
-        public async Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int applicationId)
+        public async Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int resumeId, int applicationId)
         {
             JobResult jobResult = await _languageService.CaptureJobPostingAsync(jobUrl);
 
@@ -211,6 +217,7 @@ namespace ResumeRocketQuery.Services
             {
                 await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
                 {
+                    ResumeId = resumeId,
                     ApplicationId = applicationId,
                     Accepted = true,
                     ExplanationString = change.Explanation,
@@ -227,19 +234,20 @@ namespace ResumeRocketQuery.Services
             var prompt =
                 $@"I will provide you with a Json Schema, a Job Description, and a Resume. 
 
-                    You will produce atleast 5 suggestions for changes that should be made to the resume.
+                    You will produce at least 5 suggestions for changes that should be made to the resume.
 
                     These updates should not falsify any information, meaning no additional skills, education, or work experience 
                     should be added. You are only allowed to reword items on the resume that are synonyms for items in the job posting
-                    to better match the job posting. Your suggestions should match the provided Json SSchema.
+                    to better match the job posting. Your suggestions should match the provided Json Schema.
 
                     You will fill out the Json schema from the suggested changes. 
                     1) Original Text should be the text from the resume that you are suggesting be changed. 
-                    2) Modified should be that suggested change.
-                    3) Explanation should be a reason for the change.
-                    4) DivClass should be the value of the class attribute of the div surrounding the text.
-                    5) Your response should only be the result json object, and nothing more. 
-                    6) If the fields do not appear in the resume, return a default value in the Json object being returned. 
+                    2) The Original Text must not end in the middle of its containing div, select text within multiple divs if necessary.
+                    3) Modified should be that suggested change, these should not be longer than the original.
+                    4) Explanation should be a reason for the change.
+                    5) DivClass should be the value of the class attribute of the div surrounding the text.
+                    6) Your response should only be the result json object, and nothing more. 
+                    7) If the fields do not appear in the resume, return a default value in the Json object being returned. 
 
                     Job Description:
                     ```

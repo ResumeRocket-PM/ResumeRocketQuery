@@ -295,8 +295,11 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
                 change.ModifiedText == resumeChange.ModifiedText &&
                 change.ExplanationString == resumeChange.ExplanationString &&
                 change.Accepted == resumeChange.Accepted &&
-                change.HtmlID == resumeChange.HtmlID
+                change.HtmlID == resumeChange.HtmlID &&
+                change.ApplicationId == resumeChange.ApplicationId
             );
+
+            Assert.Equal(1, storedChanges[0].ApplicationId);
         }
 
         [Theory]

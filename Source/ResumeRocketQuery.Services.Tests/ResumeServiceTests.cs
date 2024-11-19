@@ -23,6 +23,7 @@ namespace ResumeRocketQuery.Services.Tests
         private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IPdfToHtmlClient _pdfToHtmlClient;
         private readonly IApplicationService _applicationService;
+        private readonly IApplicationDataLayer _applicationDataLayer;
 
         public ResumeServiceTests()
         {
@@ -34,6 +35,7 @@ namespace ResumeRocketQuery.Services.Tests
             _pdfToHtmlClient = serviceProvider.GetService<IPdfToHtmlClient>();
 
             _applicationService = serviceProvider.GetService<IApplicationService>();
+            _applicationDataLayer = serviceProvider.GetService<IApplicationDataLayer>();
         }
 
         public class CreatePrimaryResume : ResumeServiceTests
@@ -322,7 +324,7 @@ namespace ResumeRocketQuery.Services.Tests
                     }
                 };
 
-                var actual = await _systemUnderTest.GetPerfectResume(application.ResumeContentId.Value);
+                var actual = await _systemUnderTest.GetPerfectResume(application.ResumeContentId, application.ApplicationId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
 
@@ -378,7 +380,17 @@ namespace ResumeRocketQuery.Services.Tests
                     }
                 };
 
-                var actual = await _systemUnderTest.GetPerfectResume(resumeId);
+                var applicationId = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+                {
+                    AccountId = account.AccountId,
+                    ApplyDate = DateTime.UtcNow,
+                    Status = "Pending",
+                    Position = "Software Engineer",
+                    CompanyName = "Tech Corp",
+                    JobPostingUrl = Guid.NewGuid().ToString(),
+                });
+
+                var actual = await _systemUnderTest.GetPerfectResume(resumeId, applicationId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
