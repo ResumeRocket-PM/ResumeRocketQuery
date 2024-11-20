@@ -2,12 +2,14 @@
 using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
+using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.External;
+using ResumeRocketQuery.Domain.DataLayer;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using System.Collections.Concurrent;
-using ResumeRocketQuery.Domain.Services;
-using ResumeRocketQuery.Domain.DataLayer;
+using ResumeRocketQuery.Domain.Services.Repository;
 
 namespace ResumeRocketQuery.External
 {
@@ -17,14 +19,14 @@ namespace ResumeRocketQuery.External
         private readonly OpenAIChatCompletionService _chatService;
         private readonly IJobService _jobService;
         private readonly IResumeDataLayer _resumeDataLayer;
-        private readonly IApplicationService _applicationService;
+        private readonly IApplicationDataLayer _applicationDataLayer;
 
-        public OpenAiClient(IJobService jobService, IResumeDataLayer resumeDataLayer, IApplicationService applicationService)
+        public OpenAiClient(IJobService jobService, IResumeDataLayer resumeDataLayer, IApplicationDataLayer applicationDataLayer)
         {
             _chatService = new OpenAIChatCompletionService("gpt-4o", "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");
             _jobService = jobService;
             _resumeDataLayer = resumeDataLayer;
-            _applicationService = applicationService;
+            _applicationDataLayer = applicationDataLayer;
         }
 
         public async Task<string> SendMessageAsync(string prompt, string message)
@@ -56,18 +58,19 @@ namespace ResumeRocketQuery.External
             if (!_userChats.TryGetValue(chatId, out chatHistory))
             {
                 // Get application, if application ID provided
-                Task<ApplicationResult> application = null;
+                Task<Application> application = null;
                 if (applicationId != null)
                 {
                     int id = applicationId ?? 0;
-                    application = _applicationService.GetApplication(id);
+                    application = _applicationDataLayer.GetApplicationAsync(id);
                 }
 
                 // Populate job, if resume associated with application, and resume
                 string job = null;
                 if (application != null)
-                    job = _jobService.GetJobPostingAsync(application.Result.JobUrl).Result.ToString();
-                var resume = _resumeDataLayer.GetResumeAsync(resumeId).Result.Resume;
+                    job = _jobService.GetJobPostingAsync(application.Result.JobPostingUrl).Result.ToString();
+                string resumeHtml = _resumeDataLayer.GetResumeAsync(resumeId).Result.Resume;
+                var resume = GetResumeText(resumeHtml);
 
                 // Initialize chat history with context
                 chatHistory = new ChatHistory(@$"
@@ -89,6 +92,12 @@ namespace ResumeRocketQuery.External
             var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
             chatHistory.AddAssistantMessage(response.ToString());
             return response.ToString();
+        }
+        public string GetResumeText(string html)
+        {
+            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
+            var text = new Regex("<.*?>").Replace(extract, "");
+            return text;
         }
     }
 }

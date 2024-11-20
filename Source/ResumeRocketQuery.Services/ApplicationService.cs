@@ -266,13 +266,6 @@ namespace ResumeRocketQuery.Services
             };
         }
 
-        private string GetResumeText(string html)
-        {
-            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
-            var text = new Regex("<.*?>").Replace(extract, "");
-            return text;
-        }
-
         private List<Change> ParseResult(string input)
         {
             List<Change> result = new List<Change>();
@@ -286,6 +279,12 @@ namespace ResumeRocketQuery.Services
             }
 
             return result;
+        }
+        public string GetResumeText(string html)
+        {
+            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
+            var text = new Regex("<.*?>").Replace(extract, "");
+            return text;
         }
     }
 }

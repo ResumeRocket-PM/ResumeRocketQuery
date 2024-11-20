@@ -9,6 +9,7 @@ public interface IApplicationService
     Task<List<ApplicationResult>> GetJobPostings(int accountId);
     Task<ApplicationResult> GetApplication(int applicationId);
     Task UpdateApplication(int applicationId, string status);
+    string GetResumeText(string html);
 
     Task<int> CreateJobAsync(ApplicationRequest applicationRequest);
 }
