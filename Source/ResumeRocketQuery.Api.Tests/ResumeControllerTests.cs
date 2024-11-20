@@ -31,7 +31,7 @@ namespace ResumeRocketQuery.Api.Tests
         public class ApplyResumeChanges : ResumeControllerTests
         {
             [Fact]
-            public async Task GIVEN_resume_change_id_WHEN_ApplyResumeSuggestion_is_called_THEN_suggestion_is_applied_successfully()
+            public async Task GIVEN_application_id_WHEN_ApplyResumeSuggestions_is_called_THEN_suggestion_statuses_are_updated_successfully()
             {
                 using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
                 {
@@ -47,9 +47,9 @@ namespace ResumeRocketQuery.Api.Tests
                     });
 
                     var resumeDataLayer = selfHost.ServiceProvider.GetService<IResumeDataLayer>();
+                    var applicationDataLayer = selfHost.ServiceProvider.GetService<IApplicationDataLayer>();
 
                     var suggestedChangeId = Guid.NewGuid().ToString();
-
 
                     var resumeId = await resumeDataLayer.InsertResumeAsync(new ResumeStorage
                     {
@@ -69,9 +69,19 @@ namespace ResumeRocketQuery.Api.Tests
                         OriginalText = "Sample Resume Text",
                     });
 
+                    var applicationId = await applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+                    {
+                        AccountId = createAccountResponse.AccountId,
+                        ApplyDate = DateTime.UtcNow,
+                        Status = "Pending",
+                        Position = "Software Engineer",
+                        CompanyName = "Tech Corp",
+                        JobPostingUrl = Guid.NewGuid().ToString(),
+                    });
+
                     var headers = new Dictionary<string, string>
                     {
-                        {"Authorization", $"Bearer {createAccountResponse.JsonWebToken}"}
+                        { "Authorization", $"Bearer {createAccountResponse.JsonWebToken}" }
                     };
 
                     var expected = new
@@ -83,10 +93,18 @@ namespace ResumeRocketQuery.Api.Tests
                         }
                     };
 
-                    var actual = await _restRequestClient.SendRequest<object>($"{selfHost.Url}/api/resume/{resumeId}/suggestions/{resumeChangeId}", HttpMethod.Put, new ResumeSuggestionsUpdateRequest
-                    {
-                        Accepted = true
-                    }, headers);
+                    var actual = await _restRequestClient.SendRequest<object>(
+                        $"{selfHost.Url}/api/resume/{applicationId}/suggestions",
+                        HttpMethod.Put,
+                        new ResumeSuggestionsUpdateRequest
+                        {
+                            SuggestionStatuses = new List<SuggestionStatus>
+                            {
+                        new SuggestionStatus { ResumeChangeId = resumeChangeId, IsApplied = true }
+                            }
+                        },
+                        headers
+                    );
 
                     expected.ToExpectedObject().ShouldMatch(actual);
                 }
@@ -112,6 +130,7 @@ namespace ResumeRocketQuery.Api.Tests
                     });
 
                     var resumeDataLayer = selfHost.ServiceProvider.GetService<IResumeDataLayer>();
+                    var applicationDataLayer = selfHost.ServiceProvider.GetService<IApplicationDataLayer>();
 
                     var suggestedChangeId = Guid.NewGuid().ToString();
 
@@ -123,6 +142,17 @@ namespace ResumeRocketQuery.Api.Tests
                         UpdateDate = DateTime.Today,
                     });
 
+                    var applicationId = await applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+                    {
+                        AccountId = createAccountResponse.AccountId,
+                        ResumeId = resumeId,
+                        ApplyDate = DateTime.UtcNow,
+                        Status = "Pending",
+                        Position = "Software Engineer",
+                        CompanyName = "Tech Corp",
+                        JobPostingUrl = Guid.NewGuid().ToString(),
+                    });
+
                     var resumeChangeId = await resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
                     {
                         ResumeId = resumeId,
@@ -131,6 +161,7 @@ namespace ResumeRocketQuery.Api.Tests
                         HtmlID = suggestedChangeId,
                         ModifiedText = "Professional Job Engineer",
                         OriginalText = "Sample Resume Text",
+                        ApplicationId = applicationId
                     });
 
                     var headers = new Dictionary<string, string>
@@ -156,15 +187,16 @@ namespace ResumeRocketQuery.Api.Tests
                                     ResumeChangeId = resumeChangeId,
                                     Accepted = true,
                                     ExplanationString = "Because it sounds nicer",
-                                    HtmlID = suggestedChangeId,
+                                    HtmlID = (string)null,
                                     ModifiedText = "Professional Job Engineer",
                                     OriginalText = "Sample Resume Text",
+                                    ApplicationId = applicationId
                                 }
                             }
                         }
                     };
 
-                    var actual = await _restRequestClient.SendRequest<GetResumeResult>($"{selfHost.Url}/api/resume/{resumeId}/suggestions", HttpMethod.Get, null, headers);
+                    var actual = await _restRequestClient.SendRequest<GetResumeResult>($"{selfHost.Url}/api/resume/{applicationId}/suggestions", HttpMethod.Get, null, headers);
 
                     expected.ToExpectedObject().ShouldMatch(actual);
                 }

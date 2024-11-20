@@ -2,6 +2,7 @@
 using iText.Layout.Element;
 using Newtonsoft.Json;
 using PuppeteerSharp;
+using ResumeRocketQuery.Domain.Api.Request;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.Domain.Services;
@@ -56,8 +57,8 @@ namespace ResumeRocketQuery.Services
             return await ConvertFromHtml(html);
         }
 
-        public async Task<int> CreateResume(ResumeRequest resume) {
-            var pdfBytes = Convert.FromBase64String(resume.Pdf["FileBytes"]);
+        public async Task<int> CreateResumeFromPdf(ResumeRequest request) {
+            var pdfBytes = Convert.FromBase64String(request.Pdf["FileBytes"]);
             var pdfStream = new MemoryStream(pdfBytes);
             var rawHtmlStream = await _PdfToHtmlClient.ConvertPdf(pdfStream);
 
@@ -66,10 +67,10 @@ namespace ResumeRocketQuery.Services
                 var savedResumeHtml = rawHtmlStreamReader.ReadToEnd();
                 var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
                 {
-                    AccountId = resume.AccountId,
+                    AccountId = request.AccountId,
                     Resume = savedResumeHtml,
-                    OriginalResumeID = resume.OriginalResumeID,
-                    OriginalResume = resume.OriginalResume,
+                    OriginalResumeID = request.OriginalResumeID,
+                    OriginalResume = request.OriginalResume,
                     InsertDate = DateTime.Now,
                     UpdateDate = DateTime.Now
                 });
@@ -77,7 +78,21 @@ namespace ResumeRocketQuery.Services
             }
         }
 
-        public async Task CreatePrimaryResume(ResumeRequest request)
+        public async Task<int> CreateResumeFromHtml(ResumeRequest request, string resumeHtml)
+        {
+            var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            {
+                AccountId = request.AccountId,
+                Resume = resumeHtml,
+                OriginalResumeID = request.OriginalResumeID,
+                OriginalResume = request.OriginalResume,
+                InsertDate = DateTime.Now,
+                UpdateDate = DateTime.Now
+            });
+            return resumeId;
+        }
+
+        public async Task<int> CreatePrimaryResume(ResumeRequest request)
         {
             var pdfBytes = Convert.FromBase64String(request.Pdf["FileBytes"]);
 
@@ -229,13 +244,16 @@ namespace ResumeRocketQuery.Services
                     AccountId = request.AccountId,
                     Resume = savedResumeHtml,
                     InsertDate = DateTime.Now,
-                    UpdateDate = DateTime.Now
+                    UpdateDate = DateTime.Now,
+                    OriginalResume = true
                 });
 
                 updatedAccount.PrimaryResumeId = resumeId;
                 updatedAccount.AccountId = request.AccountId;
 
                 await _accountService.UpdateAccount(updatedAccount);
+
+                return resumeId;
             }
         }
 
@@ -301,35 +319,33 @@ namespace ResumeRocketQuery.Services
             }
         }
 
-        public async Task<ResumeResult> CreateResumeFromPdf(ResumeRequest request)
-        {
-            var pdfBytes = Convert.FromBase64String(request.Pdf["FileBytes"]);
+        //public async Task<ResumeResult> CreateResumeFromPdf(ResumeRequest request)
+        //{
+        //    var pdfBytes = Convert.FromBase64String(request.Pdf["FileBytes"]);
+        //    var pdfStream = new MemoryStream(pdfBytes);
+        //    var htmlStream = await _PdfToHtmlClient.ConvertPdf(pdfStream);
 
-            var pdfStream = new MemoryStream(pdfBytes);
+        //    using (StreamReader reader = new StreamReader(htmlStream))
+        //    {
+        //        var html = reader.ReadToEnd();
 
-            var htmlStream = await _PdfToHtmlClient.ConvertPdf(pdfStream);
+        //        var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+        //        {
+        //            AccountId = request.AccountId,
+        //            Resume = html,
+        //            InsertDate = DateTime.Now,
+        //            UpdateDate = DateTime.Now
+        //        });
 
-            using (StreamReader reader = new StreamReader(htmlStream))
-            {
-                var html = reader.ReadToEnd();
+        //        var result = new ResumeResult
+        //        {
+        //            Html = html,
+        //            ResumeId = resumeId,
+        //        };
 
-                var resumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
-                {
-                    AccountId = request.AccountId,
-                    Resume = html,
-                    InsertDate = DateTime.Now,
-                    UpdateDate = DateTime.Now
-                });
-
-                var result = new ResumeResult
-                {
-                    Html = html,
-                    ResumeId = resumeId,
-                };
-
-                return result;
-            }
-        }
+        //        return result;
+        //    }
+        //}
 
         public async Task<List<ResumeStorage>> GetResumeHistory(int originalResumeId) {
             var result = await _resumeDataLayer.GetResumeHistoryAsync(originalResumeId);
@@ -353,13 +369,17 @@ namespace ResumeRocketQuery.Services
         }
 
 
-        public async Task ApplyResumeSuggestion(int resumeChangeId, bool accepted)
+        public async Task ApplyResumeSuggestions(List<SuggestionStatus> suggestionStatuses)
         {
-            await _resumeDataLayer.UpdateResumeChangeAsync(new ResumeChangesStorage
+            // For each of the suggestion statuses, update the resume change
+            foreach (var status in suggestionStatuses)
             {
-                Accepted = accepted,
-                ResumeChangeId = resumeChangeId
-            });
+                await _resumeDataLayer.UpdateResumeChangeAsync(new ResumeChangesStorage
+                {
+                    Accepted = status.IsApplied,
+                    ResumeChangeId = status.ResumeChangeId
+                });
+            }
         }
 
         public async Task<GetResumeResult> GetPerfectResume(int resumeId, int applicationId)
@@ -398,9 +418,9 @@ namespace ResumeRocketQuery.Services
                     Accepted = x.Accepted,
                     ResumeChangeId = x.ResumeChangeId,
                     ExplanationString = x.ExplanationString,
-                    HtmlID = x.HtmlID,
                     ModifiedText = x.ModifiedText,
-                    OriginalText = x.OriginalText
+                    OriginalText = x.OriginalText,
+                    ApplicationId = x.ApplicationId
                 }).ToList()
             };
         }

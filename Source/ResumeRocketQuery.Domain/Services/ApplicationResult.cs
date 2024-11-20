@@ -17,5 +17,6 @@ namespace ResumeRocketQuery.Domain.Services
         public string Position { get; set; }
         public string CompanyName { get; set; }
         public int ResumeContentId { get; set; }
+        public int ResumeId { get; set; }   
     }
 }

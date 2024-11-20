@@ -9,6 +9,7 @@ using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.Services.Repository;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Text;
 
 namespace ResumeRocketQuery.Services
 {
@@ -145,22 +146,9 @@ namespace ResumeRocketQuery.Services
 
             var changes = ParseResult(response);
 
-            foreach (var change in changes)
-            {
-                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
-                {
-                    ResumeId = originalResumeId,
-                    Accepted = true,
-                    ExplanationString = change.Explanation,
-                    HtmlID = change.DivClass,
-                    ModifiedText = change.ModifiedText,
-                    OriginalText = change.OriginalText,
-                });
-            }
-
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
-            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+            var applicationId = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
             {
                 JobPostingUrl = job.JobUrl,
                 AccountId = job.AccountId,
@@ -171,7 +159,21 @@ namespace ResumeRocketQuery.Services
                 ResumeId = originalResumeId
             });
 
-            return result;
+            foreach (var change in changes)
+            {
+                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ResumeId = originalResumeId,
+                    Accepted = true,
+                    ExplanationString = change.Explanation,
+                    HtmlID = change.DivClass,
+                    ModifiedText = change.ModifiedText,
+                    OriginalText = change.OriginalText,
+                    ApplicationId = applicationId
+                });
+            }
+
+            return applicationId;
         }
 
 
@@ -190,18 +192,22 @@ namespace ResumeRocketQuery.Services
                 cleanedHtml = reader.ReadToEnd();
             }
 
+            cleanedHtml = GetResumeText(cleanedHtml);
+            if (cleanedHtml == null || cleanedHtml == "")
+                throw new Exception("Error extracting text from PDF");
+
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
             string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
 
-            string originalHtml = null;
+            //string originalHtml = null;
 
-            resumeHtmlStream.Position = 0;
+            //resumeHtmlStream.Position = 0;
 
-            using (StreamReader reader = new StreamReader(resumeHtmlStream))
-            {
-                originalHtml = reader.ReadToEnd();
-            }
+            //using (StreamReader reader = new StreamReader(resumeHtmlStream))
+            //{
+            //    originalHtml = reader.ReadToEnd();
+            //}
 
             var changes = ParseResult(response);
 
@@ -211,7 +217,7 @@ namespace ResumeRocketQuery.Services
                 {
                     ResumeId = resumeId,
                     ApplicationId = applicationId,
-                    Accepted = true,
+                    Accepted = false,
                     ExplanationString = change.Explanation,
                     HtmlID = change.DivClass,
                     ModifiedText = change.ModifiedText,
@@ -234,7 +240,7 @@ namespace ResumeRocketQuery.Services
 
                     You will fill out the Json schema from the suggested changes. 
                     1) Original Text should be the text from the resume that you are suggesting be changed. 
-                    2) Modified should be that suggested change, these should not be longer than the original.
+                    2) Modified should be that suggested change, these MUST NOT be longer than the original.
                     3) Explanation should be a reason for the change.
                     4) DivClass should be the value of the class attribute of the div surrounding the text, if there is one otherwise null.
                     5) Your response should only be the result json object, and nothing more. 
@@ -333,7 +339,8 @@ namespace ResumeRocketQuery.Services
                 Position = x.Position,
                 Status = x.Status,
                 ResumeContent = resumeContent,
-                ResumeContentId = x.ResumeId
+                ResumeContentId = x.ResumeId,
+                ResumeId = x.ResumeId
             };
         }
 

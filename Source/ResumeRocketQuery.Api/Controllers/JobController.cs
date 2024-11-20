@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System;
 using Newtonsoft.Json;
+using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -120,6 +121,7 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(applicationId, HttpStatusCode.Created);
         }
 
+        // this is the one the applications page in front end uses 
         [HttpPost]
         [Route("postings")]
         public async Task<ServiceResponse> CreateJobPosting([FromForm] IFormFile file, [FromForm] string data)
