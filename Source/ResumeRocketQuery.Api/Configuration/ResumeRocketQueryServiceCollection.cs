@@ -147,6 +147,7 @@ namespace ResumeRocketQuery.Api.Configuration
 
             var resumeRocketQueryConfiguration = serviceProvider.GetService<IResumeRocketQueryConfigurationSettings>();
             var key = Encoding.ASCII.GetBytes(resumeRocketQueryConfiguration.AuthenticationPrivateKey);
+
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -161,7 +162,10 @@ namespace ResumeRocketQuery.Api.Configuration
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+
+                        ValidIssuer = resumeRocketQueryConfiguration.AuthenticationIssuer,
+                        ValidAudience = resumeRocketQueryConfiguration.AuthenticationAudience,
                     };
                 });
 

@@ -8,5 +8,7 @@ namespace ResumeRocketQuery.Domain.Configuration
         string BlobStorageContainerName { get; }
         string Pdf2HtmlUrl { get; }
         string LlamaClientUrl { get; }
+        string AuthenticationIssuer { get; }
+        string AuthenticationAudience { get; }
     }
 }

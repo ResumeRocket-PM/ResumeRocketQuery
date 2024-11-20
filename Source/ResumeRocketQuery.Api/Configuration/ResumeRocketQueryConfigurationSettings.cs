@@ -24,6 +24,8 @@ namespace ResumeRocketQuery.Api.Configuration
         public string Pdf2HtmlUrl => _configurationRoot.GetSection("AppSettings")["Pdf2HtmlUrl"];
         public string LlamaClientUrl => _configurationRoot.GetSection("AppSettings")["LlamaClientUrl"];
         public string AuthenticationPrivateKey => _configurationRoot.GetSection("AppSettings")["AuthenticationPrivateKey"];
+        public string AuthenticationIssuer => _configurationRoot.GetSection("AppSettings")["AuthenticationIssuer"];
+        public string AuthenticationAudience => _configurationRoot.GetSection("AppSettings")["AuthenticationAudience"];
         public string ResumeRocketQueryDatabaseConnectionString => _configurationRoot.GetSection("ConnectionStrings")["ResumeRocketQueryDatabaseConnectionString"];
         public string BlobStorageConnectionString => _configurationRoot.GetSection("AzureBlobStorage")["ConnectionString"];
         public string BlobStorageContainerName => _configurationRoot.GetSection("AzureBlobStorage")["ContainerName"];
