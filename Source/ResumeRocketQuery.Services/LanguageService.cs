@@ -2,10 +2,7 @@
 using ResumeRocketQuery.Domain.External;
 using ResumeRocketQuery.Domain.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
@@ -16,14 +13,14 @@ namespace ResumeRocketQuery.Services
     {
         private readonly IOpenAiClient openAiClient;
         private readonly IJobScraper jobScraper;
-        private readonly IPdfToHtmlClient _pdfToHtmlClient;
+        private readonly IJobService jobService;
         private readonly ILlamaClient _llamaClient;
 
-        public LanguageService(IOpenAiClient openAiClient, IJobScraper jobScraper, IPdfToHtmlClient pdfToHtmlClient, ILlamaClient llamaClient)
+        public LanguageService(IOpenAiClient openAiClient, IJobScraper jobScraper, ILlamaClient llamaClient, IJobService jobService)
         {
             this.openAiClient = openAiClient;
             this.jobScraper = jobScraper;
-            _pdfToHtmlClient = pdfToHtmlClient;
+            this.jobService = jobService;
             _llamaClient = llamaClient;
         }
 
@@ -44,7 +41,10 @@ namespace ResumeRocketQuery.Services
             string siteName = ParseSiteName(url);
             Stream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
             var result = await _llamaClient.JobDetails(htmlStream, siteName);
-            
+            if (await jobService.GetJobPostingAsync(url) == null)
+            {
+                await jobService.StoreJobPostingAsync(url, siteName, result);
+            }
 
             var prompt = @"
                         For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
