@@ -44,6 +44,8 @@ namespace ResumeRocketQuery.Services
             string siteName = ParseSiteName(url);
             Stream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
             var result = await _llamaClient.JobDetails(htmlStream, siteName);
+            
+
             var prompt = @"
                         For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:
 
