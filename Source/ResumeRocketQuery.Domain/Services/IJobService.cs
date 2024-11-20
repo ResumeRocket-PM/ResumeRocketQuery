@@ -5,7 +5,6 @@ namespace ResumeRocketQuery.Domain.Services
 {
     public interface IJobService
     {
-        // Method handles
         Task StoreJobPostingAsync(string url, string company, string posting);
         Task<JobPosting> GetJobPostingAsync(string url);
     }

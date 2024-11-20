@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using ResumeRocketQuery.Domain.External;
-using ResumeRocketQuery.Domain.Services;
-using System;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using ResumeRocketQuery.Domain.External;
+using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.Services
 {
@@ -41,10 +41,9 @@ namespace ResumeRocketQuery.Services
             string siteName = ParseSiteName(url);
             Stream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
             var result = await _llamaClient.JobDetails(htmlStream, siteName);
+            
             if (await jobService.GetJobPostingAsync(url) == null)
-            {
                 await jobService.StoreJobPostingAsync(url, siteName, result);
-            }
 
             var prompt = @"
                         For the provided job posting HTML below, pull the following fields from the job posting. If they aren't found, leave them as null:

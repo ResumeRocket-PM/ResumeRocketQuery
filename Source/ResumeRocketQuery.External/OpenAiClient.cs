@@ -6,17 +6,24 @@ using ResumeRocketQuery.Domain.External;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Collections.Concurrent;
+using ResumeRocketQuery.Domain.Services;
 
 namespace ResumeRocketQuery.External
 {
     public class OpenAiClient : IOpenAiClient
     {
         private readonly ConcurrentDictionary<string, ChatHistory> _userChats = new ConcurrentDictionary<string, ChatHistory>();
-        private readonly OpenAIChatCompletionService _resumeService;
+        private readonly OpenAIChatCompletionService _chatService;
+        private readonly IJobService _jobService;
+        private readonly IResumeService _resumeService;
+        private readonly IApplicationService _applicationService;
 
-        public OpenAiClient()
+        public OpenAiClient(IJobService jobService, IResumeService resumeService, IApplicationService applicationService)
         {
-            _resumeService = new OpenAIChatCompletionService("gpt-4o", "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");
+            _chatService = new OpenAIChatCompletionService("gpt-4o", "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");
+            _jobService = jobService;
+            _resumeService = resumeService;
+            _applicationService = applicationService;
         }
 
         public async Task<string> SendMessageAsync(string prompt, string message)
@@ -44,12 +51,24 @@ namespace ResumeRocketQuery.External
             string chatId = applicationId != null ? $"{accountId}-{resumeId}-{applicationId}" : $"{accountId}-{resumeId}";
             ChatHistory chatHistory;
 
+            // Initialize chat history if it doesn't exist
             if (!_userChats.TryGetValue(chatId, out chatHistory))
             {
-                // Initialize chat history if it doesn't exist
-                var resume = "This is where resume content would go";
-                var job = "This is where job content would go";
+                // Get application, if application ID provided
+                Task<ApplicationResult> application = null;
+                if (applicationId != null)
+                {
+                    int id = applicationId ?? 0;
+                    application = _applicationService.GetApplication(id);
+                }
 
+                // Populate job, if resume associated with application, and resume
+                string job = null;
+                if (application != null)
+                    job = _jobService.GetJobPostingAsync(application.Result.JobUrl).Result.ToString();
+                var resume = _resumeService.GetResume(resumeId).Result;
+
+                // Initialize chat history with context
                 chatHistory = new ChatHistory(@$"
                     You are a helpful assistant that will help answer my questions related to the job and resume.
                     If no job is provided, you will assume I am looking for a job in general. Greet me with a hello.
@@ -60,11 +79,13 @@ namespace ResumeRocketQuery.External
                     Job:
                     {job}
                 ");
+
+                // Add chat history to dictionary for concurrent access
                 _userChats[chatId] = chatHistory;
             }
 
             chatHistory.AddUserMessage(prompt);
-            var response = await _resumeService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
+            var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
             chatHistory.AddAssistantMessage(response.ToString());
             return response.ToString();
         }

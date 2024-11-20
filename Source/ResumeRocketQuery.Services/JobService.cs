@@ -1,14 +1,5 @@
-using Newtonsoft.Json;
-using ResumeRocketQuery.Domain.External;
-using ResumeRocketQuery.Domain.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.IO;
-using System.Text;
+using ResumeRocketQuery.Domain.Services;
 using ResumeRocketQuery.Domain.DataLayer;
 
 namespace ResumeRocketQuery.Services
