@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ResumeRocketQuery.Domain.DataLayer;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.Services;
@@ -6,10 +7,10 @@ namespace ResumeRocketQuery.Domain.Services;
 public interface IApplicationService
 {
     Task<int> CreateJobResumeAsync(Job job);
+    Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int resumeId, int applicationId);
     Task<List<ApplicationResult>> GetJobPostings(int accountId);
     Task<ApplicationResult> GetApplication(int applicationId);
     Task UpdateApplication(int applicationId, string status);
-    string GetResumeText(string html);
-
     Task<int> CreateJobAsync(ApplicationRequest applicationRequest);
+    string GetResumeText(string html);
 }

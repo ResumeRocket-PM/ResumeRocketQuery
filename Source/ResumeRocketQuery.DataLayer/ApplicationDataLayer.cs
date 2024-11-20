@@ -79,5 +79,6 @@ namespace ResumeRocketQuery.DataLayer
                 return result;
             }
         }
+
     }
 }

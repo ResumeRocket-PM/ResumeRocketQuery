@@ -39,7 +39,7 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
-                var resumeId = await  _systemUnderTest.CreateJobResumeAsync(new Job
+                var applicationId = await  _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
@@ -48,16 +48,17 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var expected = new 
                 {
+                    ApplicationId = applicationId,
                     JobUrl = jobUrl,
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
                     Position = Expect.Any<string>(x => x.Length > 5),
-                    ResumeID = resumeId,
+                    ResumeId = Expect.Any<int>(),
                     Status = "Pending"
                 };
 
-                var actual = await _systemUnderTest.GetApplication(resumeId);
+                var actual = await _systemUnderTest.GetApplication(applicationId);
 
                 expected.ToExpectedObject().ShouldMatch(actual);
             }
@@ -73,7 +74,7 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
-                var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
+                var applicationId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
@@ -82,16 +83,17 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var expected = new
                 {
+                    ApplicationId = applicationId,
                     JobUrl = jobUrl,
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
                     Position = Expect.Any<string>(x => x.Length > 5),
-                    ResumeID = resumeId,
+                    ResumeId = Expect.Any<int>(),
                     Status = "Pending"
                 };
 
-                var actual = await _systemUnderTest.GetApplication(resumeId);
+                var actual = await _systemUnderTest.GetApplication(applicationId);
 
                 Assert.IsType<string>(actual.ResumeContent);
                 expected.ToExpectedObject().ShouldMatch(actual);
@@ -130,7 +132,7 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var jobUrl = "https://www.metacareers.com/jobs/624841835890795/";
 
-                var resumeId = await _systemUnderTest.CreateJobResumeAsync(new Job
+                var applicationId = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> {{ "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
@@ -139,16 +141,19 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var expected = new
                 {
+                    ApplicationId = applicationId,
                     JobUrl = jobUrl,
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
                     Position = "Software Engineer, Machine Learning",
-                    ResumeID = resumeId,
+                    ResumeId = Expect.Any<int>(),  
+                    ResumeContentId = Expect.Any<int>(),
+                    ResumeContent = Expect.Any<string>(),
                     Status = "Pending"
                 };
 
-                var actual = await _systemUnderTest.GetApplication(resumeId);
+                var actual = await _systemUnderTest.GetApplication(applicationId);
 
                 Assert.IsType<string>(actual.ResumeContent);
                 expected.ToExpectedObject().ShouldMatch(actual);
@@ -168,41 +173,53 @@ namespace ResumeRocketQuery.Services.Tests
 
                 var jobUrl = "https://www.metacareers.com/jobs/757328535991512/";
 
-                var resumeId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
+                var applicationId1 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
                     AccountId = account.AccountId
                 });
 
-                var resumeId2 = await _systemUnderTest.CreateJobResumeAsync(new Job
+                var applicationId2 = await _systemUnderTest.CreateJobResumeAsync(new Job
                 {
                     Resume = new Dictionary<string, string>{{ "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } },
                     JobUrl = jobUrl,
                     AccountId = account.AccountId
                 });
 
+                var application1 = await _systemUnderTest.GetApplication(applicationId1);
+                var application2 = await _systemUnderTest.GetApplication(applicationId2);
+
+                var resumeId1 = application1.ResumeId;
+                var resumeId2 = application2.ResumeId;
+
                 var expected = new[]
                 {
                     new
                     {
+                        ApplicationId = applicationId1,
                         JobUrl = jobUrl,
                         AccountID = account.AccountId,
                         ApplyDate = Expect.Any<DateTime>(),
                         CompanyName = Expect.Any<string>(),
                         Position = Expect.Any<string>(),
-                        ResumeID = resumeId1,
-                        Status = "Pending"
+                        ResumeId = resumeId1,
+                        Status = "Pending",
+                        ResumeContentId = Expect.Any<int>(),
+                        ResumeContent = Expect.Any<string>(),
                     },
                     new
                     {
+                        ApplicationId = applicationId2,
                         JobUrl = jobUrl,
                         AccountID = account.AccountId,
                         ApplyDate = Expect.Any<DateTime>(),
                         CompanyName = Expect.Any<string>(),
                         Position = Expect.Any<string>(),
-                        ResumeID = resumeId2,
+                        ResumeId = resumeId2,
                         Status = "Pending",
+                        ResumeContentId = Expect.Any<int>(),
+                        ResumeContent = Expect.Any<string>(),
                     }
                 };
 

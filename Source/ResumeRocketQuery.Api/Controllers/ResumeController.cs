@@ -25,15 +25,18 @@ namespace ResumeRocketQuery.Api.Controllers
     public class ResumeController : ControllerBase
     {
         private readonly IResumeService _resumeService;
+        private readonly IApplicationService _applicationService;
         private readonly IResumeRocketQueryUserBuilder _resumeRocketQueryUserBuilder;
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
         
         public ResumeController(IServiceResponseBuilder serviceResponseBuilder, 
             IResumeService resumeService,
+            IApplicationService applicationService,
             IResumeRocketQueryUserBuilder resumeRocketQueryUserBuilder)
         {
             _serviceResponseBuilder = serviceResponseBuilder;
             _resumeService = resumeService;
+            _applicationService = applicationService;
             _resumeRocketQueryUserBuilder = resumeRocketQueryUserBuilder;
         }
 
@@ -51,19 +54,26 @@ namespace ResumeRocketQuery.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{resumeId}/suggestions")]
-        public async Task<ServiceResponseGeneric<GetResumeResult>> GetPerfectResume([FromRoute] int resumeId)
+        [Route("{applicationId}/suggestions")]
+        public async Task<ServiceResponseGeneric<GetResumeResult>> GetPerfectResume([FromRoute] int applicationId)
         {
-            var result = await _resumeService.GetPerfectResume(resumeId);
+            var application = await _applicationService.GetApplication(applicationId);
+
+            var resumeId = application.ResumeContentId;
+
+            var result = await _resumeService.GetPerfectResume(resumeId, applicationId);
 
             return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);
         }
 
         [HttpPut]
-        [Route("{resumeId}/suggestions/{resumeChangeId}")]
-        public async Task<ServiceResponse> ApplyResumeSuggestion([FromRoute] int resumeChangeId, ResumeSuggestionsUpdateRequest resumeSuggestionsUpdateRequest)
+        [Route("{applicationId}/suggestions")]
+        public async Task<ServiceResponse> ApplyResumeSuggestions([FromBody] ResumeSuggestionsUpdateRequest resumeSuggestionsUpdateRequest)
         {
-            await _resumeService.ApplyResumeSuggestion(resumeChangeId, resumeSuggestionsUpdateRequest.Accepted);
+
+            await _resumeService.ApplyResumeSuggestions(
+                resumeSuggestionsUpdateRequest.SuggestionStatuses
+            );
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.OK);
         }
@@ -129,7 +139,7 @@ namespace ResumeRocketQuery.Api.Controllers
             await _resumeService.CreatePrimaryResume(new ResumeRequest
             {
                 AccountId = user.AccountId,
-                Pdf = resultResume
+                Pdf = resultResume,
             });
 
             return _serviceResponseBuilder.BuildServiceResponse(HttpStatusCode.Created);
@@ -208,7 +218,7 @@ namespace ResumeRocketQuery.Api.Controllers
                 resultResume.Add("FileBytes", fileBytes);
             }
 
-            var resumeId = await _resumeService.CreateResume(new ResumeRequest
+            var resumeId = await _resumeService.CreateResumeFromPdf(new ResumeRequest
             {
                 AccountId = user.AccountId,
                 Pdf = resultResume,
@@ -236,27 +246,26 @@ namespace ResumeRocketQuery.Api.Controllers
         {
             var user = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
 
-            var resumeHtmlString = createResumeRequest.ResumeHtmlString;
-            var file = await _resumeService.GetResumePdfFromHtml(resumeHtmlString);
+            //var resumeHtmlString = createResumeRequest.ResumeHtmlString;
+            //var file = await _resumeService.GetResumePdfFromHtml(resumeHtmlString);
 
-            var resultResume = new Dictionary<string, string>();
+            //var resultResume = new Dictionary<string, string>();
 
-            using (var ms = new MemoryStream())
-            {
-                ms.Write(file, 0, file.Length); 
+            //using (var ms = new MemoryStream())
+            //{
+            //    ms.Write(file, 0, file.Length); 
 
-                var fileBytes = Convert.ToBase64String(ms.ToArray());
+            //    var fileBytes = Convert.ToBase64String(ms.ToArray());
 
-                resultResume.Add("FileName", "resumeVersionFor" + originalResumeId);
-                resultResume.Add("FileBytes", fileBytes);
-            }
+            //    resultResume.Add("FileName", "resumeVersionFor" + originalResumeId);
+            //    resultResume.Add("FileBytes", fileBytes);
+            //}
 
-            var resumeId = await _resumeService.CreateResume(new ResumeRequest
+            var resumeId = await _resumeService.CreateResumeFromHtml(new ResumeRequest
             {
                 AccountId = user.AccountId,
-                Pdf = resultResume,
                 OriginalResumeID = originalResumeId,
-            });
+            }, createResumeRequest.ResumeHtmlString);
 
             var response = new CreateResumeResponse
             {

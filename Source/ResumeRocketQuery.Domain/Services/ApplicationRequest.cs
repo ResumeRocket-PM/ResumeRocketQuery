@@ -7,4 +7,5 @@ public class ApplicationRequest
     public int AccountId { get; set; }
     public string JobUrl { get; set; }
     public string JobHtml { get; set; }
+    public int ResumeId { get; set; }
 }

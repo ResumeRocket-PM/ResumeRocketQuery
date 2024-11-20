@@ -8,7 +8,7 @@ namespace ResumeRocketQuery.Domain.Services
 {
     public class ApplicationResult
     {
-        public int ResumeID { get; set; }
+        public int ApplicationId { get; set; }
         public DateTime? ApplyDate { get; set; }
         public string JobUrl { get; set; }
         public int AccountID { get; set; }
@@ -16,6 +16,7 @@ namespace ResumeRocketQuery.Domain.Services
         public string ResumeContent { get; set; }
         public string Position { get; set; }
         public string CompanyName { get; set; }
-        public int? ResumeContentId { get; set; }
+        public int ResumeContentId { get; set; }
+        public int ResumeId { get; set; }   
     }
 }
