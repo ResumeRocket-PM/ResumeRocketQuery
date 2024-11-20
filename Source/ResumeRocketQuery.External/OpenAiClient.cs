@@ -7,6 +7,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Collections.Concurrent;
 using ResumeRocketQuery.Domain.Services;
+using ResumeRocketQuery.Domain.DataLayer;
 
 namespace ResumeRocketQuery.External
 {
@@ -15,14 +16,14 @@ namespace ResumeRocketQuery.External
         private readonly ConcurrentDictionary<string, ChatHistory> _userChats = new ConcurrentDictionary<string, ChatHistory>();
         private readonly OpenAIChatCompletionService _chatService;
         private readonly IJobService _jobService;
-        private readonly IResumeService _resumeService;
+        private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IApplicationService _applicationService;
 
-        public OpenAiClient(IJobService jobService, IResumeService resumeService, IApplicationService applicationService)
+        public OpenAiClient(IJobService jobService, IResumeDataLayer resumeDataLayer, IApplicationService applicationService)
         {
             _chatService = new OpenAIChatCompletionService("gpt-4o", "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");
             _jobService = jobService;
-            _resumeService = resumeService;
+            _resumeDataLayer = resumeDataLayer;
             _applicationService = applicationService;
         }
 
@@ -66,7 +67,7 @@ namespace ResumeRocketQuery.External
                 string job = null;
                 if (application != null)
                     job = _jobService.GetJobPostingAsync(application.Result.JobUrl).Result.ToString();
-                var resume = _resumeService.GetResume(resumeId).Result;
+                var resume = _resumeDataLayer.GetResumeAsync(resumeId).Result.Resume;
 
                 // Initialize chat history with context
                 chatHistory = new ChatHistory(@$"
