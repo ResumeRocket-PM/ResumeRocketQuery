@@ -4,6 +4,7 @@ namespace ResumeRocketQuery.Domain.Api.Response
 {
     public class JobPostingResponse 
     {
+        public int ApplicationId { get; set; }
         public int ResumeID { get; set; }
         public DateTime? ApplyDate { get; set; }
         public string JobUrl { get; set; }

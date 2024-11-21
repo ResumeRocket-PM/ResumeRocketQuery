@@ -42,30 +42,48 @@ namespace ResumeRocketQuery.Services
             //Take the HTML from the Posting, Pass
             var jobResult = await _languageService.ProcessJobPosting(applicationRequest.JobHtml, applicationRequest.JobUrl);
 
-            var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
+            //var primaryResume = await _resumeService.GetPrimaryResume(applicationRequest.AccountId);
 
-            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+            //var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
-            string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
+            //string response = await _openAiClient.SendMessageAsync(prompt, primaryResume);
 
-            try {
-                var jsonResult = JsonConvert.DeserializeObject<List<Change>>(response);
-            }
-            catch (Exception e) {
-                Debug.WriteLine("Error parsing returned JSON", e);
-                throw;
-            }
+            //try
+            //{
+            //    // Remove any potential code block markers (```json at the beginning and ``` at the end)
+            //    string cleanedResponse = response.Trim();
 
-            var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
-            {
-                AccountId = applicationRequest.AccountId,
-                Resume = primaryResume,
-                OriginalResumeID = null,
-                OriginalResume = true,
-                Version = 1,
-                InsertDate = DateTime.Now,
-                UpdateDate = DateTime.Now
-            });
+            //    if (cleanedResponse.StartsWith("```json"))
+            //    {
+            //        cleanedResponse = cleanedResponse.Substring(7).Trim();  // Remove ```json
+            //    }
+
+            //    if (cleanedResponse.EndsWith("```"))
+            //    {
+            //        cleanedResponse = cleanedResponse.Substring(0, cleanedResponse.Length - 3).Trim();  // Remove ```
+            //    }
+
+            //    // Now attempt deserialization with the cleaned response
+            //    var jsonResult = JsonConvert.DeserializeObject<List<Change>>(cleanedResponse);
+            //}
+            //catch (Exception e)
+            //{
+            //    Debug.WriteLine("Error parsing returned JSON", e);
+            //    throw;
+            //}
+
+            //var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
+            //{
+            //    AccountId = applicationRequest.AccountId,
+            //    Resume = primaryResume,
+            //    OriginalResumeID = null,
+            //    OriginalResume = true,
+            //    Version = 1,
+            //    InsertDate = DateTime.Now,
+            //    UpdateDate = DateTime.Now
+            //});
+
+            string resumeHtml = await _resumeService.GetResume(applicationRequest.ResumeId);
 
             var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
             {
@@ -75,8 +93,17 @@ namespace ResumeRocketQuery.Services
                 CompanyName = jobResult.CompanyName,
                 Position = jobResult.Title,
                 Status = "Pending",
-                ResumeId = originalResumeId
+                ResumeId = applicationRequest.ResumeId
             });
+
+            await CreateSuggestionsFromResumeHtmlAsync(
+                applicationRequest.AccountId, 
+                applicationRequest.JobUrl, 
+                resumeHtml,
+                applicationRequest.ResumeId,
+                result
+            );
+
 
             return result;
         }
@@ -91,27 +118,20 @@ namespace ResumeRocketQuery.Services
             
             // Take the Text of the Resume
             var htmlStream = await _pdfToHtmlClient.ConvertPdf(pdf);
-
-            var cleanedHtmlStream = await _pdfToHtmlClient.StripHtmlElements(htmlStream);
-
-            string cleanedHtml = null;
-            using (StreamReader reader = new StreamReader(cleanedHtmlStream))
+            string originalHtml = null;
+            string html = null;
+            using (StreamReader reader = new StreamReader(htmlStream))
             {
-                cleanedHtml = reader.ReadToEnd();
+                originalHtml = reader.ReadToEnd();
+                html = originalHtml;
             }
+            var cleanedHtml = GetResumeText(html);
+            if (cleanedHtml == null || cleanedHtml == "")
+                throw new Exception("Error extracting text from PDF");
 
             var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
 
             string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
-
-            string originalHtml = null;
-
-            htmlStream.Position = 0;
-
-            using (StreamReader reader = new StreamReader(htmlStream))
-            {
-                originalHtml = reader.ReadToEnd();
-            }
 
             var originalResumeId = await _resumeDataLayer.InsertResumeAsync(new ResumeStorage
             {
@@ -126,22 +146,9 @@ namespace ResumeRocketQuery.Services
 
             var changes = ParseResult(response);
 
-            foreach (var change in changes)
-            {
-                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
-                {
-                    ResumeId = originalResumeId,
-                    Accepted = true,
-                    ExplanationString = change.Explanation,
-                    HtmlID = change.DivClass,
-                    ModifiedText = change.ModifiedText,
-                    OriginalText = change.OriginalText,
-                });
-            }
-
             var regex = new Regex("https?:\\/\\/([^\\/]+)").Match(job.JobUrl).Groups[1].Value;
 
-            var result = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
+            var applicationId = await _applicationDataLayer.InsertApplicationAsync(new ApplicationStorage
             {
                 JobPostingUrl = job.JobUrl,
                 AccountId = job.AccountId,
@@ -152,7 +159,71 @@ namespace ResumeRocketQuery.Services
                 ResumeId = originalResumeId
             });
 
-            return result;
+            foreach (var change in changes)
+            {
+                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ResumeId = originalResumeId,
+                    Accepted = true,
+                    ExplanationString = change.Explanation,
+                    HtmlID = change.DivClass,
+                    ModifiedText = change.ModifiedText,
+                    OriginalText = change.OriginalText,
+                    ApplicationId = applicationId
+                });
+            }
+
+            return applicationId;
+        }
+
+
+        public async Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int resumeId, int applicationId)
+        {
+            JobResult jobResult = await _languageService.CaptureJobPostingAsync(jobUrl);
+
+            // Convert resumeHtml (string) to a Stream
+            var resumeHtmlStream = new MemoryStream(Encoding.UTF8.GetBytes(resumeHtml));
+
+            var cleanedHtmlStream = await _pdfToHtmlClient.StripHtmlElements(resumeHtmlStream);
+
+            string cleanedHtml = null;
+            using (StreamReader reader = new StreamReader(cleanedHtmlStream))
+            {
+                cleanedHtml = reader.ReadToEnd();
+            }
+
+            cleanedHtml = GetResumeText(cleanedHtml);
+            if (cleanedHtml == null || cleanedHtml == "")
+                throw new Exception("Error extracting text from PDF");
+
+            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+
+            string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
+
+            //string originalHtml = null;
+
+            //resumeHtmlStream.Position = 0;
+
+            //using (StreamReader reader = new StreamReader(resumeHtmlStream))
+            //{
+            //    originalHtml = reader.ReadToEnd();
+            //}
+
+            var changes = ParseResult(response);
+
+            foreach (var change in changes)
+            {
+                await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
+                {
+                    ResumeId = resumeId,
+                    ApplicationId = applicationId,
+                    Accepted = false,
+                    ExplanationString = change.Explanation,
+                    HtmlID = change.DivClass,
+                    ModifiedText = change.ModifiedText,
+                    OriginalText = change.OriginalText,
+                });
+            }
         }
 
         private string GeneratePrompt(string description, List<string> keywords)
@@ -161,17 +232,17 @@ namespace ResumeRocketQuery.Services
             var prompt =
                 $@"I will provide you with a Json Schema, a Job Description, and a Resume. 
 
-                    You will produce atleast 5 suggestions for changes that should be made to the resume.
+                    You will produce at least 5 suggestions for changes that should be made to the resume.
 
                     These updates should not falsify any information, meaning no additional skills, education, or work experience 
                     should be added. You are only allowed to reword items on the resume that are synonyms for items in the job posting
-                    to better match the job posting. Your suggestions should match the provided Json SSchema.
+                    to better match the job posting. Your suggestions should match the provided Json Schema.
 
                     You will fill out the Json schema from the suggested changes. 
                     1) Original Text should be the text from the resume that you are suggesting be changed. 
-                    2) Modified should be that suggested change.
+                    2) Modified should be that suggested change, these MUST NOT be longer than the original.
                     3) Explanation should be a reason for the change.
-                    4) DivClass should be the value of the class attribute of the div surrounding the text.
+                    4) DivClass should be the value of the class attribute of the div surrounding the text, if there is one otherwise null.
                     5) Your response should only be the result json object, and nothing more. 
                     6) If the fields do not appear in the resume, return a default value in the Json object being returned. 
 
@@ -248,30 +319,37 @@ namespace ResumeRocketQuery.Services
         private async Task<ApplicationResult> ConvertApplication(Application x)
         {
             var resumeContent = "";
-            int? resumeId = null;
+            //int? resumeId = null;
 
-            if (x.ResumeId.HasValue)
-            {
-                var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
+            //if (x.ResumeId.HasValue)
+            //{
+            //    var resumeResult = await _resumeDataLayer.GetResumeAsync(x.ResumeId.Value);
 
-                resumeContent = resumeResult.Resume;
-                resumeId = resumeResult.ResumeId;
-            }
+            //    resumeContent = resumeResult.Resume;
+            //    resumeId = resumeResult.ResumeId;
+            //}
 
             return new ApplicationResult
             {
+                ApplicationId = x.ApplicationId,
                 CompanyName = x.CompanyName,
                 AccountID = x.AccountId,
                 ApplyDate = x.ApplyDate,
                 JobUrl = x.JobPostingUrl,
                 Position = x.Position,
-                ResumeID = x.ApplicationId,
                 Status = x.Status,
                 ResumeContent = resumeContent,
-                ResumeContentId = resumeId
+                ResumeContentId = x.ResumeId,
+                ResumeId = x.ResumeId
             };
         }
 
+        private string GetResumeText(string html)
+        {
+            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
+            var text = new Regex("<.*?>").Replace(extract, "");
+            return text;
+        }
 
         private List<Change> ParseResult(string input)
         {
@@ -287,5 +365,7 @@ namespace ResumeRocketQuery.Services
 
             return result;
         }
+
+
     }
 }

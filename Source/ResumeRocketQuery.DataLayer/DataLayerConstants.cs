@@ -212,7 +212,7 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT ResumeId, AccountId, Version, CONVERT(nvarchar(max),Resume) as Resume, OriginalResumeId, Version, InsertDate, UpdateDate
                     FROM Resumes
                     WHERE OriginalResumeId = @OriginalResumeId
-                    ORDER BY Version;";
+                    ORDER BY Resumes.Version;";
 
                 public const string DeleteResume = @"
                     DELETE FROM Resumes
@@ -238,11 +238,26 @@ namespace ResumeRocketQuery.DataLayer
                         ModifiedText,
                         ExplanationString,
                         Accepted,
-                        HtmlID
+                        HtmlID,
+                        ApplicationId   
                     FROM 
                         ResumeChange
                     WHERE 
                         ResumeId = @ResumeId;";
+
+                public const string SelectResumeSuggestionsByApplicationId = @"
+                    SELECT 
+                        ResumeChangeId,
+                        ResumeId,
+                        OriginalText,
+                        ModifiedText,
+                        ExplanationString,
+                        Accepted,
+                        ApplicationId   
+                    FROM 
+                        ResumeChange
+                    WHERE 
+                        ApplicationId = @ApplicationId;";
 
                 public const string InsertResumeChanges = @"
                     INSERT INTO ResumeChange (
@@ -251,14 +266,16 @@ namespace ResumeRocketQuery.DataLayer
                         ModifiedText, 
                         ExplanationString, 
                         Accepted, 
-                        HtmlID
+                        HtmlID,
+                        ApplicationId
                     ) VALUES (
                         @ResumeId, 
                         @OriginalText, 
                         @ModifiedText, 
                         @ExplanationString, 
                         @Accepted, 
-                        @HtmlID
+                        @HtmlID,
+                        @ApplicationId
                     );
                     SELECT SCOPE_IDENTITY();
                     ";
