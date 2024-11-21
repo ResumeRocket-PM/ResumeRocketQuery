@@ -58,7 +58,8 @@ namespace ResumeRocketQuery.Api.Controllers
                     Position = resumeResult.Position,
                     ResumeContent = resumeResult.ResumeContent,
                     Status = resumeResult.Status,
-                    ResumeContentId = resumeResult.ResumeContentId
+                    ResumeContentId = resumeResult.ResumeContentId,
+                    ApplicationId = applicationId
                 };
 
                 return _serviceResponseBuilder.BuildServiceResponse(result, HttpStatusCode.OK);

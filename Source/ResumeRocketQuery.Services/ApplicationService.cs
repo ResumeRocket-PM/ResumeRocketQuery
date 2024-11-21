@@ -101,7 +101,9 @@ namespace ResumeRocketQuery.Services
                 applicationRequest.JobUrl, 
                 resumeHtml,
                 applicationRequest.ResumeId,
-                result
+                result,
+                jobResult.Keywords,
+                jobResult.Description
             );
 
 
@@ -177,10 +179,8 @@ namespace ResumeRocketQuery.Services
         }
 
 
-        public async Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int resumeId, int applicationId)
+        public async Task CreateSuggestionsFromResumeHtmlAsync(int accountId, string jobUrl, string resumeHtml, int resumeId, int applicationId, List<string> keywords, string description)
         {
-            JobResult jobResult = await _languageService.CaptureJobPostingAsync(jobUrl);
-
             // Convert resumeHtml (string) to a Stream
             var resumeHtmlStream = new MemoryStream(Encoding.UTF8.GetBytes(resumeHtml));
 
@@ -196,7 +196,7 @@ namespace ResumeRocketQuery.Services
             if (cleanedHtml == null || cleanedHtml == "")
                 throw new Exception("Error extracting text from PDF");
 
-            var prompt = GeneratePrompt(jobResult.Description, jobResult.Keywords);
+            var prompt = GeneratePrompt(description, keywords);
 
             string response = await _openAiClient.SendMessageAsync(prompt, cleanedHtml);
 

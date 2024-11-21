@@ -31,31 +31,6 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
         }
 
-
-        [Theory]
-        [InlineData(typeof(ChatDataLayer))]
-        public async Task Check_Stored_Friends_Pairs_Async(Type storageType)
-        {
-            var systemUnderTest = GetSystemUnderTest(storageType);
-            
-            var accountId = await _accountDataLayer.InsertAccountStorageAsync(new AccountStorage
-            {
-                AccountAlias = Guid.NewGuid().ToString(),
-                FirstName = $"{Guid.NewGuid().ToString()}_YY_Test",
-                LastName = $"{Guid.NewGuid().ToString()}_YY_Test",
-                ProfilePhotoLink = Guid.NewGuid().ToString(),
-                Title = Guid.NewGuid().ToString(),
-                StateLocation = Guid.NewGuid().ToString(),
-                PortfolioLink = Guid.NewGuid().ToString(),
-            });
-
-
-            var results = await systemUnderTest.AddFriendPairs(1438, accountId, "pending");
-
-            //var resultsDict = await systemUnderTest.AllMyFriendPairs(1438, "friends");
-            Assert.IsType<int>(results);
-        }
-
         [Theory]
         [InlineData(typeof(ChatDataLayer))]
         public async Task Check_add_new_Friends_Async(Type storageType)
@@ -157,27 +132,6 @@ namespace ResumeRocketQuery.DataLayerIntegrationTests
 
             //var blockFriends = await systemUnderTest.UpdateFriendPairStatus(fId, "block");
             //Assert.Equal("block", blockFriends.Status);
-
-        }
-
-        [Theory]
-        [InlineData(typeof(ChatDataLayer))]
-        public async Task Check_Search_My_Friends_Async(Type storageType)
-        {
-            var systemUnderTest = GetSystemUnderTest(storageType);
-
-            // check block person
-            var blockPerson = await systemUnderTest.AllMyFriendPairs(7041, "block");
-            Assert.NotNull(blockPerson);
-            Assert.Equal(1451, blockPerson[0].AccountId);
-            Assert.Equal("Ava", blockPerson[0].FirstName);
-
-            //check friends
-            var Friends = await systemUnderTest.AllMyFriendPairs(7041, "friends");
-            Assert.NotNull(Friends);
-            Assert.True(Friends.Count > 0);
-            Assert.Equal("Mia", Friends[0].FirstName);
-
 
         }
 

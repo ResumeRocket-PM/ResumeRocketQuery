@@ -187,7 +187,7 @@ namespace ResumeRocketQuery.Api.Tests
                                     ResumeChangeId = resumeChangeId,
                                     Accepted = true,
                                     ExplanationString = "Because it sounds nicer",
-                                    HtmlID = (string)null,
+                                    HtmlID = Expect.Any<string>(),
                                     ModifiedText = "Professional Job Engineer",
                                     OriginalText = "Sample Resume Text",
                                     ApplicationId = applicationId

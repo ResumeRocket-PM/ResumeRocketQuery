@@ -50,14 +50,6 @@ namespace ResumeRocketQuery.Api.Tests
                         Pdf = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
                     });
 
-                    var applicationService = selfHost.ServiceProvider.GetService<IApplicationService>();
-
-                    var applicationId = await applicationService.CreateJobResumeAsync(new Job
-                    {
-                        AccountId = createAccountResponse.AccountId,
-                        JobUrl = "https://www.metacareers.com/resume/?req=a1K2K000007p93VUAQ",
-                        Resume = new Dictionary<string, string> { { "FileBytes", GetResumeBytes() }, { "FileName", "testing.pdf" } }
-                    });
                     var expected = new
                     {
                         Succeeded = true,
@@ -68,7 +60,7 @@ namespace ResumeRocketQuery.Api.Tests
                         Result = Expect.Any<int>()
                     };
 
-                    var resource = $"{selfHost.Url}/api/job/extension/postings/{applicationId}";
+                    var resource = $"{selfHost.Url}/api/job/extension/postings/{resumeId}";
 
                     var headers = new Dictionary<string, string>
                     {
