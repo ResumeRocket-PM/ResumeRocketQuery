@@ -5,6 +5,6 @@ namespace ResumeRocketQuery.Domain.External
     public interface IOpenAiClient
     {
         Task<string> SendMessageAsync(string prompt, string message);
-        Task<string> SendMultiMessageAsync(int accountId, int resumeId, int? applicationId, string prompt);
+        Task<string> SendMultiMessageAsync(int resumeId, int? applicationId, string prompt);
     }
 }

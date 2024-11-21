@@ -49,9 +49,9 @@ namespace ResumeRocketQuery.External
             return "";
         }
 
-        public async Task<string> SendMultiMessageAsync(int accountId, int resumeId, int? applicationId, string prompt)
+        public async Task<string> SendMultiMessageAsync(int resumeId, int? applicationId, string prompt)
         {
-            string chatId = applicationId != null ? $"{accountId}-{resumeId}-{applicationId}" : $"{accountId}-{resumeId}";
+            string chatId = applicationId != null ? $"{resumeId}-{applicationId}" : $"{resumeId}";
             ChatHistory chatHistory;
 
             // Initialize chat history if it doesn't exist
@@ -68,7 +68,7 @@ namespace ResumeRocketQuery.External
                 // Populate job, if resume associated with application, and resume
                 string job = null;
                 if (application != null)
-                    job = _jobService.GetJobPostingAsync(application.Result.JobPostingUrl).Result.ToString();
+                    job = _jobService.GetJobPostingAsync(application.Result.JobPostingUrl).Result.JobDescription;
                 string resumeHtml = _resumeDataLayer.GetResumeAsync(resumeId).Result.Resume;
                 var resume = GetResumeText(resumeHtml);
 
