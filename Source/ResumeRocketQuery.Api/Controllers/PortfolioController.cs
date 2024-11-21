@@ -63,9 +63,7 @@ namespace ResumeRocketQuery.Api.Controllers
         [Route("{portfolioId}/details")]
         public async Task<ServiceResponseGeneric<PortfolioResponseBody>> Get([FromRoute] int portfolioId)
         {
-            var account = _resumeRocketQueryUserBuilder.GetResumeRocketQueryUser(User);
-
-            var portfolio = await _portfolioService.GetPortfolioByPortfolioId(account.AccountId);
+            var portfolio = await _portfolioService.GetPortfolioByPortfolioId(portfolioId);
 
             if (portfolio != null)
             {
