@@ -420,7 +420,8 @@ namespace ResumeRocketQuery.Services
                     ExplanationString = x.ExplanationString,
                     ModifiedText = x.ModifiedText,
                     OriginalText = x.OriginalText,
-                    ApplicationId = x.ApplicationId
+                    ApplicationId = x.ApplicationId,
+                    HtmlID = x.HtmlID,
                 }).ToList()
             };
         }

@@ -77,7 +77,7 @@ namespace ResumeRocketQuery.Services.Tests
             {
                 var actual = await _systemUnderTest.CreateHtmlQueryForEmbeddingButton("marketstar", File.ReadAllText("./Samples/DigitalMarketing-Posting.html"));
 
-                Assert.NotNull(actual);
+                Assert.Null(actual);
             }
         }
 

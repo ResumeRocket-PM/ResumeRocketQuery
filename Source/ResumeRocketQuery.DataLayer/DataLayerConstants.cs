@@ -253,7 +253,8 @@ namespace ResumeRocketQuery.DataLayer
                         ModifiedText,
                         ExplanationString,
                         Accepted,
-                        ApplicationId   
+                        ApplicationId,
+                        HtmlID
                     FROM 
                         ResumeChange
                     WHERE 
