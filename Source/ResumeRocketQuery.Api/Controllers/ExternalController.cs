@@ -90,9 +90,9 @@ namespace ResumeRocketQuery.Api.Controllers
 
         [HttpPost]
         [Route("openai/aiMultipleMessage")]
-        public async Task<ServiceResponseGeneric<string>> AiSendMultiMessageAsync(List<string> prompts)
+        public async Task<ServiceResponseGeneric<string>> AiSendMultiMessageAsync([FromBody]SendAiMessage sendAiMessage)
         {
-            var responseMsg = await this._openAi.SendMultiMessageAsync(prompts);
+            string responseMsg = await _openAi.SendMultiMessageAsync(sendAiMessage.resumeId, sendAiMessage.applicationId, sendAiMessage.message);
             return _serviceResponseBuilder.BuildServiceResponse(responseMsg, HttpStatusCode.OK);
         }
     }

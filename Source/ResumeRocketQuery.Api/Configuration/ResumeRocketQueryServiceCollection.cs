@@ -38,6 +38,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IEmailAddressDataLayer, EmailAddressDataLayer>();
             services.AddSingleton<IExperienceDataLayer, ExperienceDataLayer>();
             services.AddSingleton<ILoginDataLayer, LoginDataLayer>();
+            services.AddSingleton<IJobDataLayer, JobDataLayer>();
             services.AddSingleton<IPortfolioDataLayer, PortfolioDataLayer>();
             services.AddSingleton<IResumeDataLayer, ResumeDataLayer>();
             services.AddSingleton<ISearchDataLayer, SearchDataLayer>();
@@ -49,6 +50,7 @@ namespace ResumeRocketQuery.Api.Configuration
             services.AddSingleton<IOpenAiClient, OpenAiClient>(); 
             services.AddSingleton<IBlobStorage, BlobStorage>();
             services.AddTransient<IJobScraper, jobScraper>();
+            services.AddSingleton<IJobService, JobService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IAuthenticationHelper, AuthenticationHelper>();

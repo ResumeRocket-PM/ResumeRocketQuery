@@ -57,27 +57,27 @@ namespace ResumeRocketQuery.Repository.Tests
             }
 
             // [Fact]
-            [Fact(Skip = "Skipping to conserve API credits")]
-            public async Task WHEN_SendMessageAsync_is_called_in_succession_THEN_chat_history_logged()
-            {
-                List<string> prompts = new List<string>();
-                prompts.Add(
-                    @"Remember the following for this for this chat:
+            // [Fact(Skip = "Skipping to conserve API credits")]
+            // public async Task WHEN_SendMessageAsync_is_called_in_succession_THEN_chat_history_logged()
+            // {
+            //     List<string> prompts = new List<string>();
+            //     prompts.Add(
+            //         @"Remember the following for this for this chat:
 
-                     * Until I send the keyword ""Respond"" by itself, you are only allowed to respond with ""...""
-                     * That includes in response to this message"
-                );
-                prompts.Add(@"Using the result of the expression: 18+2");
-                prompts.Add(@"compute the value of the of that value divide by 2.");
-                prompts.Add(@"provide the answer as a single numeric value, no other text.");
-                prompts.Add(@"Respond");
+            //          * Until I send the keyword ""Respond"" by itself, you are only allowed to respond with ""...""
+            //          * That includes in response to this message"
+            //     );
+            //     prompts.Add(@"Using the result of the expression: 18+2");
+            //     prompts.Add(@"compute the value of the of that value divide by 2.");
+            //     prompts.Add(@"provide the answer as a single numeric value, no other text.");
+            //     prompts.Add(@"Respond");
 
-                var response = await _systemUnderTest.SendMultiMessageAsync(prompts);
+            //     var response = await _systemUnderTest.SendMultiMessageAsync(prompts);
 
-                Assert.Equal("10", response.ToLower());
-            }
+            //     Assert.Equal("10", response.ToLower());
+            // }
 
-            // [Fact]
+            //[Fact]
             [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_on_false_THEN_returned_false()
             {
@@ -104,11 +104,11 @@ namespace ResumeRocketQuery.Repository.Tests
                     the response, only the JSON text which is in plain text, not markdown code block syntax.",
                     jobPosting);
 
-                var jsonResult = JsonConvert.DeserializeObject<List<String>>(response);
+                var jsonResult = JsonConvert.DeserializeObject<List<string>>(response);
 
                 Debug.WriteLine(jsonResult);
 
-                Assert.IsType<List<String>>(jsonResult);
+                Assert.IsType<List<string>>(jsonResult);
                 Assert.Equal(10, jsonResult.Count);
             }
 

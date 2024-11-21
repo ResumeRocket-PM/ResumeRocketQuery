@@ -12,4 +12,5 @@ public interface IApplicationService
     Task<ApplicationResult> GetApplication(int applicationId);
     Task UpdateApplication(int applicationId, string status);
     Task<int> CreateJobAsync(ApplicationRequest applicationRequest);
+    string GetResumeText(string html);
 }

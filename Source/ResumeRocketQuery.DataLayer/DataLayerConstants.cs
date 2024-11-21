@@ -186,6 +186,18 @@ namespace ResumeRocketQuery.DataLayer
 
             }
 
+            public class Jobs 
+            {
+                public const string InsertJob = @"
+                    INSERT INTO Jobs (JobUrl, JobCompany, JobDescription)
+                    VALUES (@Url, @Company, @Description);";
+
+                public const string GetJob = @"
+                    SELECT JobId, JobUrl, JobCompany, JobDescription
+                    FROM Jobs
+                    WHERE JobUrl = @Url;";
+            }
+
             public class Resume
             {
                 public const string InsertResume = @"
