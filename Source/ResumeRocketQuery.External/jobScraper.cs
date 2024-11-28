@@ -15,6 +15,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System.IO;
 using OpenQA.Selenium.DevTools.V128.FileSystem;
+using System.Reflection;
 //using Microsoft.Extensions.Logging;
 
 namespace ResumeRocketQuery.External
@@ -43,7 +44,7 @@ namespace ResumeRocketQuery.External
             options.AddArgument("--disable-gpu"); // Applicable to Windows environments
             options.AddArgument("--window-size=1920,1080"); // Set a window size (needed in some cases)
             options.AddArgument("--no-sandbox"); 
-            IWebDriver driver = new ChromeDriver(options);
+            IWebDriver driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options);
 
             // Navigate to the target URL
             driver.Navigate().GoToUrl(this._url);

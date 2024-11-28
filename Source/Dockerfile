@@ -56,24 +56,20 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libxtst6 \
     libgtk-3-0 \
-	gnupg && \
+    gnupg && \
     apt-get clean
 
-# Install ChromeDriver version 114
-RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
-    rm chromedriver_linux64.zip
 
-# Install Google Chrome version 114.x
 RUN wget -q -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     dpkg -i google-chrome.deb || apt-get -f install -y && \
     rm google-chrome.deb
 
 # Ensure Chrome and ChromeDriver versions are compatible
-RUN google-chrome --version && chromedriver --version
+RUN google-chrome --version
 
 # Add ChromeDriver to PATH
 ENV PATH=$PATH:/usr/local/bin
+
 
 # Set the entry point for the application
 ENTRYPOINT ["dotnet", "ResumeRocketQuery.Api.dll"]
