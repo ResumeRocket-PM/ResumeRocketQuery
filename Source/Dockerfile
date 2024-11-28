@@ -30,7 +30,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Install Chromium and necessary dependencies
+# Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -55,18 +55,20 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     libxss1 \
     libxtst6 \
-    libgtk-3-0 \
-    chromium && \
+    libgtk-3-0 && \
     apt-get clean
 
-# Download the latest ChromeDriver that matches Chromium version 131
-RUN CHROMIUM_VERSION=$(chromium --version | awk '{print $2}' | cut -d'.' -f1) && \
-    CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROMIUM_VERSION}) && \
-    wget -q https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip && \
+# Install Chrome 114
+RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.90-1_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_114.0.5735.90-1_amd64.deb && \
+    rm google-chrome-stable_114.0.5735.90-1_amd64.deb
+
+# Install ChromeDriver for version 114
+RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
     rm chromedriver_linux64.zip
 
-# Set ChromeDriver in PATH
+# Set environment variable for ChromeDriver
 ENV PATH=$PATH:/usr/local/bin
 
 # Set the entry point for the application
