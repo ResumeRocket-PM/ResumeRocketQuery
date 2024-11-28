@@ -42,6 +42,7 @@ namespace ResumeRocketQuery.External
             options.AddArgument("--headless"); // Run in headless mode (no GUI)
             options.AddArgument("--disable-gpu"); // Applicable to Windows environments
             options.AddArgument("--window-size=1920,1080"); // Set a window size (needed in some cases)
+            options.AddArgument("--no-sandbox"); 
             IWebDriver driver = new ChromeDriver(options);
 
             // Navigate to the target URL
