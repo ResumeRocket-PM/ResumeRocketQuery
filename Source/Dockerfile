@@ -59,20 +59,18 @@ RUN apt-get update && apt-get install -y \
 	gnupg && \
     apt-get clean
 
-# Install the latest stable version of Google Chrome
-RUN wget -q -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome.deb && \
-    rm google-chrome.deb
-
-# Fetch the latest Chrome version number
-RUN LATEST_CHROME_VERSION=$(google-chrome --version | awk '{print $3}') && \
-    echo "Installed Chrome version: $LATEST_CHROME_VERSION"
-
-# Install the latest ChromeDriver matching the Chrome version
-RUN CHROME_DRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    wget -q https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip && \
+# Install ChromeDriver version 114
+RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
     rm chromedriver_linux64.zip
+
+# Install Google Chrome version 114.x
+RUN wget -q -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    dpkg -i google-chrome.deb || apt-get -f install -y && \
+    rm google-chrome.deb
+
+# Ensure Chrome and ChromeDriver versions are compatible
+RUN google-chrome --version && chromedriver --version
 
 # Add ChromeDriver to PATH
 ENV PATH=$PATH:/usr/local/bin
