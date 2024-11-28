@@ -29,4 +29,43 @@ RUN dotnet publish "ResumeRocketQuery.Api/ResumeRocketQuery.Api.csproj" -c Relea
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Install Chrome and necessary dependencies for Selenium WebDriver
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    unzip \
+    ca-certificates \
+    libnss3 \
+    libgdk-pixbuf2.0-0 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libappindicator3-1 \
+    libgbm1 \
+    libasound2 \
+    fonts-liberation \
+    libappindicator1 \
+    libnspr4 \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
+    libxss1 \
+    libxtst6 \
+    libgtk-3-0 \
+    chromium
+
+# Install ChromeDriver (latest version matching the installed Chrome version)
+RUN LATEST_CHROMEDRIVER=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
+    wget https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER/chromedriver_linux64.zip && \
+    unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
+    rm chromedriver_linux64.zip
+
+# Set environment variable for ChromeDriver
+ENV PATH=$PATH:/usr/local/bin
+
+# Set the entry point for the application
 ENTRYPOINT ["dotnet", "ResumeRocketQuery.Api.dll"]
