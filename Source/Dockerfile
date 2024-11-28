@@ -30,7 +30,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Install Chrome and necessary dependencies for Selenium WebDriver
+# Install Chromium and necessary dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -56,15 +56,17 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libxtst6 \
     libgtk-3-0 \
-    chromium
+    chromium && \
+    apt-get clean
 
-# Install ChromeDriver (latest version matching the installed Chrome version)
-RUN LATEST_CHROMEDRIVER=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    wget https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER/chromedriver_linux64.zip && \
+# Download the latest ChromeDriver that matches Chromium version 131
+RUN CHROMIUM_VERSION=$(chromium --version | awk '{print $2}' | cut -d'.' -f1) && \
+    CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROMIUM_VERSION}) && \
+    wget -q https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
     rm chromedriver_linux64.zip
 
-# Set environment variable for ChromeDriver
+# Set ChromeDriver in PATH
 ENV PATH=$PATH:/usr/local/bin
 
 # Set the entry point for the application
