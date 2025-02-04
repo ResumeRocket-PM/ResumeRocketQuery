@@ -29,6 +29,9 @@ namespace ResumeRocketQuery.Api.Configuration
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            // add AWS lambda hosting 
+            services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
             services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>();
 
             services.AddSingleton<ISkillDataLayer, SkillDataLayer>();

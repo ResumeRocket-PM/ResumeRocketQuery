@@ -95,8 +95,8 @@ namespace ResumeRocketQuery.Services
             var tokenValidationParameters = new TokenValidationParameters
             {
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateAudience = false,
-                ValidateIssuer = false,
+                ValidateAudience = false, // http://localhost:5000 || your backend url (https://resume-rocket.net) // or actually i think this should just be true
+                ValidateIssuer = false, // resume-rocket-users // also should probably just be true 
                 ValidateIssuerSigningKey = true
             };
 
