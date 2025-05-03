@@ -24,9 +24,7 @@ namespace ResumeRocketQuery.Repository.Tests
         public class CreateAccountAsync : jobScraperTests
         {
             [Theory]
-            //[InlineData("https://wasatchproperty.wd1.myworkdayjobs.com/en-US/MarketStarCareers/job/MarketStar-Bulgaria---Remote/Data-Engineer_R13907")]
-            //[InlineData("https://openai.com/careers/endpoint-engineer")]
-            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            [InlineData("https://www.metacareers.com/jobs/1408007706638053/")]
             public async Task WHEN_CreateAccountAsync_is_called_THEN_account_is_stored(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);
@@ -38,7 +36,7 @@ namespace ResumeRocketQuery.Repository.Tests
                 //Assert.NotNull(result);
             }
             [Theory]
-            [InlineData("https://www.metacareers.com/jobs/788246929742797/")]
+            [InlineData("https://www.metacareers.com/jobs/1408007706638053/")]
             public async Task TestScrapeSavedFile(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);
@@ -46,7 +44,7 @@ namespace ResumeRocketQuery.Repository.Tests
                 Assert.True(result);
             }
             [Theory]
-            [InlineData("https://www.metacareers.com/resume/?req=a1KDp00000E2LnpMAF")]
+            [InlineData("https://www.metacareers.com/resume/?req=a1K2K000008UcBvUAK")]
             public async Task TestFindTextInputField(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);
@@ -55,7 +53,7 @@ namespace ResumeRocketQuery.Repository.Tests
             }
 
             [Theory]
-            [InlineData("https://www.metacareers.com/resume/?req=a1KDp00000E2LnpMAF")]
+            [InlineData("https://www.metacareers.com/resume/?req=a1K2K000008UcBvUAK")]
             public async Task TestFindCheckBox(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);
@@ -79,7 +77,7 @@ namespace ResumeRocketQuery.Repository.Tests
             //}
 
             [Theory]
-            [InlineData("https://www.metacareers.com/resume/?req=a1KDp00000E2LnpMAF")]
+            [InlineData("https://www.metacareers.com/resume/?req=a1K2K000008UcBvUAK")]
             public async Task TestAutoFilledTextBox(string url)
             {
                 _systemUnderTest.ScrapeSetup(url);

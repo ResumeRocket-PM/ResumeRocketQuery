@@ -7,6 +7,7 @@ using Xunit;
 
 namespace ResumeRocketQuery.DataLayerIntegrationTests
 {
+    [Rollback]
     public class ExperienceDataLayerTests
     {
         private IServiceProvider _serviceProvider;

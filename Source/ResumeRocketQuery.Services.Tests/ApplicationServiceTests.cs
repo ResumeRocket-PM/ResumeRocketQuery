@@ -146,7 +146,7 @@ namespace ResumeRocketQuery.Services.Tests
                     AccountID = account.AccountId,
                     ApplyDate = Expect.Any<DateTime>(),
                     CompanyName = Expect.Any<string>(),
-                    Position = "Software Engineer Machine Learning",
+                    Position = "Software Engineer, Machine Learning",
                     ResumeId = Expect.Any<int>(),  
                     ResumeContentId = Expect.Any<int>(),
                     ResumeContent = Expect.Any<string>(),

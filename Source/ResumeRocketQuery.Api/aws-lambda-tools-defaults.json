@@ -1,6 +1,6 @@
 {
   "profile": "AdministratorAccess-370926750509",
-  "region": "us-east-1",
+  "region": "us-west-1",
   "configuration": "Release",
   "function-runtime": "dotnet8",
   "function-memory-size": 256,

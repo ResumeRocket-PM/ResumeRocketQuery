@@ -1,5 +1,7 @@
 using Microsoft.Identity.Client;
+using OpenQA.Selenium.BiDi.Modules.Input;
 using System.Security.Cryptography.X509Certificates;
+using static ResumeRocketQuery.DataLayer.DataLayerConstants.StoredProcedures;
 
 namespace ResumeRocketQuery.DataLayer
 {
@@ -38,48 +40,27 @@ namespace ResumeRocketQuery.DataLayer
 
             public class Applications
             {
-                public const string InsertApplication = @"
-
-                    DECLARE @StatusID int;
-
-                    SELECT @StatusID = StatusId
-                    FROM ApplicationStatus
-                    WHERE Status = @Status;
-
-                    INSERT INTO Applications (AccountId, ApplyDate, StatusId, Position, CompanyName, JobPostingUrl, ResumeId, InsertDate, UpdateDate)
-                    VALUES (@AccountId, @ApplyDate, @StatusId, @Position, @CompanyName, @JobPostingUrl, @ResumeId, GETDATE(), GETDATE());
-                    SELECT SCOPE_IDENTITY();";
+                public const string InsertApplication =
+                    @"
+                    INSERT INTO Applications(AccountId, ApplyDate, Status, Position, CompanyName, JobPostingUrl, ResumeId, InsertDate, UpdateDate)
+                    VALUES(@AccountId, @ApplyDate, @Status, @Position, @CompanyName, @JobPostingUrl, @ResumeId, GETDATE(), GETDATE());
+                        SELECT SCOPE_IDENTITY();";
 
                 public const string UpdateApplication = @"
-                    DECLARE @StatusID int;
-
-                    SELECT @StatusID = StatusId
-                    FROM ApplicationStatus
-                    WHERE Status = @Status;
-
-                    IF @StatusID IS NULL
-                    BEGIN
-                        INSERT INTO ApplicationStatus (Status)
-                        VALUES (@Status);
-
-                        SET @StatusID = SCOPE_IDENTITY();
-                    END
-
                     UPDATE Applications
-                    SET StatusId = @StatusID,
+                    SET Status = @Status,
                         UpdateDate = GETDATE()
                     WHERE ApplicationId = @ApplicationId;";
 
                 public const string SelectApplicationByAccount = @"
-                    SELECT ApplicationId, AccountId, ApplyDate, s.Status, Position, CompanyName, JobPostingUrl, ResumeId
-                    FROM Applications a
-                    JOIN ApplicationStatus s on a.StatusId = s.StatusId
+                    SELECT ApplicationId, AccountId, ApplyDate, Status, Position, CompanyName, JobPostingUrl, ResumeId
+                    FROM Applications
                     WHERE AccountId = @AccountId;";
 
+
                 public const string SelectApplication = @"
-                    SELECT ApplicationId, AccountId, ApplyDate, s.Status, Position, CompanyName, JobPostingUrl, ResumeId
-                    FROM Applications a
-                    JOIN ApplicationStatus s on a.StatusId = s.StatusId
+                    SELECT ApplicationId, AccountId, ApplyDate, Status, Position, CompanyName, JobPostingUrl, ResumeId
+                    FROM Applications
                     WHERE ApplicationId = @ApplicationId;";
             }
 
@@ -161,13 +142,13 @@ namespace ResumeRocketQuery.DataLayer
             public class Portfolio
             {
                 public const string InsertPortfolio = @"
-                    INSERT INTO Portfolio (AccountId, Configuration)
+                    INSERT INTO Portfolios (AccountId, Configuration)
                     VALUES (@AccountId, @Configuration);
                     SELECT SCOPE_IDENTITY();";
 
 
                 public const string UpdatePortfolio = @"
-                    UPDATE Portfolio
+                    UPDATE Portfolios
                     SET Configuration = @Configuration,
                         UpdateDate = GetDate()
                     WHERE PortfolioId = @PortfolioId";
@@ -176,12 +157,12 @@ namespace ResumeRocketQuery.DataLayer
                 // Select
                 public const string SelectPortfolio = @"
                     SELECT PortfolioId, AccountId, Configuration
-                    FROM Portfolio
+                    FROM Portfolios
                     WHERE AccountId = @AccountId";
 
                 public const string SelectPortfolioByPortfolioId = @"
                     SELECT PortfolioId, AccountId, Configuration
-                    FROM Portfolio
+                    FROM Portfolios
                     WHERE PortfolioId = @PortfolioId";
 
             }
@@ -253,7 +234,7 @@ namespace ResumeRocketQuery.DataLayer
                         HtmlID,
                         ApplicationId   
                     FROM 
-                        ResumeChange
+                        ResumeChanges
                     WHERE 
                         ResumeId = @ResumeId;";
 
@@ -268,12 +249,12 @@ namespace ResumeRocketQuery.DataLayer
                         ApplicationId,
                         HtmlID
                     FROM 
-                        ResumeChange
+                        ResumeChanges
                     WHERE 
                         ApplicationId = @ApplicationId;";
 
                 public const string InsertResumeChanges = @"
-                    INSERT INTO ResumeChange (
+                    INSERT INTO ResumeChanges (
                         ResumeId, 
                         OriginalText, 
                         ModifiedText, 
@@ -294,7 +275,7 @@ namespace ResumeRocketQuery.DataLayer
                     ";
 
                 public const string UpdateResumeChanges = @"
-                    UPDATE ResumeChange
+                    UPDATE ResumeChanges
                     SET Accepted = @Accepted
                     WHERE ResumeChangeId = @ResumeChangeId;
                 ";

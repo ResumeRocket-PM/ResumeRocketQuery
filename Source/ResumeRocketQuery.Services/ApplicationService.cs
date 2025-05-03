@@ -166,7 +166,7 @@ namespace ResumeRocketQuery.Services
                 await _resumeDataLayer.InsertResumeChangeAsync(new ResumeChangesStorage
                 {
                     ResumeId = originalResumeId,
-                    Accepted = true,
+                    Accepted = false,
                     ExplanationString = change.Explanation,
                     HtmlID = change.DivClass,
                     ModifiedText = change.ModifiedText,

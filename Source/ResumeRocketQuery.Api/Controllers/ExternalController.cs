@@ -14,12 +14,12 @@ using System.Security.Claims;
 using System;
 using iText.Layout.Element;
 using System.Collections.Generic;
-using OpenQA.Selenium.DevTools.V126.Autofill;
+//using OpenQA.Selenium.DevTools.V126.Autofill;
 using System.IO;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/Externel")]
     public class ExternalController : ControllerBase
     {

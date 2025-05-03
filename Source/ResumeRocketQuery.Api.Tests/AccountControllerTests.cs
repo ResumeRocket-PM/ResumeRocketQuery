@@ -79,11 +79,15 @@ namespace ResumeRocketQuery.Api.Tests
 
                     var email = $"{Guid.NewGuid().ToString()}@testemail.com";
                     var password = "testPassword1";
+                    var firstName = "john";
+                    var lastName = "doe";
 
                     var createAccountResponse = await accountService.CreateAccountAsync(new CreateAccountRequest
                     {
                         EmailAddress = email,
-                        Password = password
+                        Password = password,
+                        FirstName = firstName, 
+                        LastName = lastName
                     });
 
                     var expected = new
