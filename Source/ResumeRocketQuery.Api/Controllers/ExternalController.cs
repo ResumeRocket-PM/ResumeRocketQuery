@@ -16,6 +16,7 @@ using iText.Layout.Element;
 using System.Collections.Generic;
 //using OpenQA.Selenium.DevTools.V126.Autofill;
 using System.IO;
+using System.Net.Http;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -26,6 +27,7 @@ namespace ResumeRocketQuery.Api.Controllers
         private readonly IServiceResponseBuilder _serviceResponseBuilder;
         private readonly IJobScraper _scraper;
         private readonly IOpenAiClient _openAi;
+
         public ExternalController(IJobScraper jobscraper, IOpenAiClient openAiClient, IServiceResponseBuilder serviceResponseBuilder) 
         {
             _serviceResponseBuilder = serviceResponseBuilder;
@@ -33,7 +35,7 @@ namespace ResumeRocketQuery.Api.Controllers
             _openAi = openAiClient;
         }
 
-        
+
         // TODO: now sure if need provide the route
         /// <summary>
         /// Use scrape method to scrape the expected content of web page given by the url and the token domain
@@ -95,5 +97,33 @@ namespace ResumeRocketQuery.Api.Controllers
             string responseMsg = await _openAi.SendMultiMessageAsync(sendAiMessage.resumeId, sendAiMessage.applicationId, sendAiMessage.message);
             return _serviceResponseBuilder.BuildServiceResponse(responseMsg, HttpStatusCode.OK);
         }
+
+        // New ping endpoint to check connectivity to Google
+        [HttpGet]
+        [Route("ping/google")]
+        public async Task<IActionResult> PingGoogleAsync()
+        {
+            HttpClient httpClient = new HttpClient();
+
+            try
+            {
+                // Send a GET request to Google's website
+                var response = await httpClient.GetAsync("https://www.google.com");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Ok("Google is reachable!");
+                }
+                else
+                {
+                    return StatusCode((int)response.StatusCode, "Google is not reachable.");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, $"Error reaching Google: {ex.Message}");
+            }
+        }
+
     }
 }
