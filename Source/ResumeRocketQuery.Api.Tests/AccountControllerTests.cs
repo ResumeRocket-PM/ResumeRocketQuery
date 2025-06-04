@@ -24,7 +24,6 @@ namespace ResumeRocketQuery.Api.Tests
         {
             _restRequestClient = new RestRequestClient();
 
-            // Create test-specific configuration
             _testConfiguration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
@@ -83,7 +82,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_endpoint()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 
@@ -132,7 +131,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_endpoint()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 

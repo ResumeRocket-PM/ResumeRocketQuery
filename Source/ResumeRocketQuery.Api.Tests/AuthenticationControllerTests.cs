@@ -10,16 +10,26 @@ using ResumeRocketQuery.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 using ResumeRocketQuery.Tests.Helpers;
 using Xunit;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api.Tests
 {
     public class AuthenticationControllerTests
     {
         private readonly RestRequestClient _restRequestClient;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _testConfiguration;
+
 
         public AuthenticationControllerTests()
         {
             _restRequestClient = new RestRequestClient();
+
+            _testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "ConnectionStrings:ResumeRocketQueryDatabaseConnectionString", "Server=localhost; Database=ResumeRocketTest; Trusted_Connection=True; TrustServerCertificate=True;" }
+                })
+                .Build();
         }
 
         public class Authenticate : AuthenticationControllerTests
@@ -27,7 +37,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_invalid_user_WHEN_Authenticate_is_called_THEN_user_is_not_returned_jwt()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var authenticationRequestBody = new AuthenticationRequestBody
                     {
@@ -58,7 +68,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_valid_user_WHEN_Authenticate_is_called_THEN_user_is_returned_jwt()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 
@@ -103,7 +113,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task WHEN_POST_is_called_THEN_user_is_returned_jwt()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var email = $"{Guid.NewGuid().ToString()}@testemail.com";
                     var password = "testPassword1";
@@ -139,7 +149,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_invalid_data_WHEN_POST_is_called_THEN_validation_error_returned()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var email = $"{Guid.NewGuid().ToString()}";
                     var password = "testPassword1";
@@ -180,7 +190,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_invalid_length_password_WHEN_POST_is_called_THEN_validation_error_returned()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var email = $"{Guid.NewGuid().ToString()}@testemail.com";
                     var password = "12345";
