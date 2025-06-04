@@ -64,6 +64,7 @@ namespace ResumeRocketQuery.Services
                 AccountAlias = Guid.NewGuid().ToString(),
                 FirstName = createAccountRequest.FirstName,
                 LastName = createAccountRequest.LastName,
+                ProfilePhotoLink = pickRandomProfilePicture()
             };
 
             accountStorage.AccountId = await _accountDataLayer.InsertAccountStorageAsync(accountStorage);
@@ -112,6 +113,7 @@ namespace ResumeRocketQuery.Services
                 FirstName = account.Result.FirstName,
                 LastName = account.Result.LastName,
                 ProfilePhotoLink = account.Result.ProfilePhotoLink,
+                BackgroundPhotoLink = account.Result.BackgroundPhotoLink,
                 StateLocation = account.Result.StateLocation,
                 Title = account.Result.Title,
                 Skills = skills.Result.Select(x => new Skill
@@ -183,6 +185,7 @@ namespace ResumeRocketQuery.Services
                 FirstName = updates.ContainsKey("FirstName") ? updates["FirstName"] : account.FirstName,
                 LastName = updates.ContainsKey("LastName") ? updates["LastName"] : account.LastName,
                 ProfilePhotoLink = updates.ContainsKey("ProfilePhotoLink") ? updates["ProfilePhotoLink"] : account.ProfilePhotoLink,
+                BackgroundPhotoLink = updates.ContainsKey("BackgroundPhotoLink") ? updates["BackgroundPhotoLink"] : account.BackgroundPhotoLink,
                 Title = updates.ContainsKey("Title") ? updates["Title"] : account.Title,
                 StateLocation = updates.ContainsKey("Location") ? updates["Location"] : account.StateLocation,
                 PortfolioLink = updates.ContainsKey("PortfolioLink") ? updates["PortfolioLink"] : account.PortfolioLink,
@@ -264,5 +267,34 @@ namespace ResumeRocketQuery.Services
                 });
             }
         }
+
+
+        /////////////// HELPER METHODS //////////////
+        ///
+
+        private string pickRandomProfilePicture()
+        {
+            Random rand = new Random();
+            int number = rand.Next(1, 7); // generates a number from 1 to 6
+
+            switch (number)
+            {
+                case 1:
+                    return "light-red";
+                case 2:
+                    return "pink";
+                case 3:
+                    return "purple";
+                case 4:
+                    return "raspberry-rose";
+                case 5:
+                    return "space-cadet";
+                case 6:
+                    return "verdigris";
+                default:
+                    return "solid-orange"; // fallback
+            }
+        }
+
     }
 }

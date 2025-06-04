@@ -9,6 +9,7 @@ namespace ResumeRocketQuery.Domain.Api.Response
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string ProfilePhotoLink { get; set; }
+        public string BackgroundPhotoLink { get; set; }
         public string Title { get; set; }
         public string Email { get; set; }
         public string Location { get; set; }

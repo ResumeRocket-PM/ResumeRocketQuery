@@ -11,16 +11,26 @@ using ResumeRocketQuery.Tests.Helpers;
 using Xunit;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.Domain.Api.Request;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api.Tests
 {
     public class AccountControllerTests
     {
         private readonly RestRequestClient _restRequestClient;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _testConfiguration;
 
         public AccountControllerTests()
         {
             _restRequestClient = new RestRequestClient();
+
+            // Create test-specific configuration
+            _testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "ConnectionStrings:ResumeRocketQueryDatabaseConnectionString", "Server=localhost; Database=ResumeRocketTest; Trusted_Connection=True; TrustServerCertificate=True;" }
+                })
+                .Build();
         }
 
         public class GetAccount : AccountControllerTests
@@ -28,7 +38,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_GetAccount_is_called_THEN_user_is_able_to_access_endpoint()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 

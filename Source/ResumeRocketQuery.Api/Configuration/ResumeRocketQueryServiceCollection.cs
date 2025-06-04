@@ -22,17 +22,23 @@ using ResumeRocketQuery.External;
 using Microsoft.AspNetCore.Http.Features;
 using ResumeRocketQuery.Service;
 using ResumeRocketQuery.DataLayer;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api.Configuration
 {
     public class ResumeRocketQueryServiceCollection
     {
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration = null)
         {
+            // Use the provided configuration or fall back to the default
+            var configSettings = new ResumeRocketQueryConfigurationSettings(configuration);
+
             // add AWS lambda hosting 
             services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
-            services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>();
+            //services.AddSingleton<IResumeRocketQueryConfigurationSettings, ResumeRocketQueryConfigurationSettings>(configuration);
+            services.AddSingleton<IResumeRocketQueryConfigurationSettings>(configSettings);
+
 
             services.AddSingleton<ISkillDataLayer, SkillDataLayer>();
             services.AddSingleton<IApplicationDataLayer, ApplicationDataLayer>();

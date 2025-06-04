@@ -67,6 +67,7 @@ namespace ResumeRocketQuery.DataLayer
                         firstName = accountStorage.FirstName,
                         lastName = accountStorage.LastName,
                         profilePhotoLink = accountStorage.ProfilePhotoLink,
+                        backgroundPhotoLink = accountStorage.BackgroundPhotoLink,
                         title = accountStorage.Title,
                         stateLocation = accountStorage.StateLocation,
                         portfolioLink = accountStorage.PortfolioLink,
