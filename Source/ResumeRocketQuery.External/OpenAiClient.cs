@@ -10,6 +10,7 @@ using ResumeRocketQuery.Domain.DataLayer;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using ResumeRocketQuery.Domain.Services.Repository;
+using ResumeRocketQuery.Domain.Configuration;
 
 namespace ResumeRocketQuery.External
 {
@@ -20,10 +21,12 @@ namespace ResumeRocketQuery.External
         private readonly IJobService _jobService;
         private readonly IResumeDataLayer _resumeDataLayer;
         private readonly IApplicationDataLayer _applicationDataLayer;
+        private readonly IResumeRocketQueryConfigurationSettings _resumeRocketQueryConfigurationSettings;
 
-        public OpenAiClient(IJobService jobService, IResumeDataLayer resumeDataLayer, IApplicationDataLayer applicationDataLayer)
+        public OpenAiClient(IJobService jobService, IResumeDataLayer resumeDataLayer, IApplicationDataLayer applicationDataLayer, IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
         {
-            _chatService = new OpenAIChatCompletionService("gpt-4o", "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");
+            _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
+            _chatService = new OpenAIChatCompletionService("gpt-4o", _resumeRocketQueryConfigurationSettings.OpenAI_API_Key);
             _jobService = jobService;
             _resumeDataLayer = resumeDataLayer;
             _applicationDataLayer = applicationDataLayer;
@@ -39,7 +42,7 @@ namespace ResumeRocketQuery.External
                 {
                     builder.AddOpenAIChatCompletion(
                         model, // OpenAI Model name
-                        "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"); // OpenAI API Key
+                        _resumeRocketQueryConfigurationSettings.OpenAI_API_Key); // OpenAI API Key
                     var kernel = builder.Build();
                     var result = await kernel.InvokePromptAsync(prompt, new() { ["input"] = message });
                     return result.ToString();
@@ -49,7 +52,7 @@ namespace ResumeRocketQuery.External
             return "";
         }
 
-        public async Task<string> SendMultiMessageAsync(int resumeId, int? applicationId, string prompt)
+        public async IAsyncEnumerable<string> StreamMultiMessageAsync(int resumeId, int? applicationId, string prompt)
         {
             string chatId = applicationId != null ? $"{resumeId}-{applicationId}" : $"{resumeId}";
             ChatHistory chatHistory;
@@ -89,9 +92,20 @@ namespace ResumeRocketQuery.External
             }
 
             chatHistory.AddUserMessage(prompt);
-            var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
-            chatHistory.AddAssistantMessage(response.ToString());
-            return response.ToString();
+
+            // vvv all in one way .vvv // 
+            //var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
+            //chatHistory.AddAssistantMessage(response.ToString());
+            //return response.ToString();
+
+            // streaming way: 
+            await foreach (var content in _chatService.GetStreamingChatMessageContentsAsync(chatHistory, new OpenAIPromptExecutionSettings()))
+            {
+                if (content != null)
+                {
+                    yield return content.Content;
+                }
+            }
         }
         public string GetResumeText(string html)
         {

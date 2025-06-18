@@ -10,5 +10,6 @@ namespace ResumeRocketQuery.Domain.Configuration
         string LlamaClientUrl { get; }
         string AuthenticationIssuer { get; }
         string AuthenticationAudience { get; }
+        string OpenAI_API_Key { get; }
     }
 }

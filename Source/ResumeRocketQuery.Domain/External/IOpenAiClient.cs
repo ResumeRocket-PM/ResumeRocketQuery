@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ResumeRocketQuery.Domain.External
 {
     public interface IOpenAiClient
     {
         Task<string> SendMessageAsync(string prompt, string message);
-        Task<string> SendMultiMessageAsync(int resumeId, int? applicationId, string prompt);
+        IAsyncEnumerable<string> StreamMultiMessageAsync(int resumeId, int? applicationId, string prompt);
     }
 }

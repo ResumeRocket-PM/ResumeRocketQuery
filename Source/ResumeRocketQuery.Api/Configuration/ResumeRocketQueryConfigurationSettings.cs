@@ -34,5 +34,6 @@ namespace ResumeRocketQuery.Api.Configuration
         public string ResumeRocketQueryDatabaseConnectionString => _configurationRoot.GetSection("ConnectionStrings")["ResumeRocketQueryDatabaseConnectionString"];
         public string BlobStorageConnectionString => _configurationRoot.GetSection("AzureBlobStorage")["ConnectionString"];
         public string BlobStorageContainerName => _configurationRoot.GetSection("AzureBlobStorage")["ContainerName"];
+        public string OpenAI_API_Key => _configurationRoot.GetSection("OpenAi")["API_key"];
     }
 }
