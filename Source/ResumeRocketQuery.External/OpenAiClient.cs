@@ -26,7 +26,7 @@ namespace ResumeRocketQuery.External
         public OpenAiClient(IJobService jobService, IResumeDataLayer resumeDataLayer, IApplicationDataLayer applicationDataLayer, IResumeRocketQueryConfigurationSettings resumeRocketQueryConfigurationSettings)
         {
             _resumeRocketQueryConfigurationSettings = resumeRocketQueryConfigurationSettings;
-            _chatService = new OpenAIChatCompletionService("gpt-4o", _resumeRocketQueryConfigurationSettings.OpenAI_API_Key);
+            _chatService = new OpenAIChatCompletionService("gpt-3.5-turbo", _resumeRocketQueryConfigurationSettings.OpenAI_API_Key); // this used to be using gpt-4o
             _jobService = jobService;
             _resumeDataLayer = resumeDataLayer;
             _applicationDataLayer = applicationDataLayer;
@@ -94,18 +94,18 @@ namespace ResumeRocketQuery.External
             chatHistory.AddUserMessage(prompt);
 
             // vvv all in one way .vvv // 
-            //var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
-            //chatHistory.AddAssistantMessage(response.ToString());
-            //return response.ToString();
+            var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
+            chatHistory.AddAssistantMessage(response.ToString());
+            yield return response.ToString();
 
             // streaming way: 
-            await foreach (var content in _chatService.GetStreamingChatMessageContentsAsync(chatHistory, new OpenAIPromptExecutionSettings()))
-            {
-                if (content != null)
-                {
-                    yield return content.Content;
-                }
-            }
+            //await foreach (var content in _chatService.GetStreamingChatMessageContentsAsync(chatHistory, new OpenAIPromptExecutionSettings()))
+            //{
+            //    if (content != null)
+            //    {
+            //        yield return content.Content;
+            //    }
+            //}
         }
         public string GetResumeText(string html)
         {
