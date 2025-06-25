@@ -16,6 +16,11 @@ namespace ResumeRocketQuery.Services
 
         public async Task<List<SearchResult>> SearchAsync(string searchTerm, int result)
         { 
+            if(searchTerm == "")
+            {
+                return await _searchDataLayer.GetAllUsersAsync();
+            }
+
             return await _searchDataLayer.SearchAsync(searchTerm, result);
         }
     }

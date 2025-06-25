@@ -10,16 +10,25 @@ using Microsoft.Extensions.DependencyInjection;
 using ResumeRocketQuery.Tests.Helpers;
 using Xunit;
 using ResumeRocketQuery.Domain.Api.Request;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api.Tests
 {
     public class PortfolioControllerTests
     {
         private readonly RestRequestClient _restRequestClient;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _testConfiguration;
 
         public PortfolioControllerTests()
         {
             _restRequestClient = new RestRequestClient();
+
+            _testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "ConnectionStrings:ResumeRocketQueryDatabaseConnectionString", "Server=localhost; Database=ResumeRocketTest; Trusted_Connection=True; TrustServerCertificate=True;" }
+                })
+                .Build();
         }
 
         public class Post : PortfolioControllerTests
@@ -27,7 +36,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_POST_is_called_THEN_user_is_able_to_access_endpoint()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 
@@ -71,7 +80,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_endpoint()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 

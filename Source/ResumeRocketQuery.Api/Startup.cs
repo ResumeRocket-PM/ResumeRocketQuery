@@ -6,14 +6,22 @@ using Microsoft.OpenApi.Models;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            (new ResumeRocketQueryServiceCollection()).ConfigureServices(services);
+            (new ResumeRocketQueryServiceCollection()).ConfigureServices(services, _configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

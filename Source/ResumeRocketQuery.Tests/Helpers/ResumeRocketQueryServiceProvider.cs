@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Microsoft.Extensions.Configuration;
 using ResumeRocketQuery.Tests.ResourceBuilder;
+using System.Collections.Generic;
 
 namespace ResumeRocketQuery.Tests.Helpers
 {
@@ -14,7 +15,17 @@ namespace ResumeRocketQuery.Tests.Helpers
         public IServiceProvider Create()
         {
             var container = new ServiceCollection();
-            (new ResumeRocketQueryServiceCollection()).ConfigureServices(container);
+
+            // Create a test-specific configuration
+            var testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                { "ConnectionStrings:ResumeRocketQueryDatabaseConnectionString", "Server=localhost; Database=ResumeRocketTest; Trusted_Connection=True; TrustServerCertificate=True;" }
+                })
+                .Build();
+
+            // Pass the test configuration to the service collection
+            (new ResumeRocketQueryServiceCollection()).ConfigureServices(container, testConfiguration);
 
             RegisterAll(container);
 

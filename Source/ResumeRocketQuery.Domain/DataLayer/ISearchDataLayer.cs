@@ -7,5 +7,6 @@ namespace ResumeRocketQuery.Domain.DataLayer
     public interface ISearchDataLayer
     {
         Task<List<SearchResult>> SearchAsync(string searchTerm, int resultCount);
+        Task<List<SearchResult>> GetAllUsersAsync();
     }
 }

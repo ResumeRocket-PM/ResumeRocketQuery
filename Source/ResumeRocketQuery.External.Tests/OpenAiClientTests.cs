@@ -26,7 +26,7 @@ namespace ResumeRocketQuery.Repository.Tests
 
         public class SendMessageAsync : OpenAiClientTests
         {
-            // [Fact]
+            //[Fact]
             [Fact(Skip = "Skipping to conserve API credits")]
             public async Task WHEN_SendMessageAsync_is_called_THEN_response_is_NOT_NULL()
             {
@@ -148,6 +148,22 @@ namespace ResumeRocketQuery.Repository.Tests
 
                 var result = JsonConvert.DeserializeObject<List<Change>>(json);
             }
+
+            //[Fact]
+            ////[Fact(Skip = "Skipping to conserve API credits")]
+            //public async Task WHEN_StreamMultiMessageAsync_is_called_THEN_response_is_NOT_NULL()
+            //{
+            //    var response = await _systemUnderTest.StreamMultiMessageAsync(
+            //        @"{{$input}} 
+
+            //        One line TLDR with the fewest words.",
+            //        @"
+            //        1st Law of Thermodynamics - Energy cannot be created or destroyed.
+            //        2nd Law of Thermodynamics - For a spontaneous process, the entropy of the universe increases.
+            //        3rd Law of Thermodynamics - A perfect crystal at zero Kelvin has zero entropy.");
+
+            //    Assert.True(response != null);
+            //}
         }
     }
 }

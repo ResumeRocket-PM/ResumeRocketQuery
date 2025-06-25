@@ -30,5 +30,17 @@ namespace ResumeRocketQuery.DataLayer
                 return result.ToList();
             }
         }
+
+        public async Task<List<SearchResult>> GetAllUsersAsync()
+        {
+            using (var connection = new SqlConnection(_resumeRocketQueryConfigurationSettings.ResumeRocketQueryDatabaseConnectionString))
+            {
+                var result = await connection.QueryAsync<SearchResult>(
+                    DataLayerConstants.StoredProcedures.Search.GetAllUsers,
+                    commandType: CommandType.Text);
+
+                return result.ToList();
+            }
+        }
     }
 }

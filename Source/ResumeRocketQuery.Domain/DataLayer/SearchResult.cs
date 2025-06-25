@@ -7,6 +7,7 @@ namespace ResumeRocketQuery.Domain.DataLayer
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string ProfilePhotoLink { get; set; }
+        public string BackgroundPhotoLink { get; set; }
         public string Title { get; set; }
         public string StateLocation { get; set; }
         public string PortfolioLink { get; set; }

@@ -17,6 +17,7 @@ using System.Collections.Generic;
 //using OpenQA.Selenium.DevTools.V126.Autofill;
 using System.IO;
 using System.Net.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace ResumeRocketQuery.Api.Controllers
 {
@@ -90,12 +91,25 @@ namespace ResumeRocketQuery.Api.Controllers
             return _serviceResponseBuilder.BuildServiceResponse(responseMsg, HttpStatusCode.OK);
         }
 
+        //[HttpPost]
+        //[Route("openai/aiMultipleMessage")]
+        //public async Task<ServiceResponseGeneric<string>> AiSendMultiMessageAsync([FromBody]SendAiMessage sendAiMessage)
+        //{
+        //    string responseMsg = await _openAi.SendMultiMessageAsync(sendAiMessage.resumeId, sendAiMessage.applicationId, sendAiMessage.message);
+        //    return _serviceResponseBuilder.BuildServiceResponse(responseMsg, HttpStatusCode.OK);
+        //}
+
         [HttpPost]
-        [Route("openai/aiMultipleMessage")]
-        public async Task<ServiceResponseGeneric<string>> AiSendMultiMessageAsync([FromBody]SendAiMessage sendAiMessage)
+        [Route("openai/streamAiMessage")]
+        public async Task StreamMultiMessageAsync([FromBody] SendAiMessage sendAiMessage)
         {
-            string responseMsg = await _openAi.SendMultiMessageAsync(sendAiMessage.resumeId, sendAiMessage.applicationId, sendAiMessage.message);
-            return _serviceResponseBuilder.BuildServiceResponse(responseMsg, HttpStatusCode.OK);
+            Response.ContentType = "text/event-stream";
+
+            await foreach (var chunk in _openAi.StreamMultiMessageAsync(sendAiMessage.resumeId, sendAiMessage.applicationId, sendAiMessage.message))
+            {
+                await Response.WriteAsync($"data: {chunk}\n\n");
+                await Response.Body.FlushAsync();
+            }
         }
 
         // New ping endpoint to check connectivity to Google

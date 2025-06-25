@@ -12,15 +12,25 @@ using Xunit;
 using System.Net.Http;
 using ExpectedObjects;
 using ResumeRocketQuery.Domain.Api.Request;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api.Tests
 {
     public class ProfileControllerTests
     {
         private readonly RestRequestClient _restRequestClient;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _testConfiguration;
+
         public ProfileControllerTests()
         {
             _restRequestClient = new RestRequestClient();
+
+            _testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "ConnectionStrings:ResumeRocketQueryDatabaseConnectionString", "Server=localhost; Database=ResumeRocketTest; Trusted_Connection=True; TrustServerCertificate=True;" }
+                })
+                .Build();
         }
 
         public class Get : ProfileControllerTests
@@ -28,7 +38,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task Test_profileController_Get_univeristyName()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 

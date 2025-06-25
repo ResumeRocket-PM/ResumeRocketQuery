@@ -15,16 +15,25 @@ using Microsoft.Identity.Client;
 using ResumeRocketQuery.Domain.DataLayer;
 using ResumeRocketQuery.DataLayer;
 using ResumeRocketQuery.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace ResumeRocketQuery.Api.Tests
 {
     public class ResumeControllerTests
     {
         private readonly RestRequestClient _restRequestClient;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _testConfiguration;
 
         public ResumeControllerTests()
         {
             _restRequestClient = new RestRequestClient();
+
+            _testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "ConnectionStrings:ResumeRocketQueryDatabaseConnectionString", "Server=localhost; Database=ResumeRocketTest; Trusted_Connection=True; TrustServerCertificate=True;" }
+                })
+                .Build();
         }
 
 
@@ -33,7 +42,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_application_id_WHEN_ApplyResumeSuggestions_is_called_THEN_suggestion_statuses_are_updated_successfully()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 
@@ -116,7 +125,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_resume_change_id_WHEN_ApplyResumeSuggestion_is_called_THEN_suggestion_is_applied_successfully()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 
@@ -209,7 +218,7 @@ namespace ResumeRocketQuery.Api.Tests
             [Fact]
             public async Task GIVEN_jwt_is_passed_WHEN_GET_is_called_THEN_user_is_able_to_access_resume()
             {
-                using (var selfHost = new WebApiStarter().Start(typeof(Startup)))
+                using (var selfHost = new WebApiStarter(_testConfiguration).Start(typeof(Startup)))
                 {
                     var accountService = selfHost.ServiceProvider.GetService<IAccountService>();
 

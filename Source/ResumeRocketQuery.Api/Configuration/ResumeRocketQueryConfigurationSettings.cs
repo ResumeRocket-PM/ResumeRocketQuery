@@ -9,7 +9,7 @@ namespace ResumeRocketQuery.Api.Configuration
     {
         private readonly IConfigurationRoot _configurationRoot;
 
-        public ResumeRocketQueryConfigurationSettings()
+        public ResumeRocketQueryConfigurationSettings(IConfiguration configuration = null)
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
@@ -17,6 +17,11 @@ namespace ResumeRocketQuery.Api.Configuration
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true);
+
+            if (configuration != null)
+            {
+                builder.AddConfiguration(configuration); // Add custom configuration for tests
+            }
 
             _configurationRoot = builder.Build();
         }
@@ -29,5 +34,6 @@ namespace ResumeRocketQuery.Api.Configuration
         public string ResumeRocketQueryDatabaseConnectionString => _configurationRoot.GetSection("ConnectionStrings")["ResumeRocketQueryDatabaseConnectionString"];
         public string BlobStorageConnectionString => _configurationRoot.GetSection("AzureBlobStorage")["ConnectionString"];
         public string BlobStorageContainerName => _configurationRoot.GetSection("AzureBlobStorage")["ContainerName"];
+        public string OpenAI_API_Key => _configurationRoot.GetSection("OpenAi")["API_key"];
     }
 }

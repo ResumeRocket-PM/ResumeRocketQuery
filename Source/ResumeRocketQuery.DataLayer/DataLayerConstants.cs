@@ -17,7 +17,7 @@ namespace ResumeRocketQuery.DataLayer
                     SELECT SCOPE_IDENTITY();";
 
                 public const string SelectAccount = @"
-                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId
+                    SELECT AccountId, AccountAlias, FirstName, LastName, ProfilePhotoLink, BackgroundPhotoLink, Title, StateLocation, PortfolioLink, PrimaryResumeId
                     FROM Accounts
                     WHERE AccountId = @accountID;";
 
@@ -30,6 +30,7 @@ namespace ResumeRocketQuery.DataLayer
                         FirstName = @firstName,
                         LastName = @lastName,
                         ProfilePhotoLink = @profilePhotoLink,
+                        BackgroundPhotoLink = @backgroundPhotoLink,
                         Title = @title,
                         StateLocation = @stateLocation,
                         PortfolioLink = @portfolioLink,
@@ -358,6 +359,10 @@ namespace ResumeRocketQuery.DataLayer
                     ORDER BY 1 DESC, 
 	                    CASE WHEN ProfilePhotoLink IS NULL THEN 1 ELSE 0 END,
 	                    CASE WHEN FirstName IS NULL OR LastName is null THEN 1 ELSE 0 END";
+
+                public const string GetAllUsers = @"
+                    SELECT * 
+                    FROM dbo.Accounts";
 
             }
             public class Profile
