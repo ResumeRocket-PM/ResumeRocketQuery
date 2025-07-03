@@ -11,6 +11,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using ResumeRocketQuery.Domain.Services.Repository;
 using ResumeRocketQuery.Domain.Configuration;
+using System.Text;
 
 namespace ResumeRocketQuery.External
 {
@@ -35,7 +36,7 @@ namespace ResumeRocketQuery.External
         public async Task<string> SendMessageAsync(string prompt, string message)
         {
             var builder = Kernel.CreateBuilder();
-            var models = new List<string>{"gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-4o-mini", "gpt-3.5-turbo" };
+            var models = new List<string>{"gpt-3.5-turbo" }; // old models that we don't give access to: "gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-4o-mini", 
             foreach (var model in models)
             {
                 try
@@ -78,7 +79,7 @@ namespace ResumeRocketQuery.External
                 // Initialize chat history with context
                 chatHistory = new ChatHistory(@$"
                     You are a helpful assistant that will help answer my questions related to the job and resume.
-                    If no job is provided, you will assume I am looking for a job in general. Greet me with a hello.
+                    If no job is provided, you will assume I am looking for a job in general.
 
                     Resume:
                     {resume}
@@ -94,24 +95,51 @@ namespace ResumeRocketQuery.External
             chatHistory.AddUserMessage(prompt);
 
             // vvv all in one way .vvv // 
-            var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
-            chatHistory.AddAssistantMessage(response.ToString());
-            yield return response.ToString();
+            //var response = await _chatService.GetChatMessageContentAsync(chatHistory, new OpenAIPromptExecutionSettings());
+            //chatHistory.AddAssistantMessage(response.ToString());
+            //yield return response.ToString();
 
             // streaming way: 
-            //await foreach (var content in _chatService.GetStreamingChatMessageContentsAsync(chatHistory, new OpenAIPromptExecutionSettings()))
-            //{
-            //    if (content != null)
-            //    {
-            //        yield return content.Content;
-            //    }
-            //}
+            await foreach (var content in _chatService.GetStreamingChatMessageContentsAsync(chatHistory, new OpenAIPromptExecutionSettings()))
+            {
+                if (content != null)
+                {
+                    yield return content.Content;
+                }
+            }
         }
         public string GetResumeText(string html)
         {
-            var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
-            var text = new Regex("<.*?>").Replace(extract, "");
-            return text;
+            // VVV this way was only getting the first page VVV
+
+            //var extract = new Regex("<div class=\"c x[0-9] y[0-9] w[0-9] h[0-9]\"><div class=\"t m[0-9] x[0-9] h[0-9] y[0-9] ff[0-9] fs[0-9] fc[0-9] sc[0-9] ls[0-9] ws[0-9]\">(.*)</div></div>").Match(html).Groups[1].Value;
+            //var text = new Regex("<.*?>").Replace(extract, "");
+            //return text;
+
+
+            // Match all divs that contain resume text content
+            var matches = Regex.Matches(
+                html,
+                "<div class=\"t m\\d+ x\\d+ h\\d+ y\\w+ ff\\d+ fs\\d+ fc\\d+ sc\\d+ ls\\d+ ws\\d+\">(.*?)</div>",
+                RegexOptions.Singleline
+            );
+
+            var sb = new StringBuilder();
+
+            foreach (Match match in matches)
+            {
+                string line = match.Groups[1].Value;
+
+                // Remove any internal tags like <span> within the line
+                line = Regex.Replace(line, "<.*?>", string.Empty);
+
+                // Decode HTML entities if needed
+                line = System.Net.WebUtility.HtmlDecode(line);
+
+                sb.AppendLine(line.Trim());
+            }
+
+            return sb.ToString().Trim();
         }
     }
 }

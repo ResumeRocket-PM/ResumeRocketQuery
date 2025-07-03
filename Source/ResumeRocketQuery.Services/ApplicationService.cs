@@ -10,6 +10,7 @@ using ResumeRocketQuery.Domain.Services.Repository;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace ResumeRocketQuery.Services
 {
@@ -358,9 +359,14 @@ namespace ResumeRocketQuery.Services
             string[] lines = input.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length > 2)
             {
-                var jsonResult = string.Join(Environment.NewLine, lines[1..^1]);
+                var jsonResult = "{" + string.Join(Environment.NewLine, lines[1..^1]) + "}";
 
-                result = JsonConvert.DeserializeObject<List<Change>>(jsonResult);
+                var jObject = JObject.Parse(jsonResult);
+                var items = jObject["items"];
+                if (items != null)
+                {
+                    result = items.ToObject<List<Change>>();
+                }
             }
 
             return result;

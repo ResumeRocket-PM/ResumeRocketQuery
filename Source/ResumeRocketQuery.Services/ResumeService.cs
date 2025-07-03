@@ -264,7 +264,8 @@ namespace ResumeRocketQuery.Services
             string[] lines = input.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length > 2)
             {
-                var jsonResult = string.Join(Environment.NewLine, lines[1..^1]);
+                //var jsonResult = string.Join(Environment.NewLine, lines[1..^1]);
+                var jsonResult = "{" + string.Join(Environment.NewLine, lines[1..^1]) + "}";
 
                 result = JsonConvert.DeserializeObject<AccountDetails>(jsonResult);
             }
