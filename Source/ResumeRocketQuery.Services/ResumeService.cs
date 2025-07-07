@@ -223,7 +223,7 @@ namespace ResumeRocketQuery.Services
                     Additional steps:
                     1) If only a partial date is given, such as only Month/Year, put the day component to the start of the month. Example: 6/2017 should be 6/1/2017.
                     2) Skills should be a short Keyword, and only a Keyword pulled from the resume. Limit it to 10 separate keywords total.
-                    3) The Experience objects should only be populated from Professional Career experience.
+                    3) The Experience objects (there may be multiple) should only be populated from Professional Career/ Experience. Remember to include all bullet points in the description of the experience.
                     4) If a current job title isn't present, provide a title that conveys the intended job the user is looking to seek based on the resume.
                     4) Return only a Json Object. 
 
