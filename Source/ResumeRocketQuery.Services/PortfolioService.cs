@@ -32,8 +32,8 @@ namespace ResumeRocketQuery.Services
                     Configuration = portfolio.Configuration,
                 });
 
-                //string portfolioLink = $"https://resume-rocket.net/{result}/portfolio"; // for deployment
-                string portfolioLink = $"http://localhost:5174/{result}/portfolio"; // temporary / dev
+                string portfolioLink = $"https://resume-rocket.online/{result}/portfolio"; // for deployment
+                //string portfolioLink = $"http://localhost:5174/{result}/portfolio"; // temporary / dev
 
 
                 Dictionary<string, string> updates = new Dictionary<string, string>
